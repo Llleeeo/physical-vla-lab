@@ -16,6 +16,8 @@ Task: `grasp_wind_driven_motion_1s1p_hgprgew`.
 - A temporary TLS interruption delayed cloud downloads after upload had succeeded; sync-only resumption completed delivery without rerendering.
 - Manual quality/visibility review, ball-task action conversion and training remain pending; no held-out split is claimed yet. See the [render-completion evidence](../../results/summaries/2026-10-28-render-complete.json).
 
+A [descriptive quality screen](QUALITY_SCREEN.md) now covers all 40 episodes, with nine event sheets spot-checked. It finds mixed source-group advantages, frequent wrist-view truncation and one substep contact-alternation case requiring review. No source-based training weight or success label has been changed.
+
 A 40/619 collection ratio describes this adaptive development collection only. It is neither a policy success rate nor an unbiased estimate of a frozen expert's generalization.
 
 ## Earlier DynamicVLA integration: irregular egg-object task

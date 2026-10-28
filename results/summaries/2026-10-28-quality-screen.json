@@ -1,0 +1,249 @@
+{
+  "schema": "physical-vla-lab.quality-screen.v1",
+  "date": "2026-10-28",
+  "timezone": "Asia/Hong_Kong",
+  "task_id": "grasp_wind_driven_motion_1s1p_hgprgew",
+  "episodes_by_source": {
+    "local": 21,
+    "hongtao": 19
+  },
+  "source_report_sha256": "6edd36e5bf79883a984b15e129fcb99d05fe93154775013ba591416981eb3fed",
+  "spot_review_sha256": "4e0d2cc0a7cbc0d49c8d3a8f4cad423a514f314fe5b1663b50d3cbb36d56d012",
+  "group_comparison": {
+    "tail_relative_center_jitter_p95_mm": {
+      "local": {
+        "n": 21,
+        "median": 0.2660769363802938,
+        "q25": 0.11219375207882176,
+        "q75": 0.5840687626004943,
+        "min": 0.01208427850943807,
+        "max": 3.0722547454922755
+      },
+      "hongtao": {
+        "n": 19,
+        "median": 0.40178648161372715,
+        "q25": 0.145750217756939,
+        "q75": 3.374875291767654,
+        "min": 0.04316839476376276,
+        "max": 4.476393876904813
+      },
+      "local_minus_hongtao_median": {
+        "observed": -0.13570954523343337,
+        "exploratory_bootstrap_95_interval": [
+          -3.1068787054280875,
+          0.2536337764144322
+        ],
+        "interpretation": "Unpaired selected-success groups; descriptive, not a causal test or a quality ranking."
+      }
+    },
+    "lift_to_final_relative_center_shift_mm": {
+      "local": {
+        "n": 21,
+        "median": 4.04135500709535,
+        "q25": 1.4481806258935286,
+        "q75": 5.88764952195742,
+        "min": 0.17834317796746177,
+        "max": 16.682096464692968
+      },
+      "hongtao": {
+        "n": 19,
+        "median": 2.3284633353697317,
+        "q25": 1.8494390355115147,
+        "q75": 9.640597645541519,
+        "min": 0.6845348244911904,
+        "max": 12.276417761728649
+      },
+      "local_minus_hongtao_median": {
+        "observed": 1.7128916717256186,
+        "exploratory_bootstrap_95_interval": [
+          -5.263900897959969,
+          3.5335050569806126
+        ],
+        "interpretation": "Unpaired selected-success groups; descriptive, not a causal test or a quality ranking."
+      }
+    },
+    "minimum_tail_lift_from_first_bilateral_mm": {
+      "local": {
+        "n": 21,
+        "median": 52.37926542758942,
+        "q25": 52.009351551532745,
+        "q75": 52.74422839283943,
+        "min": 51.671477034687996,
+        "max": 55.12485094368458
+      },
+      "hongtao": {
+        "n": 19,
+        "median": 52.28805914521217,
+        "q25": 52.141519263386726,
+        "q75": 52.41971928626299,
+        "min": 51.88898555934429,
+        "max": 52.99259163439274
+      },
+      "local_minus_hongtao_median": {
+        "observed": 0.09120628237724304,
+        "exploratory_bootstrap_95_interval": [
+          -0.22346526384353638,
+          0.40872208774089813
+        ],
+        "interpretation": "Unpaired selected-success groups; descriptive, not a causal test or a quality ranking."
+      }
+    },
+    "tail_relative_speed_p95_mps": {
+      "local": {
+        "n": 21,
+        "median": 0.014746134093854637,
+        "q25": 0.010817568433957071,
+        "q75": 0.030975920398278442,
+        "min": 0.0036558401742031667,
+        "max": 0.37965274375278574
+      },
+      "hongtao": {
+        "n": 19,
+        "median": 0.014619490339222677,
+        "q25": 0.00868337781142527,
+        "q75": 0.018200457278950456,
+        "min": 0.003573484410698172,
+        "max": 0.021939001737277107
+      },
+      "local_minus_hongtao_median": {
+        "observed": 0.0001266437546319603,
+        "exploratory_bootstrap_95_interval": [
+          -0.005410246892975458,
+          0.018497194576620496
+        ],
+        "interpretation": "Unpaired selected-success groups; descriptive, not a causal test or a quality ranking."
+      }
+    },
+    "raw_longest_bilateral_duration_s": {
+      "local": {
+        "n": 21,
+        "median": 1.8611111561767757,
+        "q25": 1.761111153755337,
+        "q75": 1.9555556029081345,
+        "min": 0.03888888983055949,
+        "max": 2.6222222857177258
+      },
+      "hongtao": {
+        "n": 19,
+        "median": 1.7833333765156567,
+        "q25": 1.6972222633194178,
+        "q75": 1.8777778232470155,
+        "min": 1.4722222578711808,
+        "max": 2.1222222736105323
+      },
+      "local_minus_hongtao_median": {
+        "observed": 0.07777777966111898,
+        "exploratory_bootstrap_95_interval": [
+          -0.06666666828095913,
+          0.19444444915279746
+        ],
+        "interpretation": "Unpaired selected-success groups; descriptive, not a causal test or a quality ranking."
+      }
+    },
+    "precontact_ee_acceleration_p95_mps2": {
+      "local": {
+        "n": 21,
+        "median": 7.877090166532018,
+        "q25": 7.732474886693635,
+        "q75": 7.923024127027706,
+        "min": 7.453855806988893,
+        "max": 7.974501322171046
+      },
+      "hongtao": {
+        "n": 19,
+        "median": 7.755207623264394,
+        "q25": 7.286262901986934,
+        "q75": 7.857753448658477,
+        "min": 6.312699572353591,
+        "max": 7.962044444948278
+      },
+      "local_minus_hongtao_median": {
+        "observed": 0.12188254326762404,
+        "exploratory_bootstrap_95_interval": [
+          -0.03538426245827608,
+          0.5890416308785404
+        ],
+        "interpretation": "Unpaired selected-success groups; descriptive, not a causal test or a quality ranking."
+      }
+    }
+  },
+  "visibility_samples_by_source": {
+    "local": {
+      "opst_cam": {
+        "samples": 210,
+        "zero_target_mask": 0,
+        "target_touches_image_edge": 0
+      },
+      "side_left_cam": {
+        "samples": 210,
+        "zero_target_mask": 0,
+        "target_touches_image_edge": 0
+      },
+      "side_right_cam": {
+        "samples": 210,
+        "zero_target_mask": 0,
+        "target_touches_image_edge": 0
+      },
+      "overhead_cam": {
+        "samples": 210,
+        "zero_target_mask": 136,
+        "target_touches_image_edge": 0
+      },
+      "wrist_cam": {
+        "samples": 210,
+        "zero_target_mask": 0,
+        "target_touches_image_edge": 203
+      }
+    },
+    "hongtao": {
+      "opst_cam": {
+        "samples": 190,
+        "zero_target_mask": 0,
+        "target_touches_image_edge": 0
+      },
+      "side_left_cam": {
+        "samples": 190,
+        "zero_target_mask": 0,
+        "target_touches_image_edge": 0
+      },
+      "side_right_cam": {
+        "samples": 190,
+        "zero_target_mask": 0,
+        "target_touches_image_edge": 0
+      },
+      "overhead_cam": {
+        "samples": 190,
+        "zero_target_mask": 87,
+        "target_touches_image_edge": 0
+      },
+      "wrist_cam": {
+        "samples": 190,
+        "zero_target_mask": 0,
+        "target_touches_image_edge": 152
+      }
+    }
+  },
+  "multi_lift_episodes_by_source": {
+    "local": 5,
+    "hongtao": 1
+  },
+  "all_40_final_control_bins_have_both_fingers_contacting_within_bin": true,
+  "physical_tick_alternation_review_case": {
+    "host": "local",
+    "episode": "traj_00019",
+    "tail_simultaneous_bilateral_fraction": 0.0,
+    "tail_control_bin_bilateral_fraction": 1.0,
+    "tail_relative_speed_p95_mps": 0.37965274375278574,
+    "interpretation": "Alternating contact and unusually high recorded relative speed; requires inspection, not automatically a failed grasp."
+  },
+  "event_sheets_spot_reviewed": 9,
+  "full_visual_review_complete": false,
+  "automatically_excluded_episodes": 0,
+  "sampling_weights_changed": false,
+  "recommendation": "Retain both groups; establish uniform episode sampling first. Defer reweighting until visual review and fixed-budget closed-loop comparison.",
+  "limits": [
+    "Local and remote have distinct base seeds and 2 mm vs 0 mm depth bias; selected outcomes cannot identify the bias's causal effect.",
+    "Bootstrap intervals are exploratory descriptions across episodes, not multiplicity-adjusted hypothesis tests.",
+    "No automatic exclusions, split assignment or sampling-weight changes."
+  ]
+}

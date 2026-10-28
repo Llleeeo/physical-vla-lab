@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Descriptive trajectory-quality screen
+
+- Added independent CPU metrics for rotating-hand retention, recorded relative velocity, physical-substep versus control-bin contact and sampled target visibility; generated per-episode review sheets and video links for all 40 episodes.
+- Recorded mixed source-group differences, 355/400 wrist samples touching the image edge, and the local traj_00019 contact-alternation/velocity case. No automatic exclusions, training-weight changes or causal depth-bias claim.
+- Added 11 focused regressions and documented nine event-sheet spot checks separately from incomplete full-video review.
+
 ## 2026-10-28 — Full ball-cohort rendering and delivery verified
 
 - All 40 camera-v2 episodes (21 main, 19 remote; 12,154 frames) passed the CPU audit for source identity, render completeness and exact 60 Hz frame/time alignment.
