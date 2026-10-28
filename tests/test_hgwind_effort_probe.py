@@ -258,3 +258,39 @@ def test_reference_clock_held_positions_do_not_describe_supplied_nonzero_velocit
 
 def test_reference_clock_invalid_timing_is_rejected():
     with pytest.raises(ValueError):clock_module().position_velocity_consistency(np.zeros((3,2)),np.zeros((3,2)),0)
+
+
+def test_partial_native_branch_is_verified_before_final_rejected_effort():
+    tag={'native_pose_command_count':132}
+    assert probe.controller_branch_verified('native-pose',393,394,132,tag,True)
+    assert not probe.controller_branch_verified('native-pose',393,394,132,tag,False)
+    assert not probe.controller_branch_verified('native-pose',393,395,132,tag,True)
+
+
+def test_original_expert_can_use_osc_for_only_some_control_phases():
+    tag={'original_expert_used':True,'segment_trace_count':209}
+    assert probe.controller_branch_verified('native-expert',627,582,209,tag,False)
+    assert not probe.controller_branch_verified('native-expert',627,628,209,tag,False)
+
+
+def test_original_trace_copies_inputs_without_changing_commands(tmp_path,monkeypatch):
+    from capstone_vla import hgwind_expert_trace as trace
+    state={'plan':{'output':str(tmp_path),'schema':'test','source_reference_sha256':'source','original_depth_bias_m':.002},'rows':[],'assistance':[],'joints':[]}
+    monkeypatch.setattr(trace,'_STATE',state)
+    target=np.arange(9,dtype=float);original=target.copy();segment={'goal_position':target[:7],'goal_velocity':np.zeros(7),'operational_space_reference':{'jacobian':np.eye(6,7)},'policy_joint_velocity_limit':None,'duration_s':1/60,'episode_time_s':0.}
+    trace.record_segment(0,segment,target,np.zeros(9),np.zeros(9),None,'robot',[],{})
+    np.testing.assert_array_equal(target,original);target[0]=99
+    assert state['rows'][0]['target'][0]==0
+    result=trace.summary(None);assert result['original_expert_used'] and not result['saved_commands_own_motors']
+    assert (tmp_path/'original_expert_control_references.json').is_file()
+
+
+def test_original_trace_rejects_unknown_frozen_source():
+    from capstone_vla import hgwind_expert_trace as trace
+    with pytest.raises(ValueError):trace.patch_collector('unrelated=1')
+    with pytest.raises(ValueError):trace.patch_profile_wrapper('unrelated=1')
+
+
+def test_original_expert_source_validation_does_not_require_saved_action_execution():
+    p,m,a,t=source();p.update(tracking='native-expert',reference='online-expert')
+    probe.validate_source(p,m,a,t)

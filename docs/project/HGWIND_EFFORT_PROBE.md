@@ -4,7 +4,7 @@
 
 The wind-driven-ball recordings use `operational_space_inverse_dynamics_effort`. The earlier egg-task position-drive probe does not establish compatibility with them. This diagnostic first executes saved joint commands through the frozen RoboPhys effort pipeline, then permits a Cartesian/IK comparison using the same executor.
 
-The first saved-target physical probe aborted during its 109th control interval. Recorded-motion joint tracking then completed 208 intervals safely, briefly held and lifted the ball, but lost it before the end. The constructed task-space comparison completed but performed worse. CPU endpoint-semantics checks identify an incompatible interpretation of its inputs; a native outer-pose-servo adapter is prepared for the next physical check. No ball-task training or learned-policy result is claimed.
+The first saved-target physical probe aborted during its 109th control interval. Recorded-motion joint tracking then completed 208 intervals safely, briefly held and lifted the ball, but lost it before the end. The constructed task-space comparison completed but performed worse. CPU endpoint-semantics checks identify an incompatible interpretation of its inputs; the native outer-pose-servo adapter subsequently aborted after contact. A trace-only original-expert reference is prepared for the next physical check. No ball-task training or learned-policy result is claimed.
 
 ## Execution and recording boundary
 
@@ -112,3 +112,20 @@ data/derived/hf_pilot_render_repo/.venv/bin/python \
 The new branch passes CPU adapter tests and real-data preflight; its physical outcome remains pending. The earlier `task-space` branch is retained for provenance and is not the recommended continuation. Original source episodes and upstream code are unchanged.
 
 Native-pose runs additionally save each returned OSC-reference dictionary alongside waypoint/twist inputs in `native_pose_references.json`, and the actual requested q/qdot in `command_diagnostics.npz`. This avoids repeating the earlier omission of the paired reference signals. These local diagnostic records are not published or declared training data.
+
+## Native-pose contact abort and original-expert reference
+
+The native-pose run completed 131 intervals and recorded the start of interval 132. It had five positive right-finger/ball contact reports from approximately 2.1667 to 2.1889 s and no bilateral grasp. Measured joint 5 velocity then reached 2.674532 rad/s against a 2.61 rad/s limit. Returning below the limit in one 1/180 s step requires acceleration at most -11.61579 rad/s², while the current acceleration/jerk constraints permit no value below -7.07415 rad/s². The intervals do not intersect. Even the strongest permitted braking yields about 2.63523 rad/s next step. This establishes why the final command was rejected, not a complete causal diagnosis of the approach/contact error. Constraints remain unchanged.
+
+The original report incorrectly marked the native branch unverified because it compared 394 OSC calls with 393 completed callbacks. The native code increments the OSC counter before final effort feasibility. The last calculation was rejected before physics completion. The analyzer now permits exactly one such extra attempt only for an aborted run and reports completed-interval cadence separately; full episode/grasp gates still fail. The previous report is retained locally.
+
+The next reference restores original online expert command generation instead of feeding any saved or converted command array. `--tracking native-expert` reuses the frozen collection worker and frozen `smooth_lift_v1` profile, plus the existing separately deployed depth helper at the source's 0.002 m setting. The profile wrapper, depth helper, worker and local trace adapter are hashed. Base seed 202610280, attempt index 43, variation, physics scene and physical grasp mode are retained. This asks for one fresh attempt, not a guaranteed reproduction of the source episode; initial states, the newly observed result and trajectory differences are checked afterward.
+
+```bash
+data/derived/hf_pilot_render_repo/.venv/bin/python \
+  scripts/run_hgwind_effort_probe.py --tracking native-expert --run
+```
+
+The time budget is the original 12 simulated seconds (720 control steps maximum), with normal early completion after verified success. The old source episode's 208-transition replay budget does not truncate this online attempt. No new target, speed, friction, contact-recovery or limit parameter is introduced. Native target q/qdot, pending OSC reference and policy limits are copied at each actual command segment into `original_expert_control_references.json`; tracing does not modify them. Physical assistance is separately checked.
+
+`scripts/sim/run_hgwind_native_expert_worker.py` assembles the original wrappers in memory. `src/capstone_vla/hgwind_expert_trace.py` only copies logs and adds metadata. The report separates `native_expert_reference_passed` from all converted-action and learned-policy gates. A successful original expert reference would support the original execution setup and provide the missing command log; it would not validate the conversion or DynamicVLA. A failed reference requires investigating original-expert/environment reproducibility before further adapter tuning. Original code and the 40 development episodes remain unchanged.

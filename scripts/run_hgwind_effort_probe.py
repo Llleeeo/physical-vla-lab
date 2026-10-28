@@ -25,7 +25,7 @@ from capstone_vla.recorded_franka import RecordedFrankaAdapter
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--mode',choices=('joint','cartesian'),default='joint')
-    parser.add_argument('--tracking',choices=('joint','task-space','native-pose'),default='joint')
+    parser.add_argument('--tracking',choices=('joint','task-space','native-pose','native-expert'),default='joint')
     parser.add_argument('--reference',choices=('saved-targets','recorded-motion'),default='saved-targets')
     parser.add_argument('--host',choices=('local','hongtao'),default='local')
     parser.add_argument('--episode',default='traj_00000')
@@ -50,17 +50,33 @@ def main():
     require(args.reference!='recorded-motion' or args.mode=='joint','Recorded-motion is a separate joint-tracking diagnostic; Cartesian support is not implemented')
     n=len(reference_actions) if args.frames==0 else args.frames;require(n<=len(reference_actions),'Smoke length exceeds source')
     stamp=datetime.now(ZoneInfo('Asia/Hong_Kong')).strftime('%Y%m%d_%H%M%S_%f')
-    output=ROOT/'data/derived/hgwind_effort_probes'/(stamp+'_'+args.mode+'_'+args.reference+'_'+args.tracking)
+    output=ROOT/'data/derived/hgwind_effort_probes'/(stamp+'_'+args.mode+'_'+('online-expert' if args.tracking=='native-expert' else args.reference)+'_'+args.tracking)
     plan={'schema':'physical-vla-lab.hgwind-effort-probe.v1','mode':args.mode,'host':args.host,'episode':args.episode,
           'tracking':args.tracking,'reference':args.reference,'reference_frames':len(reference_actions),'frames':n,'source_frames':len(actions),'source':str(source),'source_files':row['files'],'source_reference_sha256':sha256(source),
           'task':cohort['task_usd'],'task_sha256':cohort['task_sha256'],'physics_sha256':cohort['physics_sha256'],
           'worker':str(worker),'worker_sha256':sha256(worker),'patch_sha256':hashlib.sha256(patched.encode()).hexdigest(),
           'bundle_manifest':str(bundle_manifest),'bundle_manifest_sha256':cohort['bundle_manifest_sha256'],
-          'adapter_sha256':{name:sha256(ROOT/name) for name in ['src/capstone_vla/hgwind_effort_probe.py','src/capstone_vla/recorded_franka.py','src/capstone_vla/franka.py','scripts/sim/run_hgwind_effort_probe_worker.py']},
+          'adapter_sha256':{name:sha256(ROOT/name) for name in ['src/capstone_vla/hgwind_effort_probe.py','src/capstone_vla/recorded_franka.py','src/capstone_vla/franka.py','scripts/sim/run_hgwind_effort_probe_worker.py','src/capstone_vla/task2_bridge.py']},
           'controller_config':str(cfg_path),'controller_config_sha256':sha256(cfg_path),'urdf_sha256':adapter.urdf_sha256,
           'output':str(output),'worker_output':str(output/'worker_output'),'seed':meta['base_seed'],'attempt_offset':meta['attempt_index'],
           'reference_fidelity':args.tracking+' tracking through the existing effort feasibility/limit pipeline; original expert operational references are not reconstructed.',
           'baseline_run':str(args.baseline_run.resolve()) if args.baseline_run else None,'training_eligible':False}
+    if args.tracking=='native-expert':
+        require(args.mode=='joint' and args.reference=='saved-targets' and args.frames==0,'Native expert uses its online commands and full 12 s attempt budget')
+        require(meta['capstone_expert_control']['profile']=='smooth_lift_v1','Original profile is not the frozen smooth-lift configuration')
+        from capstone_vla.hgwind_expert_trace import patch_collector,patch_profile_wrapper
+        bundle=Path(cohort['bundle']);wrapper=bundle/'scripts/sim/collect_hgwind_worker.py'
+        patch_profile_wrapper(wrapper.read_text())
+        original_text=worker.read_text();anchor='"skill_terminations": _jsonify(skill_terminations),'
+        require(original_text.count(anchor)==1,'Original profile metadata insertion changed')
+        original_text=original_text.replace(anchor,anchor+'\n            "capstone_expert_control": CAPSTONE_PROFILE_SUMMARY(pol),')
+        patched=patch_collector(original_text)
+        plan.update(reference='online-expert',reference_frames=720,frames=720,patch_sha256=hashlib.sha256(patched.encode()).hexdigest(),
+            original_profile_wrapper=str(wrapper),original_depth_helper=str(ROOT/'scripts/run_hgwind_depth_worker.py'),original_depth_bias_m=meta['capstone_expert_control']['depth_bias']['requested_downward_goal_bias_m'],
+            reference_fidelity='Fresh frozen online expert with source smooth-lift/depth profile; saved source actions are not executed.')
+        require(0<=plan['original_depth_bias_m']<=.002,'Unexpected original depth profile')
+        for path in [ROOT/'src/capstone_vla/hgwind_expert_trace.py',ROOT/'scripts/sim/run_hgwind_native_expert_worker.py',wrapper,ROOT/'scripts/run_hgwind_depth_worker.py',bundle/'src/capstone_vla/hgwind_control.py']:
+            plan['adapter_sha256'][str(path)]=sha256(path)
     validate_source(plan,meta,actions,times)
     if args.mode=='cartesian':
         require(args.baseline_run is not None,'First run/inspect the joint baseline; provide --baseline-run for Cartesian')
@@ -83,7 +99,12 @@ def main():
              '--keep_failed','--run_id','hgwind_effort_probe_'+stamp,'--device','cuda:0','--headless','--no-visualization','--fast_exit_after_save',
              '--experience','isaacsim.exp.base.python.kit',
              '--kit_args=--portable-root '+str(ROOT/'data/derived/.cache/isaacsim/linux')+' --/renderer/multiGpu/autoEnable=false --/renderer/multiGpu/enabled=false --/renderer/multiGpu/maxGpuCount=1 --/app/extensions/fsWatcherEnabled=false']
-    print(f'CPU_PREFLIGHT_OK mode={args.mode} reference={args.reference} source={args.host}/{args.episode} frames={n} effort_pipeline=true primary_tracking={args.tracking} exact_state_replay=false',flush=True)
+    if args.tracking=='native-expert':
+        command[2]=str(ROOT/'scripts/sim/run_hgwind_native_expert_worker.py')
+        i=command.index('--repair-action-reference');del command[i:i+2]
+        command.extend(['--episode_s','12','--no-expert-config'])
+        n=plan['frames']
+    print(f'CPU_PREFLIGHT_OK mode={args.mode} reference={plan['reference']} source={args.host}/{args.episode} frames={n} effort_pipeline=true primary_tracking={args.tracking} exact_state_replay=false',flush=True)
     print('REFERENCE_LIMIT '+plan['reference_fidelity'],flush=True);print('OUTPUT '+str(output),flush=True);print('COMMAND '+shlex.join(command),flush=True)
     if not args.run:print('DRY_RUN_ONLY: add --run');return 0
     output.mkdir(parents=True,exist_ok=False);(output/'plan.json').write_text(json.dumps(plan,indent=2)+'\n')

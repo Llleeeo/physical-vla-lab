@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Native-pose contact abort; original expert reference prepared
+
+- Recorded a joint-5 overspeed/contact sequence and an empty acceleration/jerk/braking intersection. Constraints remain unchanged; full failure causality is not established.
+- Corrected partial-run branch verification: 394 attempted OSC commands include the final rejected calculation; 393 callbacks / 131 intervals completed. Full success gates remain false.
+- Added trace-only instrumentation around the frozen original expert profile and existing 2 mm depth helper for one fresh seeded reference attempt. Five regressions added; 98 portable CPU checks pass. New simulation pending.
+
 ## 2026-10-28 — Reject constructed task reference; reuse native pose servo
 
 - The constructed OSC probe completed safely but had no bilateral grasp and worse pose tracking than joint tracking. Preserved both outcomes.

@@ -1,0 +1,63 @@
+{
+  "schema": "physical-vla-lab.hgwind-native-pose-abort.v1",
+  "date": "2026-10-28",
+  "status": "NATIVE_POSE_CONTACT_AND_INFEASIBLE_BRAKING",
+  "source_sha256": "e1b54faae644b64f8148b0fe0397d74287f06d7c48fa97ee34a054339a72e3d3",
+  "recorded_frames": 132,
+  "completed_intervals": 131,
+  "completed_callbacks": 393,
+  "attempted_osc_commands": 394,
+  "tracking_branch_verified_after_counter_correction": true,
+  "initial_state_match": true,
+  "runtime_safety_passed": false,
+  "bilateral_control_bins": 0,
+  "infeasible_axis": {
+    "joint": "panda_joint5",
+    "measured_velocity_rad_s": 2.674532175064087,
+    "hard_velocity_limit_rad_s": 2.61,
+    "overspeed_percent": 2.472497128892215,
+    "physics_dt_s": 0.005555555555555556,
+    "required_acceleration_upper_rad_s2": -11.615791230266403,
+    "allowed_acceleration_lower_rad_s2": -7.074149471717625,
+    "minimum_possible_next_velocity_rad_s": 2.6352313446656557
+  },
+  "positive_contact_evidence": {
+    "body": "panda_rightfinger",
+    "target": "ball_y9bssvn",
+    "first_time_s": 2.1666667,
+    "last_time_s": 2.1888889,
+    "sampled_positive_contact_steps": 5,
+    "impulse_norm_ns": [
+      0.18142,
+      0.131888,
+      0.220319,
+      0.207787,
+      0.445478
+    ]
+  },
+  "original_source_control": {
+    "profile": "smooth_lift_v1",
+    "depth_bias_m": 0.002,
+    "base_seed": 202610280,
+    "attempt_index": 43
+  },
+  "next_reference": {
+    "tracking": "native-expert",
+    "command_arrays_replayed": false,
+    "motor_commands_overridden": false,
+    "control_log_only_instrumentation": true,
+    "simulation_attempts": 1,
+    "maximum_simulated_duration_s": 12,
+    "simulation_started": false,
+    "portable_cpu_tests_passed": 98
+  },
+  "report_sha256": "8257b85e9c0af01592f41913fe36387309c6df25f48c6b71bd6ee42d384f5314",
+  "log_sha256": "b0589f09e10905ab3afb1691ea0860749b3eadc7d101e818aa496516aa516c36",
+  "limitations": [
+    "The acceleration interval contradiction proves infeasibility at the saved state; it does not isolate the entire trajectory failure cause.",
+    "Positive contact preceded the velocity increase; exclusive causal attribution to contact is not established.",
+    "OSC counts increment before final feasibility; the final rejected command must not be counted as a completed physics update.",
+    "The native expert reference will use privileged expert inputs and cannot count as a VLA result.",
+    "Existing source data are preserved; no new controller limits or thresholds are introduced."
+  ]
+}

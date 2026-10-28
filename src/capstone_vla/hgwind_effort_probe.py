@@ -24,7 +24,7 @@ _STATE = {}
 def validate_source(plan, metadata, actions, times):
     require(plan['schema']=='physical-vla-lab.hgwind-effort-probe.v1','Unknown probe manifest')
     require(plan['mode'] in ('joint','cartesian'),'Unknown probe mode')
-    require(plan.get('tracking','joint') in ('joint','task-space','native-pose'),'Unknown tracking branch')
+    require(plan.get('tracking','joint') in ('joint','task-space','native-pose','native-expert'),'Unknown tracking branch')
     require(plan.get('tracking','joint') not in ('task-space','native-pose') or (plan.get('reference')=='recorded-motion' and plan['mode']=='joint'),'Task-space tracking requires recorded-motion joint goals')
     steps=metadata.get('task_plan',{}).get('steps',[])
     require(metadata.get('task',{}).get('id')==TASK_ID and len(steps)==1
@@ -286,3 +286,14 @@ def initial_state_differences(source, current, source_paths, current_paths):
     a=np.asarray(source['object_quat']);b=np.asarray(current['object_quat'])[order]
     result['object_quaternion_sign_invariant_max']=float(np.max(np.minimum(np.linalg.norm(a-b,axis=-1),np.linalg.norm(a+b,axis=-1))))
     return result
+
+
+def controller_branch_verified(tracking,completed_callbacks,osc_attempts,command_frames,tag,aborted):
+    """OSC counts before final feasibility, completed callbacks after it."""
+    allowed={completed_callbacks}
+    if aborted:allowed.add(completed_callbacks+1)
+    if tracking=='joint':return osc_attempts==0
+    if tracking=='task-space':return osc_attempts in allowed and tag.get('task_reference_callback_count')==osc_attempts
+    if tracking=='native-pose':return osc_attempts in allowed and tag.get('native_pose_command_count')==command_frames
+    if tracking=='native-expert':return bool(tag.get('original_expert_used') and tag.get('segment_trace_count')==command_frames and 0<=osc_attempts<=max(allowed))
+    return False

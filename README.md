@@ -17,7 +17,7 @@ This is an independent research integration, not the upstream RoboPhys benchmark
 | Physical generalization | Evaluation questions and failure-analysis workflow defined | Independent held-out physical conditions and systematic experiments |
 | UR10e | Later-stage research direction | Embodiment adaptation, simulation validation and supervised hardware experiments |
 
-The 40 ball episodes are **expert development data, not 40 VLA successes**. No disturbance-robustness improvement or sim-to-real transfer is claimed. The [effort-control probes](docs/project/HGWIND_EFFORT_PROBE.md) exposed an action-reference mismatch: recorded-motion joint tracking runs safely but loses the ball during lift. A constructed task-space reference performed worse; endpoint semantics were audited and an adapter to the native RoboPhys pose servo now awaits simulation. See [results and limitations](docs/project/RESULTS.md).
+The 40 ball episodes are **expert development data, not 40 VLA successes**. No disturbance-robustness improvement or sim-to-real transfer is claimed. The [effort-control probes](docs/project/HGWIND_EFFORT_PROBE.md) exposed an action-reference mismatch: recorded-motion joint tracking runs safely but loses the ball during lift. A constructed task-space reference performed worse; endpoint semantics were audited and the native pose-servo adapter aborted after contact. An original-expert reference with trace-only instrumentation now awaits simulation. See [results and limitations](docs/project/RESULTS.md).
 
 ## Workflow
 
