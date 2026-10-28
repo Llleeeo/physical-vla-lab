@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Upper-target live-feedback reexecution prepared
+
+- Added an opt-in diagnostic that regenerates native arm/OSC commands from captured upper goals and current robot state; recorded inner outputs are not used.
+- Explicitly retain native expert timing, live safety callbacks, gripper and terminal joint fallback for this component gate. Callback descriptors are never executed; unexpected calls fail closed.
+- Eight new regressions bring the portable CPU suite to 149 passes. Real source/scene/native API preflight and frozen Python 3.10 patch compilation pass; physical reexecution is pending.
+
 ## 2026-10-29 — Upper target capture verified; association audit corrected
 
 - Original expert succeeds over 209 intervals, captures 194 upper Cartesian calls and exactly reproduces all 15 core arrays.

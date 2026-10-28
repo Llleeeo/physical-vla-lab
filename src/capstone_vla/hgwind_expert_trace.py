@@ -12,13 +12,20 @@ def _require(value,message):
 
 def configure(plan):
     _STATE.clear();_STATE.update(plan=plan,rows=[],assistance=[])
+    if plan.get('cartesian_target_capture'):
+        from .cartesian_target_replay import CartesianTargetReplayer
+        from .hf_archive import sha256
+        path=Path(plan['cartesian_target_capture'])
+        _require(sha256(path)==plan['cartesian_target_capture_sha256'], 'Upper target capture changed')
+        _STATE['cartesian_replayer']=CartesianTargetReplayer(json.loads(path.read_text()))
     if plan.get('trace_cartesian_targets'):
         from .cartesian_target_trace import CartesianTargetRecorder
         _STATE['cartesian_recorder']=CartesianTargetRecorder()
 
 
 def begin_cartesian_frame(expert,index):
-    _STATE['cartesian_recorder'].begin_frame(expert,index)
+    key='cartesian_replayer' if 'cartesian_replayer' in _STATE else 'cartesian_recorder'
+    _STATE[key].begin_frame(expert,index)
 
 
 def plain(value):
@@ -38,7 +45,8 @@ def record_segment(index,segment,target,q,qd,stage,robot_path,objects,attach_sta
     _require(not any(assistance),'Original expert reference probe detected grasp assistance')
     _STATE['assistance'].append(assistance)
     # Copy at the command boundary; later physics mutates segment bookkeeping.
-    links=_STATE['cartesian_recorder'].segment_links(index,segment) if 'cartesian_recorder' in _STATE else {}
+    observer=_STATE.get('cartesian_replayer') or _STATE.get('cartesian_recorder')
+    links=observer.segment_links(index,segment) if observer is not None else {}
     _STATE['rows'].append(plain({**links,'frame':int(index),'joint_positions':q,'joint_velocities':qd,'target':target,
         **{k:segment[k] for k in ['goal_position','goal_velocity','operational_space_reference','policy_joint_velocity_limit','duration_s','episode_time_s']}}))
 
@@ -50,13 +58,15 @@ def summary(policy):
     if 'cartesian_recorder' in _STATE:
         capture=root/'cartesian_target_inputs.json';_require(not capture.exists(),'Cartesian capture already exists')
         capture.write_text(json.dumps(_STATE['cartesian_recorder'].payload(),indent=2,allow_nan=False)+'\n')
+    if 'cartesian_replayer' in _STATE:
+        (root/'cartesian_target_reexecution.json').write_text(json.dumps(_STATE['cartesian_replayer'].payload(),indent=2,allow_nan=False)+'\n')
     np.savez(root/'command_diagnostics.npz',requested_joints=np.asarray([x['target'] for x in rows]),assistance=np.asarray(_STATE['assistance']))
     return {'schema':plan['schema'],'tracking':'native-expert','mode':'joint','reference':'online-expert',
         'original_expert_used':True,'source_success_reused':False,'saved_commands_own_motors':False,
         'shadow_expert_operational_reference_used':False,'shadow_expert_velocity_limit_used':False,
         'source_native_operational_reference_reconstructed':False,'original_control_configuration_used':True,
         'command_frames':len(rows),'segment_trace_count':len(rows),'source_reference_sha256':plan['source_reference_sha256'],
-        'depth_bias_m':plan['original_depth_bias_m'],'control_reference_file':out.name,'cartesian_target_capture_enabled':'cartesian_recorder' in _STATE,'training_eligible':False,'vla_policy':False}
+        'depth_bias_m':plan['original_depth_bias_m'],'control_reference_file':out.name,'cartesian_target_capture_enabled':'cartesian_recorder' in _STATE,'cartesian_upper_target_reexecution':'cartesian_replayer' in _STATE,'saved_inner_control_outputs_used':False,'standalone_policy_controller':False,'training_eligible':False,'vla_policy':False}
 
 
 def patch_collector(source):

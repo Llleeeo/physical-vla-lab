@@ -32,6 +32,12 @@ The task-acceleration feedforward ablation completed 209 intervals safely but pr
 
 The read-only [upper Cartesian target capture](CARTESIAN_TARGET_CAPTURE.md) succeeds over 209 intervals, records 194 upper calls and preserves exact equality of all 15 core arrays. The initial identity-based association check was incorrect because native consumption copies references; corrected exact-content matching recovers all 194 links offline, with raw records unchanged and the original report preserved. `cartesian_target_capture_verified=true`; 141 CPU checks pass. Standalone feedback execution remains pending. See [verified capture evidence](../../results/summaries/2026-10-29-cartesian-target-capture-result.json).
 
+The next upper-target feedback diagnostic is prepared with 149 portable CPU checks
+and passing real CPU preflight. It reads the captured upper goals and regenerates
+inner arm/OSC commands from live robot state; native expert timing, live safety
+callbacks, gripper, source settings schedule and terminal joint fallback remain
+explicit. No physical or VLA result is claimed yet. See [the protocol](CARTESIAN_TARGET_CAPTURE.md#upper-target-feedback-reexecution-prepared--2026-10-29).
+
 ## Earlier DynamicVLA integration: irregular egg-object task
 
 Task: `grasp_sliding_motion_on_flat_surface_1s1p_g9wvkk1`. Earlier shorthand called the object a ball; the target is an egg. This task remains a difficult development case.

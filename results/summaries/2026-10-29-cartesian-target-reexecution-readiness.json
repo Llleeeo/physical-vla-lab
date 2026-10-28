@@ -1,0 +1,27 @@
+{
+  "schema": "physical-vla-lab.cartesian-target-reexecution-readiness.v1",
+  "date": "2026-10-29",
+  "status": "CPU_PREFLIGHT_PASSED_PHYSICAL_RUN_PENDING",
+  "source_capture_result": "2026-10-29-cartesian-target-capture-result.json",
+  "upper_calls": 194,
+  "expected_intervals": 209,
+  "control_hz": 60,
+  "physics_hz": 180,
+  "portable_cpu_tests_passed": 149,
+  "real_scene_and_native_signature_preflight_passed": true,
+  "frozen_worker_wrapper_python310_parse_passed": true,
+  "saved_inner_outputs_executed": false,
+  "current_robot_feedback": true,
+  "retained_dependencies": [
+    "native expert call timing",
+    "source upper input/controller setting schedule",
+    "live native safety callbacks",
+    "native controller memory",
+    "native gripper",
+    "15 joint-only terminal intervals"
+  ],
+  "physical_execution_passed": null,
+  "standalone_policy_controller": false,
+  "vla_evaluated": false,
+  "training_started": false
+}

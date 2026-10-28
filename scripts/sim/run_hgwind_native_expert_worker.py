@@ -38,7 +38,7 @@ def profile_summary(policy):
 
 def fixed_trace_patch(source):
     patched=trace.patch_collector(source) if plan['tracking']=='native-expert' else probe.patch_worker(source)
-    if plan.get('trace_cartesian_targets'):
+    if plan.get('trace_cartesian_targets') or plan.get('cartesian_target_capture'):
         from capstone_vla.cartesian_target_trace import patch_capture_collector
         patched=patch_capture_collector(patched)
     if hashlib.sha256(patched.encode()).hexdigest()!=plan['patch_sha256']:raise RuntimeError('Native trace assembly differs from preflight')

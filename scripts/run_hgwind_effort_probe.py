@@ -31,6 +31,7 @@ def main():
     parser.add_argument('--task-feedforward',choices=('logged','zero'),default='logged',help='One-factor task-acceleration diagnostic; gravity compensation stays unchanged')
     parser.add_argument('--kinematics-run',type=Path,help='Passing native live-kinematics baseline required for zero task feedforward')
     parser.add_argument('--trace-cartesian-targets',action='store_true',help='Read-only original upper Cartesian requests; native-expert only')
+    parser.add_argument('--cartesian-target-run',type=Path,help='Passing upper-target capture; regenerate native inner commands from current robot state (expert diagnostic)')
     parser.add_argument('--reference',choices=('saved-targets','recorded-motion'),default='saved-targets')
     parser.add_argument('--host',choices=('local','hongtao'),default='local')
     parser.add_argument('--episode',default='traj_00000')
@@ -42,6 +43,7 @@ def main():
     require(args.jacobian_method=='shifted-tool' or args.tracking=='live-jacobian','Native pinch calculation is only a live-Jacobian component diagnostic')
     require(args.task_feedforward!='zero' or (args.tracking=='live-jacobian' and args.jacobian_method=='native-pinch' and args.kinematics_run is not None),'First provide a passing native-pinch --kinematics-run for zero task feedforward')
     require(not args.trace_cartesian_targets or args.tracking=='native-expert','Upper target capture requires the unchanged original expert')
+    require(args.cartesian_target_run is None or (args.tracking=='native-expert' and not args.trace_cartesian_targets),'Upper target replay requires native-expert and excludes read-only capture')
     manifest_path=ROOT/'data/derived/hgwind_40_camera_v2_20261028/render_manifest.json'
     cohort=json.loads(manifest_path.read_text());matches=[r for r in cohort['rows'] if r['host']==args.host and r['episode']==args.episode]
     require(len(matches)==1,'Unknown source episode');row=matches[0];source=Path(row['source'])/'replay.hdf5';meta=json.loads((source.parent/'meta.json').read_text())
@@ -61,6 +63,7 @@ def main():
     stamp=datetime.now(ZoneInfo('Asia/Hong_Kong')).strftime('%Y%m%d_%H%M%S_%f')
     output=ROOT/'data/derived/hgwind_effort_probes'/(stamp+'_'+args.mode+'_'+({'native-expert':'online-expert','logged-command':'control-log','live-jacobian':'control-log'}.get(args.tracking,args.reference))+'_'+args.tracking)
     if args.task_feedforward=='zero':output=output.with_name(output.name+'_ff-zero')
+    if args.cartesian_target_run is not None:output=output.with_name(output.name+'_target-reexecution')
     if args.trace_cartesian_targets:output=output.with_name(output.name+'_target-capture')
     plan={'trace_cartesian_targets':args.trace_cartesian_targets,'task_feedforward':args.task_feedforward,'schema':'physical-vla-lab.hgwind-effort-probe.v1','mode':args.mode,'host':args.host,'episode':args.episode,
           'tracking':args.tracking,'reference':args.reference,'reference_frames':len(reference_actions),'frames':n,'source_frames':len(actions),'source':str(source),'source_files':row['files'],'source_reference_sha256':sha256(source),
@@ -82,7 +85,7 @@ def main():
         require(original_text.count(anchor)==1,'Original profile metadata insertion changed')
         original_text=original_text.replace(anchor,anchor+'\n            "capstone_expert_control": CAPSTONE_PROFILE_SUMMARY(pol),')
         patched=patch_collector(original_text) if args.tracking=='native-expert' else patch_worker(original_text)
-        if args.trace_cartesian_targets:
+        if args.trace_cartesian_targets or args.cartesian_target_run is not None:
             from capstone_vla.cartesian_target_trace import patch_capture_collector
             patched=patch_capture_collector(patched)
             path=ROOT/'src/capstone_vla/cartesian_target_trace.py';plan['adapter_sha256'][str(path)]=sha256(path)
@@ -92,6 +95,41 @@ def main():
         require(0<=plan['original_depth_bias_m']<=.002,'Unexpected original depth profile')
         for path in [ROOT/'src/capstone_vla/hgwind_expert_trace.py',ROOT/'scripts/sim/run_hgwind_native_expert_worker.py',wrapper,ROOT/'scripts/run_hgwind_depth_worker.py',bundle/'src/capstone_vla/hgwind_control.py']:
             plan['adapter_sha256'][str(path)]=sha256(path)
+    if args.cartesian_target_run is not None:
+        from capstone_vla.cartesian_target_trace import audit_capture
+        from capstone_vla.cartesian_target_replay import CartesianTargetReplayer
+        previous=args.cartesian_target_run.resolve();prior_path=previous/'report.json'
+        prior=json.loads(prior_path.read_text());prior_plan=json.loads((previous/'plan.json').read_text())
+        require(prior.get('cartesian_target_capture_verified') is True and prior.get('native_expert_reference_passed') is True,'First provide a passing original upper-target capture')
+        for key in ['source_reference_sha256','task_sha256','physics_sha256','worker_sha256','controller_config_sha256','urdf_sha256']:
+            require(prior_plan[key]==plan[key],'Upper capture provenance differs: '+key)
+        for dependency in [wrapper,Path(plan['original_depth_helper']),bundle/'src/capstone_vla/hgwind_control.py']:
+            require(prior['execution_fingerprints']['adapter_sha256'].get(str(dependency))==sha256(dependency),'Original profile/depth changed')
+        target_path=previous/'cartesian_target_inputs.json';capture=json.loads(target_path.read_text())
+        segments=json.loads((previous/'original_expert_control_references.json').read_text())
+        require(audit_capture(capture,segments,len(capture['frames']))['capture_alignment_passed'],'Raw upper inputs no longer align')
+        CartesianTargetReplayer(capture)
+        require(len(capture['frames'])==len(actions),'Upper capture length differs from source')
+        # Verify the actual native API and safety implementation against the
+        # frozen bundle, not merely the bundle manifest file itself.
+        frozen_files={entry['path']:entry['sha256'] for entry in json.loads(bundle_manifest.read_text())['files']}
+        for dependency in [worker.parent/'expert.py',worker.parent/'collision_safety.py']:
+            expected=frozen_files.get(str(dependency.relative_to(bundle)))
+            require(expected is not None and sha256(dependency)==expected,'Frozen native feedback implementation changed: '+dependency.name)
+            plan['adapter_sha256'][str(dependency)]=expected
+        import ast,inspect
+        tree=ast.parse((worker.parent/'expert.py').read_text())
+        method=next(node for node in ast.walk(tree) if isinstance(node,ast.FunctionDef) and node.name=='operational_space_pinch_action')
+        stub=ast.FunctionDef(name='native_signature',args=method.args,body=[ast.Pass()],decorator_list=[])
+        namespace={};exec(compile(ast.fix_missing_locations(ast.Module(body=[stub],type_ignores=[])),'<native-upper-signature>','exec'),namespace)
+        parameters=set(inspect.signature(namespace['native_signature']).parameters)-{'self'}
+        require(all(set(event['inputs'])==parameters for event in capture['calls']),'Captured upper parameters differ from frozen native signature')
+        plan.update(cartesian_target_capture=str(target_path),cartesian_target_capture_sha256=sha256(target_path),
+            cartesian_target_capture_report=str(prior_path),cartesian_target_capture_report_sha256=sha256(prior_path),
+            cartesian_target_source_segments=str(previous/'original_expert_control_references.json'),
+            cartesian_target_source_segments_sha256=sha256(previous/'original_expert_control_references.json'),
+            reference_fidelity='Recorded upper goals/motion/settings through current-state native feedback; live native safety callbacks, expert call timing/gripper/terminal joint fallback retained. No saved inner q/qdot/Jacobian/OSC commands execute. Not a standalone VLA controller.')
+        path=ROOT/'src/capstone_vla/cartesian_target_replay.py';plan['adapter_sha256'][str(path)]=sha256(path)
     if args.tracking in ('logged-command','live-jacobian'):
         require(args.reference_run is not None,'Provide the passing original-expert reference run')
         ref_root=args.reference_run.resolve();ref_report=ref_root/'report.json';ref=json.loads(ref_report.read_text())
@@ -161,6 +199,7 @@ def main():
     print(f'CPU_PREFLIGHT_OK mode={args.mode} reference={plan['reference']} source={args.host}/{args.episode} frames={n} effort_pipeline=true primary_tracking={args.tracking} exact_state_replay=false',flush=True)
     if args.tracking=='live-jacobian':print(f"TASK_METRIC_OK orientation_length_scale_m={plan['operational_orientation_length_scale_m']} coupled_rows={plan['source_coupled_task_metric_rows_verified']} jacobian_method={args.jacobian_method}",flush=True)
     if args.task_feedforward=='zero':print(f"TASK_FEEDFORWARD_ABLATION mode=zero nonzero_source_commands={plan['expected_removed_feedforward_commands']} gravity_compensation=unchanged",flush=True)
+    if args.cartesian_target_run is not None:print('CARTESIAN_TARGET_REEXECUTION enabled=true saved_inner_outputs=false native_safety_and_fallback=retained',flush=True)
     if args.trace_cartesian_targets:print('CARTESIAN_TARGET_CAPTURE enabled=true motor_overrides=false callable_descriptors_only=true',flush=True)
     print('REFERENCE_LIMIT '+plan['reference_fidelity'],flush=True);print('OUTPUT '+str(output),flush=True);print('COMMAND '+shlex.join(command),flush=True)
     if not args.run:print('DRY_RUN_ONLY: add --run');return 0

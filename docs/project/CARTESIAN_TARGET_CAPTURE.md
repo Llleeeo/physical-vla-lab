@@ -42,3 +42,55 @@ The first report marked target alignment false because the recorder used Python 
 The local parameter inventory finds position/orientation gains 9/8 on 173 calls and 4/4 on the remaining 21 calls, with a transition at frame 173. It also records varying orientation/limit settings, a posture reference on 173 calls, and `cartesian_velocity_projector` / `joint_velocity_projector` callable descriptors. These are observed dependencies in one expert episode, not an approved runtime mode schedule or policy observations. The [result evidence](../../results/summaries/2026-10-29-cartesian-target-capture-result.json) keeps that scope explicit.
 
 Next, use these actual upper goals and motion fields to generate q/qdot/OSC from current robot state through a documented feedback interface. Resolve the scene-safety callbacks, phase-varying controller settings, posture choice and terminal hold behavior explicitly. Do not replay expert phase timing or privileged object-state logic as undisclosed policy inputs. Target capture is complete for this case; standalone replay, VLA action dimensionality and ball-task training remain pending.
+
+
+## Upper-target feedback reexecution prepared — 2026-10-29
+
+The opt-in `--cartesian-target-run` diagnostic now passes recorded upper position,
+wxyz orientation, velocity, acceleration and controller settings to the original
+`operational_space_pinch_action`. That function measures the current articulation
+and regenerates the arm q/qdot and pending OSC reference. Recorded returned joint
+outputs, Jacobians and pending OSC fields are deliberately discarded by the
+runtime target reader. An added CPU regression perturbs the measured robot state
+and confirms that the same upper goal produces a different newly computed action.
+
+This first diagnostic deliberately retains the native expert call schedule,
+current native safety callback objects, gripper execution, controller memory and
+15-frame joint-only terminal fallback. Recorded scalar/posture/orientation settings
+also retain their source schedule. Callback descriptors are never executed or
+deserialized: only the two known native callback names are accepted, and each must
+match the callback actually supplied in that live call, including `None`.
+Unexpected, missing, reordered or exhausted calls stop execution; no last target
+is silently repeated. Thus this is an exposed expert component test, not a
+standalone policy controller, a disturbance experiment or a learned-policy result.
+
+```bash
+cd /home/robophys/Capstone_Project_Yuan_Haoming
+
+data/derived/hf_pilot_render_repo/.venv/bin/python \
+  scripts/run_hgwind_effort_probe.py \
+  --tracking native-expert \
+  --cartesian-target-run data/derived/hgwind_effort_probes/20261028_235048_763413_joint_online-expert_native-expert_target-capture \
+  --run
+```
+
+Without `--run`, the command checks source/capture alignment, task physics,
+Isaac versions, frozen native API/safety file hashes and the real native parameter
+signature; it never creates a simulator. Source input/report/control-log hashes
+are recorded. Each executed call and its regenerated output/reference go into a
+new `cartesian_target_reexecution.json`; original source files are not edited.
+
+`cartesian_feedback_replay_passed` requires the complete 209-frame/194-call stream,
+exact applied input correspondence, unique call-to-segment associations, 60/180 Hz
+cadence including three OSC callbacks per Cartesian call, matching initial state,
+runtime safety, no grasp assistance and independent contact/lift/retention checks.
+All 15 source core-array comparisons are additionally reported; physical success
+is not defined by exact state equality. The original unchanged-expert success gate
+is left null for this new intervention. The portable CPU suite has 149 passes;
+actual frozen worker/wrapper Python 3.10 compilation and real CPU preflight pass.
+**Physical reexecution remains pending user execution.**
+
+Omit `--cartesian-target-run` to use the previous native-expert path. The next gate,
+after this component succeeds, is to remove the retained expert scheduling and
+safety-context dependencies through an explicit runtime controller contract before
+ball-task action labeling or DynamicVLA training.
