@@ -1,0 +1,57 @@
+{
+  "schema": "physical-vla-lab.hgwind-contact-divergence.v1",
+  "date": "2026-10-28",
+  "status": "CORRECTED_METRIC_RUN_FAILED_NATIVE_GEOMETRY_DIAGNOSTIC_READY",
+  "source_control_log_sha256": "78b6ea934b8266aa428f47b95d9eb3be94d3bf8bce723fd5de99e402c054e140",
+  "source_report_sha256": "8371b4a1b9cb035ef5b68918e3c470d106fcef9691d0b00e212a3a84ee70fbdb",
+  "actual_run": {
+    "recorded_frames": 175,
+    "completed_frames": 174,
+    "physics_callback_count": 523,
+    "attempted_osc_commands": 524,
+    "initial_state_match": true,
+    "runtime_safety_passed": false,
+    "live_kinematics_component_passed": false,
+    "source_state_comparison": {
+      "ee_position_mean_mm": 2.7914202213287354,
+      "ee_position_p95_mm": 25.738264083862305,
+      "ee_orientation_p95_deg": 5.9994718020759965,
+      "first_position_discrepancy_above_0_01mm_frame": 139,
+      "position_error_at_frame_90_mm": 0.00027161429170519114
+    }
+  },
+  "grasp_measurements": {
+    "frames": 175,
+    "sample_hz": 60.00000000000021,
+    "bilateral_frames": 38,
+    "longest_bilateral_duration_s": 0.6333333333333311,
+    "first_contact_frame": 135,
+    "first_bilateral_frame": 137,
+    "minimum_final_lift_from_first_bilateral_m": 0.0008571576327085495,
+    "final_relative_position_jitter_m": 0.0072303247871129146,
+    "object_speed_before_first_contact_m_s": 0.22630296647548676,
+    "object_angular_speed_before_first_contact_rad_s": null,
+    "final_relative_spin_p95_rad_s": null
+  },
+  "abort_reason": "no feasible arm command: hardware constraints infeasible during velocity reserve recovery",
+  "maximum_precontact_ee_difference_mm": 0.0029784459620714188,
+  "observation": "Robot motion remains close to the source before contact; source/rollout divergence becomes appreciable after bilateral contact, and lift is not completed.",
+  "hypotheses_not_established": [
+    "Small numerical Jacobian differences may be amplified by contact and controller active-set changes.",
+    "Replaying frozen task/joint/constraint references on a diverging live state may lose feasibility."
+  ],
+  "next_controlled_change": "Reuse the frozen native pinch-point finite-difference geometry block on current robot state, retaining the 0.03 task metric and all other original references.",
+  "native_geometry_safety_scope": "Only robot state, base transform, calibration offset and FK are accessed; the servo solve and object/planner state are excluded. Original source is not edited or vendored.",
+  "portable_cpu_tests_passed": 123,
+  "actual_frozen_geometry_cpu_execution_passed": true,
+  "scene_preflight_frames": 209,
+  "new_simulation_started": false,
+  "native_geometry_component_passed": null,
+  "physics_limits_relaxed": false,
+  "vla_evaluated": false,
+  "limitations": [
+    "One exposed development episode; this does not establish robustness or learned-policy performance.",
+    "Matching native numerical geometry alone does not address stale frozen reference inputs or guarantee grasp success.",
+    "Even a successful exact reproduction must be followed by robustness and independent policy-interface validation."
+  ]
+}

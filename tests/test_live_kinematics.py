@@ -120,3 +120,74 @@ def test_live_boundary_applies_metric_before_pairing_original_velocity(monkeypat
     actual=probe.live_reference(robot(),reference,0)
     np.testing.assert_allclose(actual['jacobian']@qd,actual['commanded_task_velocity'])
     assert state['live_jacobian_records'][0]['comparison_max_abs']==0
+
+
+
+def native_fixture_source():
+    # Independent toy FK: a rotating planar tool plus a calibrated offset.
+    # The wrapper must extract geometry only, leaving servo work unexecuted.
+    return """class Expert:
+    def operational_space_pinch_action(self, *, finite_difference_rad=1.e-4):
+        try:
+            offset=np.asarray(self._pinch_offset_local,float)
+            jacobian=np.zeros((6,7))
+            for k in range(7):
+                plus=q.copy();minus=q.copy()
+                plus[k]=min(q[k]+finite_difference_rad,state.upper[k])
+                minus[k]=max(q[k]-finite_difference_rad,state.lower[k])
+                pp,rp=self._kinematics.compute_forward_kinematics(self._ee_frame,plus)
+                pm,rm=self._kinematics.compute_forward_kinematics(self._ee_frame,minus)
+                delta=plus[k]-minus[k]
+                jacobian[:3,k]=((pp+rp@offset)-(pm+rm@offset))/delta
+                jacobian[3:,k]=shortest_quaternion_rotation_vector(utils.matrix_to_quat_wxyz(rm),utils.matrix_to_quat_wxyz(rp))/delta
+            self._last_differential_jacobian=jacobian.copy()
+            raise RuntimeError('servo must never run')
+        except Exception:
+            raise
+"""
+
+
+def native_fixture_robot():
+    import time
+    from scipy.spatial.transform import Rotation
+    from capstone_vla.live_kinematics import compile_native_pinch_jacobian
+    def quaternion(matrix):
+        q=Rotation.from_matrix(matrix).as_quat();return q[[3,0,1,2]]
+    def difference(left,right):
+        a=Rotation.from_quat(np.asarray(left)[[1,2,3,0]])
+        b=Rotation.from_quat(np.asarray(right)[[1,2,3,0]])
+        return (b*a.inv()).as_rotvec()
+    namespace={'np':np,'time':time,'utils':SimpleNamespace(matrix_to_quat_wxyz=quaternion),'shortest_quaternion_rotation_vector':difference}
+    state=SimpleNamespace(position=np.zeros(7),lower=np.full(7,-3.),upper=np.full(7,3.))
+    fk=SimpleNamespace(set_robot_base_pose=lambda p,q:None,
+        compute_forward_kinematics=lambda frame,q:(np.array([q[0],0.,0.]),Rotation.from_euler('z',q[6]).as_matrix()))
+    expert=SimpleNamespace(arm_motion_state=lambda:state,_base_pose=lambda:(np.zeros(3),[1,0,0,0]),
+        _pinch_offset_local=np.array([.1,0,0]),_ee_frame='tool',_kinematics=fk,_last_differential_jacobian='unchanged')
+    return compile_native_pinch_jacobian(native_fixture_source(),namespace),expert,state
+
+
+def test_native_geometry_extraction_uses_current_robot_and_skips_servo():
+    fn,expert,state=native_fixture_robot();original=state.position.copy()
+    actual=fn(expert)
+    assert actual[0,0]==pytest.approx(1.)
+    assert actual[1,6]==pytest.approx(.1,abs=1e-8)
+    assert actual[5,6]==pytest.approx(1.)
+    assert expert._last_differential_jacobian=='unchanged'
+    np.testing.assert_array_equal(state.position,original)
+    state.position[6]=np.pi/2
+    changed=fn(expert)
+    assert changed[0,6]==pytest.approx(-.1,abs=1e-8)
+    assert abs(changed[1,6])<1e-8
+
+
+def test_native_geometry_keeps_one_sided_joint_limit_difference():
+    fn,expert,state=native_fixture_robot();state.position[6]=state.upper[6]
+    assert fn(expert)[5,6]==pytest.approx(1.,abs=1e-8)
+
+
+def test_native_geometry_rejects_unexpected_state_or_frozen_source():
+    from capstone_vla.live_kinematics import compile_native_pinch_jacobian
+    with pytest.raises(ValueError):compile_native_pinch_jacobian('unrelated=1')
+    unsafe=native_fixture_source().replace('offset=np.asarray(self._pinch_offset_local,float)','offset=np.asarray(self.target_object_position,float)')
+    with pytest.raises(ValueError,match='non-geometry'):compile_native_pinch_jacobian(unsafe)
+    with pytest.raises(ValueError,match='step changed'):compile_native_pinch_jacobian(native_fixture_source().replace('1.e-4','1.e-5'))

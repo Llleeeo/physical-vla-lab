@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Post-contact divergence isolated for diagnosis
+
+- Metric-corrected live-Jacobian run completes 174 intervals, with matching contact timing and 0.633 s bilateral contact, but fails lift and aborts during velocity-reserve recovery. Appreciable motion divergence begins after contact.
+- Added an opt-in native pinch-geometry calculation that reuses frozen numerical operations on live robot state, excluding the servo/planner. Other references and limits remain fixed; physical outcome is pending.
+- Three additional regressions bring the portable suite to 123 passes. Actual frozen geometry execution on CPU and the 209-frame scene preflight pass. No VLA result or robustness improvement is claimed.
+
 ## 2026-10-28 — Coupled task-metric adapter correction
 
 - The first live-Jacobian diagnostic aborted after 150 completed intervals. Identified an adapter error: raw angular Jacobian rows were paired with task velocities already weighted by the original 0.03 m length scale.

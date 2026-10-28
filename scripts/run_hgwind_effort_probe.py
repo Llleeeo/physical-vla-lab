@@ -27,6 +27,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--mode',choices=('joint','cartesian'),default='joint')
     parser.add_argument('--tracking',choices=('joint','task-space','native-pose','native-expert','logged-command','live-jacobian'),default='joint')
+    parser.add_argument('--jacobian-method',choices=('shifted-tool','native-pinch'),default='shifted-tool',help='Live-Jacobian geometry calculation only')
     parser.add_argument('--reference',choices=('saved-targets','recorded-motion'),default='saved-targets')
     parser.add_argument('--host',choices=('local','hongtao'),default='local')
     parser.add_argument('--episode',default='traj_00000')
@@ -35,6 +36,7 @@ def main():
     parser.add_argument('--baseline-run',type=Path,help='Required successful joint baseline for the Cartesian branch')
     parser.add_argument('--run',action='store_true')
     args=parser.parse_args();require(args.frames==0 or args.frames>=2,'frames must be 0 or >=2')
+    require(args.jacobian_method=='shifted-tool' or args.tracking=='live-jacobian','Native pinch calculation is only a live-Jacobian component diagnostic')
     manifest_path=ROOT/'data/derived/hgwind_40_camera_v2_20261028/render_manifest.json'
     cohort=json.loads(manifest_path.read_text());matches=[r for r in cohort['rows'] if r['host']==args.host and r['episode']==args.episode]
     require(len(matches)==1,'Unknown source episode');row=matches[0];source=Path(row['source'])/'replay.hdf5';meta=json.loads((source.parent/'meta.json').read_text())
@@ -88,6 +90,13 @@ def main():
         control_log=ref_root/'original_expert_control_references.json';targets,_,_=load_logged_commands(control_log,positions,velocities)
         plan.update(reference='control-log',frames=len(targets),reference_frames=len(targets),control_log=str(control_log),control_log_sha256=sha256(control_log),control_log_report=str(ref_report),control_log_report_sha256=sha256(ref_report),reference_fidelity='Diagnostic replay of logged original q/qdot/OSC references, including cached original Jacobians; not a deployed policy controller.')
     if args.tracking=='live-jacobian':
+        plan['jacobian_method']=args.jacobian_method
+        if args.jacobian_method=='native-pinch':
+            from capstone_vla.live_kinematics import compile_native_pinch_jacobian
+            native_source=worker.parent/'expert.py'
+            compile_native_pinch_jacobian(native_source.read_text())
+            plan.update(native_jacobian_source=str(native_source),native_jacobian_source_sha256=sha256(native_source))
+            plan['adapter_sha256'][str(native_source)]=sha256(native_source)
         require(all(x['operational_space_reference'] is None or (np.asarray(x['operational_space_reference']['jacobian']).shape==(6,7) and 'secondary_jacobian' not in x['operational_space_reference']) for x in json.loads(Path(plan['control_log']).read_text())),'Live component check requires six-dimensional task references')
         from capstone_vla.live_kinematics import validate_logged_task_metric
         # Catch explicitly passes max(r_A, 1e-6) as its coupled orientation
@@ -129,7 +138,7 @@ def main():
         command.extend(['--episode_s','12','--no-expert-config'])
         n=plan['frames']
     print(f'CPU_PREFLIGHT_OK mode={args.mode} reference={plan['reference']} source={args.host}/{args.episode} frames={n} effort_pipeline=true primary_tracking={args.tracking} exact_state_replay=false',flush=True)
-    if args.tracking=='live-jacobian':print(f"TASK_METRIC_OK orientation_length_scale_m={plan['operational_orientation_length_scale_m']} coupled_rows={plan['source_coupled_task_metric_rows_verified']}",flush=True)
+    if args.tracking=='live-jacobian':print(f"TASK_METRIC_OK orientation_length_scale_m={plan['operational_orientation_length_scale_m']} coupled_rows={plan['source_coupled_task_metric_rows_verified']} jacobian_method={args.jacobian_method}",flush=True)
     print('REFERENCE_LIMIT '+plan['reference_fidelity'],flush=True);print('OUTPUT '+str(output),flush=True);print('COMMAND '+shlex.join(command),flush=True)
     if not args.run:print('DRY_RUN_ONLY: add --run');return 0
     output.mkdir(parents=True,exist_ok=False);(output/'plan.json').write_text(json.dumps(plan,indent=2)+'\n')

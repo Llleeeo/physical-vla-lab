@@ -190,3 +190,22 @@ The fix keeps `live_pinch_jacobian()` as the physical world-frame Jacobian, then
 Seven further regression cases cover the coupled equation, invalid scales, source metric mismatch and propagation to the motor-reference boundary. All 120 portable CPU checks and the real 209-frame preflight pass. The command above is unchanged; it now also prints `TASK_METRIC_OK orientation_length_scale_m=0.03 coupled_rows=194`. Corrected physical execution remains pending; safety thresholds, gains, physics and demonstrations were not changed.
 
 Correction to the earlier narrative: the 15 references without OSC are frames 194–208 at the end of the source trajectory, not startup frames. The source log and executable None handling were already correct; the sequence description was inaccurate. The original failed report remains unchanged, and a separate [diagnosis summary](../../results/summaries/2026-10-28-task-metric-correction.json) records the failure and correction.
+
+
+## Metric-corrected run still diverges after contact
+
+The shifted-tool calculation with the restored 0.03 angular metric saved 175 states, completed 174 intervals and aborted during velocity-reserve recovery because the combined hardware constraints had no feasible solution. Initial state matched. The first and bilateral contact frames were 135 and 137, matching the source contact timing; bilateral contact persisted for 38 bins (0.633 s), but retained lift was below 1 mm. This remains an unsuccessful grasp run.
+
+The first end-effector difference above 0.01 mm occurred at frame 139, after contact. At frame 90 it was only 0.000272 mm. This contrasts with the unweighted adapter's immediate divergence and supports the task-metric correction, but does not prove a sole cause for the remaining failure. The shifted-tool Jacobian differs from the original by about 7.9e-10 at the first matching state. Contact dynamics, optimizer active sets and frozen reference/state inconsistency are possible contributors; they are not isolated yet.
+
+A new opt-in `--jacobian-method native-pinch` diagnostic reuses only the geometry block of the frozen `Expert.operational_space_pinch_action` via AST extraction. It preserves the native 1e-4 joint finite-difference step, pinch-point FK evaluation, joint-bound clipping, quaternion conversion and arithmetic order. The servo solve is excluded, no cached Jacobian is copied, and the original source is not changed or vendored. Runtime supplies current robot joints, base pose, gripper calibration and the original math helpers. Source hashes and extraction anchors are checked. The existing `shifted-tool` option remains available for rollback.
+
+```bash
+data/derived/hf_pilot_render_repo/.venv/bin/python \
+  scripts/run_hgwind_effort_probe.py --tracking live-jacobian \
+  --jacobian-method native-pinch \
+  --reference-run data/derived/hgwind_effort_probes/20261028_191242_476137_joint_online-expert_native-expert \
+  --run
+```
+
+123 portable CPU checks pass, including three added extraction/geometry tests. The actual frozen geometry block was also executed against an independent CPU toy FK, and the real scene/control-log preflight passed. New physical execution is pending. This is a numerical-method component comparison, not a fix proven in simulation and not a VLA rollout. It retains logged q/qdot/twist/feedforward/constraints and the shadow FSM. If it reproduces success exactly, this will still not establish robustness to policy errors or disturbances.

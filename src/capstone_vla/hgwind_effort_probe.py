@@ -167,7 +167,16 @@ def live_reference(expert,reference,index):
     from .live_kinematics import live_pinch_jacobian,operational_task_jacobian
     old=np.asarray(reference['jacobian'],float)
     require(old.shape==(6,7) and 'secondary_jacobian' not in reference,'Live component check supports the logged coupled six-dimensional task only')
-    current=operational_task_jacobian(live_pinch_jacobian(expert),_STATE['plan']['operational_orientation_length_scale_m'])
+    if _STATE['plan'].get('jacobian_method','shifted-tool')=='native-pinch':
+        if 'native_jacobian_callable' not in _STATE:
+            from .live_kinematics import compile_native_pinch_jacobian
+            native=Path(_STATE['plan']['native_jacobian_source'])
+            require(sha256(native)==_STATE['plan']['native_jacobian_source_sha256'],'Frozen native geometry source changed')
+            namespace=type(expert).operational_space_pinch_action.__globals__
+            _STATE['native_jacobian_callable']=compile_native_pinch_jacobian(native.read_text(),namespace)
+        physical=_STATE['native_jacobian_callable'](expert)
+    else:physical=live_pinch_jacobian(expert)
+    current=operational_task_jacobian(physical,_STATE['plan']['operational_orientation_length_scale_m'])
     result={k:np.asarray(v,float).copy() if isinstance(v,list) else v for k,v in reference.items() if k!='jacobian'}
     result['jacobian']=current
     # Saved J is compared for diagnosis only; it never selects a motor value.
@@ -303,7 +312,7 @@ def summary():
         'shadow_expert_operational_reference_used':False,'shadow_expert_velocity_limit_used':False,
         'shadow_task_fsm_runs_for_evidence':True,'source_native_operational_reference_reconstructed':False,'primary_tracking_controller':'operational_space_inverse_dynamics' if plan.get('tracking') in ('task-space','native-pose','logged-command','live-jacobian') else 'joint_inverse_dynamics',
         'training_eligible':False,'vla_policy':False,'source_actuator_mode':'operational_space_inverse_dynamics_effort',
-        'control_log_sha256':plan.get('control_log_sha256'),'cached_original_jacobians_replayed':plan.get('tracking')=='logged-command','operational_orientation_length_scale_m':plan.get('operational_orientation_length_scale_m'),'live_jacobian_control_updates':len(records),'expected_issued_live_jacobian_updates':issued_live_updates,'live_jacobian_comparison_max_abs':max((x['comparison_max_abs'] for x in records),default=None),'original_joint_goals_and_constraints_retained':plan.get('tracking') in ('logged-command','live-jacobian'),'standalone_policy_controller':False,'logged_control_command_count':len(data) if plan.get('tracking') in ('logged-command','live-jacobian') else 0,'expected_logged_osc_callbacks':3*sum(row['operational_space_reference'] is not None for row in _STATE['logged_rows']) if plan.get('tracking') in ('logged-command','live-jacobian') else None,
+        'control_log_sha256':plan.get('control_log_sha256'),'cached_original_jacobians_replayed':plan.get('tracking')=='logged-command','operational_orientation_length_scale_m':plan.get('operational_orientation_length_scale_m'),'jacobian_method':plan.get('jacobian_method','shifted-tool'),'live_jacobian_control_updates':len(records),'expected_issued_live_jacobian_updates':issued_live_updates,'live_jacobian_comparison_max_abs':max((x['comparison_max_abs'] for x in records),default=None),'original_joint_goals_and_constraints_retained':plan.get('tracking') in ('logged-command','live-jacobian'),'standalone_policy_controller':False,'logged_control_command_count':len(data) if plan.get('tracking') in ('logged-command','live-jacobian') else 0,'expected_logged_osc_callbacks':3*sum(row['operational_space_reference'] is not None for row in _STATE['logged_rows']) if plan.get('tracking') in ('logged-command','live-jacobian') else None,
         'velocity_reference':('matched logged original joint-goal velocity' if plan.get('tracking') in ('logged-command','live-jacobian') else 'matched native pose-servo output; recorded robot velocity supplies waypoint feed-forward' if plan.get('tracking')=='native-pose' else 'next observed joint velocity' if plan.get('reference')=='recorded-motion' else 'measured-state position-error fallback'),
         'reference_path':('original goals/velocity/twist/constraints plus current robot pinch Jacobian -> original effort executor' if plan.get('tracking')=='live-jacobian' else 'logged original q/qdot/OSC tuple -> original effort executor' if plan.get('tracking')=='logged-command' else 'robot-only waypoint -> native pose-servo q/qdot/OSC tuple -> shared physics-rate viability and effort executor' if plan.get('tracking')=='native-pose' else 'saved/converted joint goals -> shared physics-rate viability generator -> original certified model-effort executor')}
 

@@ -59,3 +59,51 @@ def validate_logged_task_metric(rows, orientation_length_scale_m):
         count+=1
     if not count:raise ValueError('No coupled task references to validate')
     return count
+
+
+def compile_native_pinch_jacobian(source, namespace=None):
+    """Reuse only the frozen robot-geometry block, excluding its servo solve.
+
+    This preserves its finite-difference point, step, clipping, quaternion
+    conversion and operation order. No upstream source is edited or vendored.
+    """
+    import ast
+    tree=ast.parse(source)
+    methods=[x for x in ast.walk(tree) if isinstance(x,ast.FunctionDef) and x.name=='operational_space_pinch_action']
+    if len(methods)!=1:raise ValueError('Native pinch method anchor changed')
+    method=methods[0]
+    defaults=dict(zip([x.arg for x in method.args.args][-len(method.args.defaults):],method.args.defaults))
+    defaults.update(zip([x.arg for x in method.args.kwonlyargs],method.args.kw_defaults))
+    if ast.literal_eval(defaults.get('finite_difference_rad',ast.Constant(None)))!=1.e-4:
+        raise ValueError('Native finite-difference step changed')
+    blocks=[x for x in method.body if isinstance(x,ast.Try)]
+    if len(blocks)!=1:raise ValueError('Native pinch geometry scope changed')
+    body=blocks[0].body
+    def assigns(node,name):
+        return isinstance(node,ast.Assign) and any(isinstance(x,ast.Name) and x.id==name for x in node.targets)
+    starts=[i for i,x in enumerate(body) if assigns(x,'offset')]
+    ends=[i for i,x in enumerate(body) if isinstance(x,ast.Assign) and any(isinstance(y,ast.Attribute) and y.attr=='_last_differential_jacobian' for y in x.targets)]
+    if len(starts)!=1 or len(ends)!=1 or starts[0]>=ends[0]:raise ValueError('Native geometry block anchors changed')
+    geometry=body[starts[0]:ends[0]]
+    attrs={x.attr for n in geometry for x in ast.walk(n) if isinstance(x,ast.Attribute) and isinstance(x.value,ast.Name) and x.value.id=='self'}
+    if attrs!={'_pinch_offset_local','_kinematics','_ee_frame'}:
+        raise ValueError('Native block contains non-geometry robot inputs')
+    template=ast.parse("""def recompute(self):
+    state=self.arm_motion_state()
+    q=np.asarray(state.position,dtype=float).reshape(-1)
+    if q.shape!=(7,) or not np.isfinite(q).all():raise ValueError('Invalid live arm state')
+    base_t,base_r=self._base_pose()
+    self._kinematics.set_robot_base_pose(base_t,base_r)
+    finite_difference_rad=1.e-4
+    forward_kinematics_wall_s=0.0
+    forward_kinematics_call_count=0
+""")
+    template.body[0].body.extend(geometry)
+    template.body[0].body.append(ast.Return(value=ast.Name(id='jacobian',ctx=ast.Load())))
+    code=compile(ast.fix_missing_locations(template),'<frozen-robot-pinch-geometry>','exec')
+    # Preflight compiles without importing Isaac. Runtime supplies only the
+    # original math helpers; policy, target and object state stay unavailable.
+    if namespace is None:return code
+    scope={key:namespace[key] for key in ['np','time','utils','shortest_quaternion_rotation_vector']}
+    exec(code,scope)
+    return scope['recompute']
