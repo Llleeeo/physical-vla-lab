@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Upper-target live-feedback reexecution succeeds
+
+- User-executed physical rollout completes 209 intervals / 627 physics updates / 582 OSC callbacks with safe, independently verified grasping. All 194 upper calls align; regenerated references and all 15 core arrays exactly match the source.
+- Bilateral contact lasts 1.2 s, final retained lift is at least 74.861 mm, and relative-position jitter is 0.123 mm. Source files remain unchanged.
+- Native expert scheduling, source settings, live safety callbacks, gripper and terminal joint fallback remain explicit dependencies. This is one exposed expert component result, not learned-policy or generalization success. Runtime code is unchanged in this evidence update.
+
 ## 2026-10-29 — Upper-target live-feedback reexecution prepared
 
 - Added an opt-in diagnostic that regenerates native arm/OSC commands from captured upper goals and current robot state; recorded inner outputs are not used.

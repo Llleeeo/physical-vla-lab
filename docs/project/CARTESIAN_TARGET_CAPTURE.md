@@ -94,3 +94,25 @@ Omit `--cartesian-target-run` to use the previous native-expert path. The next g
 after this component succeeds, is to remove the retained expert scheduling and
 safety-context dependencies through an explicit runtime controller contract before
 ball-task action labeling or DynamicVLA training.
+
+
+## Physical reexecution result — 2026-10-29
+
+The user-executed `_target-reexecution` run passes the separate
+`cartesian_feedback_replay_passed` gate and independent grasp checks. It completes
+209 intervals / 627 physics updates / 582 OSC callbacks. All 194 upper calls use
+exactly the captured inputs and link uniquely to executed segments; the newly
+generated references and all 15 core arrays exactly match the original source.
+Bilateral contact lasts 1.2 s, final retained lift is at least 74.861 mm and
+relative-position jitter is 0.123 mm. Runtime safety and initial state pass. The
+original capture/control/source file hashes are unchanged. See the compact
+[result](../../results/summaries/2026-10-29-cartesian-target-reexecution-result.json).
+
+This establishes successful current-state native feedback execution of the
+captured upper stream in this exposed case. The retained native expert call
+schedule, source controller settings, live safety callbacks, controller memory,
+gripper and 15 terminal joint-only intervals still prevent a standalone VLA claim.
+Do not treat the null unchanged-expert/capture gates as failed checks: this run
+uses the distinct target-reexecution gate. No new simulation or runtime changes
+were needed for result verification. Next, turn the retained dependencies into
+an explicit policy-facing controller contract before ball-task labeling/training.

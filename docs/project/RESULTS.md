@@ -32,11 +32,17 @@ The task-acceleration feedforward ablation completed 209 intervals safely but pr
 
 The read-only [upper Cartesian target capture](CARTESIAN_TARGET_CAPTURE.md) succeeds over 209 intervals, records 194 upper calls and preserves exact equality of all 15 core arrays. The initial identity-based association check was incorrect because native consumption copies references; corrected exact-content matching recovers all 194 links offline, with raw records unchanged and the original report preserved. `cartesian_target_capture_verified=true`; 141 CPU checks pass. Standalone feedback execution remains pending. See [verified capture evidence](../../results/summaries/2026-10-29-cartesian-target-capture-result.json).
 
-The next upper-target feedback diagnostic is prepared with 149 portable CPU checks
-and passing real CPU preflight. It reads the captured upper goals and regenerates
-inner arm/OSC commands from live robot state; native expert timing, live safety
-callbacks, gripper, source settings schedule and terminal joint fallback remain
-explicit. No physical or VLA result is claimed yet. See [the protocol](CARTESIAN_TARGET_CAPTURE.md#upper-target-feedback-reexecution-prepared--2026-10-29).
+The upper-target feedback reexecution now passes: 209 completed intervals, 627
+physics updates, 582 OSC callbacks and all 194 upper calls aligned. Regenerated
+references and all 15 core arrays exactly match the exposed source. Independent
+grasp evidence measures 1.2 s continuous bilateral contact, at least 74.861 mm
+retained lift and 0.123 mm relative-position jitter; initial state and runtime
+safety also pass. Original source files are unchanged. Native expert timing,
+live safety callbacks, gripper, source settings schedule, controller memory and
+15 terminal joint-only intervals remain explicit dependencies. This is one expert
+component result; a standalone policy contract and VLA success remain unverified.
+See [the protocol](CARTESIAN_TARGET_CAPTURE.md) and [source-hashed result](../../results/summaries/2026-10-29-cartesian-target-reexecution-result.json).
+Latest runtime CPU suite remains 149 passes; no runtime code changed in this result update.
 
 ## Earlier DynamicVLA integration: irregular egg-object task
 
