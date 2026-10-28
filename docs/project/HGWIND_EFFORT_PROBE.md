@@ -4,7 +4,7 @@
 
 The wind-driven-ball recordings use `operational_space_inverse_dynamics_effort`. The earlier egg-task position-drive probe does not establish compatibility with them. This diagnostic first executes saved joint commands through the frozen RoboPhys effort pipeline, then permits a Cartesian/IK comparison using the same executor.
 
-The first saved-target physical probe aborted during its 109th control interval. Its initial robot and object states matched the source exactly. The new recorded-motion tracking diagnostic is CPU-checked and awaits simulation. No ball-task training or learned-policy result is claimed.
+The first saved-target physical probe aborted during its 109th control interval. Recorded-motion joint tracking then completed 208 intervals safely, briefly held and lifted the ball, but lost it before the end. A task-space tracking comparison is CPU-checked and awaits simulation. No ball-task training or learned-policy result is claimed.
 
 ## Execution and recording boundary
 
@@ -72,3 +72,21 @@ data/derived/hf_pilot_render_repo/.venv/bin/python \
 For each source row k it requests the observed arm joint position and velocity at k+1, keeping the original binary gripper request at k. There are 208 transitions from 209 observed states; the missing final state is not invented. Neither simulator state nor object motion is overwritten. The existing viability generator, physical gripper, effort feasibility checks and limits remain active. This uses recorded desired robot motion as diagnostic input, not a learned policy and not recovered native controller references. It changes both reference-position semantics and velocity supply; it cannot isolate their individual causal effects. A pass would support motion executability under this diagnostic, not full action-interface equivalence.
 
 The mode currently supports joint tracking only and cannot unlock the saved-target Cartesian gate. Its result is reported separately as `motion_tracking_passed`; a future Cartesian reference/velocity contract still requires design and validation. Aborted runs with saved episodes now receive independent reports while preserving the nonzero worker exit code. The analyzer uses the collector's actual output layout and distinguishes recorded states from fully completed control intervals.
+
+## Recorded-motion joint result and task-space comparison
+
+The recorded-motion joint run completed 208 intervals / 624 physics callbacks with matching initial state and passing runtime safety. Both fingers had impulses in 39 consecutive control bins (frames 137–175, approximately 0.65 s), followed by lost contact. The ball rose transiently and fell; final retention and sustained lift checks failed. Whole-episode EE discrepancy from the source was 10.838 mm mean / 22.933 mm p95. Over frames 137–175, position/orientation discrepancy p95 was 22.717 mm / 7.599 degrees. These observations do not isolate friction or prove tracking error is the sole cause.
+
+A new `--tracking task-space` branch keeps the same recorded-motion joint goals, velocity, gripper schedule, existing physics-rate viability generator and constraints. At each 180 Hz callback it maps the bounded reference into tool pose, twist and acceleration, then calls the existing RoboPhys `operational_space_inverse_dynamics_command` instead of joint inverse dynamics. It does not consume the shadow expert's Cartesian commands or object state.
+
+The reference uses world-frame position error and shortest rotation error, `J(q_ref) qdot_ref` twist, and `J(q_ref) qddot_ref + Jdot(q_ref) qdot_ref` feed-forward. The native controller's optional measured `Jdot(q) qdot` argument is also supplied. Directional Jacobian derivatives use a centered 1e-5 s difference. Fresh physics-rate twist is not extrapolated a second time using elapsed control-interval time. The existing controller gain, inverse-dynamics solver, disturbance compensation and final hardware/geometry feasibility checks are retained. This is a constructed tracking reference, not the missing original expert reference.
+
+Before its first command, the adapter compares its world-frame tool pose and Jacobian with live RoboPhys control kinematics (1e-4 m/rad and Jacobian absolute tolerances). A mismatch stops the diagnostic. The report verifies native OSC and generated-reference callback counts.
+
+```bash
+data/derived/hf_pilot_render_repo/.venv/bin/python \
+  scripts/run_hgwind_effort_probe.py --mode joint \
+  --reference recorded-motion --tracking task-space --run
+```
+
+Here `--mode joint` describes how the diagnostic goals are supplied; `--tracking task-space` selects their physical tracking controller. The mode does not perform IK or evaluate a learned policy. CPU checks cover transforms, rotation error, derivative terms, branch isolation and live-frame rejection. A call into the frozen native OSC implementation also passed at five source poses with an artificial identity-inertia model; this checks the software interface, not real robot dynamics. Physical success of the new branch remains unverified.

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Recorded-motion retention failure and task-space comparison
+
+- Verified 208 completed control intervals, 624 callbacks and passing runtime safety, but contact was lost after a 0.65 s bilateral span; final lift/retention failed. Tracking error remains a candidate contributor, not a demonstrated sole cause.
+- Added an isolated physics-rate tool-reference adapter to the existing RoboPhys OSC branch, retaining joint goals, gripper schedule, viability generator and final feasibility checks. Added live frame/Jacobian guards and branch-count verification.
+- Eight regressions added; 86 portable CPU checks and a five-pose synthetic-inertia call into frozen native OSC passed. New physical rollout pending; no IK/VLA training result claimed.
+
 ## 2026-10-28 — Saved-target probe abort diagnosed
 
 - Recorded a physical safety abort before jaw closure despite identical first states. Processed actuator references, missing original operational references and a different primary tracking branch prevent faithful replay; this is not an IK/VLA failure.

@@ -48,6 +48,8 @@ def analyze(output):
     source_profile=source_meta['robot_limit_profile'];actual_profile=meta['robot_limit_profile']
     require(source_profile['sha256']==actual_profile['sha256'],'Manufacturer limit profile changed')
     n=int(meta['num_steps']);require(n>=2,'Probe saved fewer than two states; inspect simulation.log');callback_count=int(meta.get('arm_execution',{}).get('dynamic_drive',{}).get('physics_callback_count',-1));cadence_ok=callback_count==3*n;full=(n==plan['frames'] and plan['frames']==plan.get('reference_frames',plan['source_frames']))
+    task_callbacks=int(meta.get('arm_execution',{}).get('dynamic_drive',{}).get('operational_space_callback_count',0))
+    branch_verified=(task_callbacks==callback_count and tag.get('task_reference_callback_count')==callback_count) if plan.get('tracking')=='task-space' else task_callbacks==0
     completed_segments=int(meta.get('arm_execution',{}).get('dynamic_drive',{}).get('completed_segment_count',0))
     full=full and completed_segments==n
     state_keys=['joint_pos','joint_vel','object_pos','object_quat','object_vel','object_ang_vel']
@@ -79,16 +81,16 @@ def analyze(output):
                        'source_operational_space_callbacks':source_meta['arm_execution']['dynamic_drive'].get('operational_space_callback_count'),
                        'probe_operational_space_callbacks':meta['arm_execution']['dynamic_drive'].get('operational_space_callback_count'),
                        'abort_reason':meta['runtime_safety'].get('abort_reason')}
-    report={'schema':'physical-vla-lab.hgwind-effort-probe-report.v1','mode':plan['mode'],'reference':plan.get('reference','saved-targets'),'source_reference_sha256':plan['source_reference_sha256'],
+    report={'schema':'physical-vla-lab.hgwind-effort-probe-report.v1','mode':plan['mode'],'reference':plan.get('reference','saved-targets'),'tracking':plan.get('tracking','joint'),'tracking_branch_verified':branch_verified,'source_reference_sha256':plan['source_reference_sha256'],
             'task_sha256':plan['task_sha256'],'execution_fingerprints':{k:plan.get(k) for k in ['worker_sha256','patch_sha256','controller_config_sha256','urdf_sha256','adapter_sha256']},'recorded_frames':n,'completed_frames':completed_segments,'requested_frames':plan['frames'],'full_source_length_completed':full,'physics_callback_count':callback_count,'servo_cadence_passed':cadence_ok,'incomplete_control_interval':completed_segments<n,
             'initial_state_differences':initial,'initial_state_match':initial_match,'runtime_safety_passed':meta['runtime_safety']['passed'],
             'independent_grasp_evidence':grasp,'source_state_comparison':tracking,'probe_episode':str(ep),'motor_reference_audit':tag,'control_context':motor_context,'worker_exit_code':json.loads((output/'worker_exit.json').read_text())['exit_code'] if (output/'worker_exit.json').exists() else None,
-            'motion_tracking_passed':bool(plan.get('reference')=='recorded-motion' and full and cadence_ok and initial_match and meta['runtime_safety']['passed'] and grasp and grasp['status']=='pass'),
-            'baseline_ready_for_cartesian':bool(plan.get('reference','saved-targets')=='saved-targets' and plan['mode']=='joint' and full and cadence_ok and initial_match and meta['runtime_safety']['passed'] and grasp and grasp['status']=='pass'),
+            'motion_tracking_passed':bool(plan.get('reference')=='recorded-motion' and full and branch_verified and cadence_ok and initial_match and meta['runtime_safety']['passed'] and grasp and grasp['status']=='pass'),
+            'baseline_ready_for_cartesian':bool(plan.get('reference','saved-targets')=='saved-targets' and plan['mode']=='joint' and full and branch_verified and cadence_ok and initial_match and meta['runtime_safety']['passed'] and grasp and grasp['status']=='pass'),
             'official_benchmark_success_verified':False,'vla_policy':False,'training_eligible':False,
             'limits':['This uses the original effort/limit chain with saved joint-goal references, not reconstructed original operational references.','Shadow task FSM outcomes are not the independent probe result.','A short smoke cannot establish grasp performance.']}
     (output/'report.json').write_text(json.dumps(report,indent=2)+'\n')
-    print('HGWIND_EFFORT_PROBE_COMPLETED '+json.dumps({k:report[k] for k in ['mode','reference','recorded_frames','completed_frames','full_source_length_completed','initial_state_match','motion_tracking_passed','baseline_ready_for_cartesian']}))
+    print('HGWIND_EFFORT_PROBE_COMPLETED '+json.dumps({k:report[k] for k in ['mode','reference','tracking','tracking_branch_verified','recorded_frames','completed_frames','full_source_length_completed','initial_state_match','motion_tracking_passed','baseline_ready_for_cartesian']}))
     print('INDEPENDENT_GRASP '+str(None if grasp is None else grasp['status']));print('REPORT '+str(output/'report.json'))
     return report
 

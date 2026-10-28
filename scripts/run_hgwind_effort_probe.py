@@ -25,6 +25,7 @@ from capstone_vla.recorded_franka import RecordedFrankaAdapter
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--mode',choices=('joint','cartesian'),default='joint')
+    parser.add_argument('--tracking',choices=('joint','task-space'),default='joint')
     parser.add_argument('--reference',choices=('saved-targets','recorded-motion'),default='saved-targets')
     parser.add_argument('--host',choices=('local','hongtao'),default='local')
     parser.add_argument('--episode',default='traj_00000')
@@ -49,23 +50,23 @@ def main():
     require(args.reference!='recorded-motion' or args.mode=='joint','Recorded-motion is a separate joint-tracking diagnostic; Cartesian support is not implemented')
     n=len(reference_actions) if args.frames==0 else args.frames;require(n<=len(reference_actions),'Smoke length exceeds source')
     stamp=datetime.now(ZoneInfo('Asia/Hong_Kong')).strftime('%Y%m%d_%H%M%S_%f')
-    output=ROOT/'data/derived/hgwind_effort_probes'/(stamp+'_'+args.mode+'_'+args.reference)
+    output=ROOT/'data/derived/hgwind_effort_probes'/(stamp+'_'+args.mode+'_'+args.reference+'_'+args.tracking)
     plan={'schema':'physical-vla-lab.hgwind-effort-probe.v1','mode':args.mode,'host':args.host,'episode':args.episode,
-          'reference':args.reference,'reference_frames':len(reference_actions),'frames':n,'source_frames':len(actions),'source':str(source),'source_files':row['files'],'source_reference_sha256':sha256(source),
+          'tracking':args.tracking,'reference':args.reference,'reference_frames':len(reference_actions),'frames':n,'source_frames':len(actions),'source':str(source),'source_files':row['files'],'source_reference_sha256':sha256(source),
           'task':cohort['task_usd'],'task_sha256':cohort['task_sha256'],'physics_sha256':cohort['physics_sha256'],
           'worker':str(worker),'worker_sha256':sha256(worker),'patch_sha256':hashlib.sha256(patched.encode()).hexdigest(),
           'bundle_manifest':str(bundle_manifest),'bundle_manifest_sha256':cohort['bundle_manifest_sha256'],
           'adapter_sha256':{name:sha256(ROOT/name) for name in ['src/capstone_vla/hgwind_effort_probe.py','src/capstone_vla/recorded_franka.py','src/capstone_vla/franka.py','scripts/sim/run_hgwind_effort_probe_worker.py']},
           'controller_config':str(cfg_path),'controller_config_sha256':sha256(cfg_path),'urdf_sha256':adapter.urdf_sha256,
           'output':str(output),'worker_output':str(output/'worker_output'),'seed':meta['base_seed'],'attempt_offset':meta['attempt_index'],
-          'reference_fidelity':'Joint inverse-dynamics tracking through the existing effort feasibility/limit pipeline; original operational-space control references are absent.',
+          'reference_fidelity':args.tracking+' tracking through the existing effort feasibility/limit pipeline; original expert operational references are not reconstructed.',
           'baseline_run':str(args.baseline_run.resolve()) if args.baseline_run else None,'training_eligible':False}
     validate_source(plan,meta,actions,times)
     if args.mode=='cartesian':
         require(args.baseline_run is not None,'First run/inspect the joint baseline; provide --baseline-run for Cartesian')
         baseline=json.loads((args.baseline_run/'report.json').read_text())
         require(baseline['mode']=='joint' and baseline['baseline_ready_for_cartesian']
-                and baseline.get('reference','saved-targets')==args.reference
+                and baseline.get('reference','saved-targets')==args.reference and baseline.get('tracking','joint')==args.tracking
                 and baseline['source_reference_sha256']==plan['source_reference_sha256']
                 and baseline['task_sha256']==plan['task_sha256']
                 and baseline['execution_fingerprints']=={k:plan[k] for k in ['worker_sha256','patch_sha256','controller_config_sha256','urdf_sha256','adapter_sha256']},'Baseline is incomplete, failed or refers to another source')
@@ -82,7 +83,7 @@ def main():
              '--keep_failed','--run_id','hgwind_effort_probe_'+stamp,'--device','cuda:0','--headless','--no-visualization','--fast_exit_after_save',
              '--experience','isaacsim.exp.base.python.kit',
              '--kit_args=--portable-root '+str(ROOT/'data/derived/.cache/isaacsim/linux')+' --/renderer/multiGpu/autoEnable=false --/renderer/multiGpu/enabled=false --/renderer/multiGpu/maxGpuCount=1 --/app/extensions/fsWatcherEnabled=false']
-    print(f'CPU_PREFLIGHT_OK mode={args.mode} reference={args.reference} source={args.host}/{args.episode} frames={n} effort_pipeline=true primary_tracking=joint_inverse_dynamics exact_state_replay=false',flush=True)
+    print(f'CPU_PREFLIGHT_OK mode={args.mode} reference={args.reference} source={args.host}/{args.episode} frames={n} effort_pipeline=true primary_tracking={args.tracking} exact_state_replay=false',flush=True)
     print('REFERENCE_LIMIT '+plan['reference_fidelity'],flush=True);print('OUTPUT '+str(output),flush=True);print('COMMAND '+shlex.join(command),flush=True)
     if not args.run:print('DRY_RUN_ONLY: add --run');return 0
     output.mkdir(parents=True,exist_ok=False);(output/'plan.json').write_text(json.dumps(plan,indent=2)+'\n')

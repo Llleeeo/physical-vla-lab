@@ -11,6 +11,7 @@ from pathlib import Path
 
 import h5py
 import numpy as np
+from scipy.spatial.transform import Rotation
 
 from .franka import FrankaActionContract
 from .recorded_franka import RecordedFrankaAdapter
@@ -23,6 +24,8 @@ _STATE = {}
 def validate_source(plan, metadata, actions, times):
     require(plan['schema']=='physical-vla-lab.hgwind-effort-probe.v1','Unknown probe manifest')
     require(plan['mode'] in ('joint','cartesian'),'Unknown probe mode')
+    require(plan.get('tracking','joint') in ('joint','task-space'),'Unknown tracking branch')
+    require(plan.get('tracking','joint')!='task-space' or (plan.get('reference')=='recorded-motion' and plan['mode']=='joint'),'Task-space tracking requires recorded-motion joint goals')
     steps=metadata.get('task_plan',{}).get('steps',[])
     require(metadata.get('task',{}).get('id')==TASK_ID and len(steps)==1
             and steps[0]['skill']=='Grasp' and steps[0]['target_role']=='A','Probe is HGwind Grasp only')
@@ -85,7 +88,7 @@ def load_action_reference(source, *, task_id, control_hz=None):
     require(adapter.urdf_sha256==plan['urdf_sha256'],'URDF changed')
     actions=actions[:count]
     poses=np.stack([adapter.contract.encode(*adapter.pose_jacobian(q[:7])[:2],1 if q[7]>.02 else -1) for q in actions])
-    _STATE.clear();_STATE.update(plan=plan,adapter=adapter,poses=poses,velocities=velocities[:count],requests=[],assistance=[])
+    _STATE.clear();_STATE.update(plan=plan,adapter=adapter,poses=poses,velocities=velocities[:count],requests=[],assistance=[],task_reference_checks=[])
     return actions.astype(np.float32),meta,{'source_trajectory':str(source),'source_sha256':sha256(source),
         'source_joint_names':meta['joint_names'],'source_frames':count,'mode':'capstone_hgwind_effort_command_probe',
         'initialization':'same_scene_base_seed_and_attempt_index; physical first states must be compared',
@@ -117,6 +120,55 @@ def reference_frame(actions, index, source_names, runtime_names, *, measured_pos
     return target,velocity
 
 
+
+def _jacobian_rate_product(adapter, position, velocity):
+    if not np.any(velocity):return np.zeros(6)
+    epsilon=1.e-5
+    plus=adapter.pose_jacobian(position+epsilon*velocity)[2]
+    minus=adapter.pose_jacobian(position-epsilon*velocity)[2]
+    return ((plus-minus)/(2*epsilon))@velocity
+
+
+def task_reference_terms(adapter, measured_q, measured_v, desired_q, desired_v, desired_a, base_rotation):
+    """World-frame pose/twist/acceleration from the same bounded joint reference.
+
+    All inputs are robot proprioception or the diagnostic reference. No ball,
+    contact, grasp phase, source future object state or expert plan is consumed.
+    """
+    vectors=[np.asarray(x,float) for x in (measured_q,measured_v,desired_q,desired_v,desired_a)]
+    require(all(x.shape==(7,) and np.isfinite(x).all() for x in vectors),'Invalid task-reference joint vectors')
+    measured_q,measured_v,desired_q,desired_v,desired_a=vectors
+    base=np.asarray(base_rotation,float)
+    require(base.shape==(3,3) and np.isfinite(base).all() and np.allclose(base.T@base,np.eye(3),atol=1e-7)
+            and np.isclose(np.linalg.det(base),1.),'Invalid robot base rotation')
+    p,rotation,jac=adapter.pose_jacobian(measured_q)
+    desired_p,desired_rotation,desired_jac=adapter.pose_jacobian(desired_q)
+    world=lambda x:np.r_[base@x[:3],base@x[3:]]
+    return {'jacobian':np.vstack((base@jac[:3],base@jac[3:])),
+            'task_position_error':world(np.r_[desired_p-p,(desired_rotation*rotation.inv()).as_rotvec()]),
+            'commanded_task_velocity':world(desired_jac@desired_v),
+            'feedforward_task_acceleration':world(desired_jac@desired_a+_jacobian_rate_product(adapter,desired_q,desired_v)),
+            'jacobian_dot_velocity':world(_jacobian_rate_product(adapter,measured_q,measured_v)),
+            'physics_rate_reference':True}
+
+
+def physics_task_reference(expert, measured_q, measured_v, desired_q, desired_v, desired_a):
+    if _STATE['plan'].get('tracking','joint')=='joint':return None
+    adapter=_STATE['adapter'];base_p,base_wxyz=expert._base_pose()
+    base=Rotation.from_quat(np.asarray(base_wxyz)[[1,2,3,0]])
+    reference=task_reference_terms(adapter,measured_q,measured_v,desired_q,desired_v,desired_a,base.as_matrix())
+    if not _STATE['task_reference_checks']:
+        p,rotation,_=adapter.pose_jacobian(measured_q);live_p,live_wxyz=expert.ee_pose()
+        live_r=Rotation.from_quat(np.asarray(live_wxyz)[[1,2,3,0]])
+        require(np.linalg.norm(np.asarray(base_p)+base.apply(p)-live_p)<1.e-4
+                and ((base*rotation)*live_r.inv()).magnitude()<1.e-4,'Task-space/live control tool frames differ')
+        require(np.allclose(reference['jacobian'],expert.measured_ee_jacobian(),atol=1.e-4,rtol=0),'Task-space/live control Jacobians differ')
+    _STATE['task_reference_checks'].append([float(np.linalg.norm(reference['task_position_error'][:3])),
+        float(np.linalg.norm(reference['task_position_error'][3:])),float(np.linalg.norm(reference['commanded_task_velocity'])),
+        float(np.linalg.norm(reference['feedforward_task_acceleration']))])
+    return reference
+
+
 def check_assistance(stage, robot_path, object_paths, attach_state):
     from .task2_bridge import grasp_joint_candidates
     if 'joint_candidates' not in _STATE:
@@ -132,12 +184,13 @@ def summary():
     data=_STATE['requests']
     arrays={key:np.asarray([x[key] for x in data]) for key in ['frame','measured_joints','requested_joints','requested_velocity','source_pose_action']}
     arrays['assistance']=np.asarray(_STATE['assistance'])
+    arrays['task_reference_checks']=np.asarray(_STATE['task_reference_checks']).reshape(-1,4)
     if out.exists():raise FileExistsError('Probe diagnostics already exist')
     np.savez(out,**arrays)
-    return {'schema':plan['schema'],'mode':plan['mode'],'reference':plan.get('reference','saved-targets'),'command_frames':len(data),'assistance_checks':len(_STATE['assistance']),
+    return {'schema':plan['schema'],'mode':plan['mode'],'reference':plan.get('reference','saved-targets'),'tracking':plan.get('tracking','joint'),'task_reference_callback_count':len(_STATE['task_reference_checks']),'command_frames':len(data),'assistance_checks':len(_STATE['assistance']),
         'source_reference_sha256':sha256(plan['source']),'saved_commands_own_motors':True,
         'shadow_expert_operational_reference_used':False,'shadow_expert_velocity_limit_used':False,
-        'shadow_task_fsm_runs_for_evidence':True,'source_native_operational_reference_reconstructed':False,'primary_tracking_controller':'joint_inverse_dynamics',
+        'shadow_task_fsm_runs_for_evidence':True,'source_native_operational_reference_reconstructed':False,'primary_tracking_controller':'operational_space_inverse_dynamics' if plan.get('tracking')=='task-space' else 'joint_inverse_dynamics',
         'training_eligible':False,'vla_policy':False,'source_actuator_mode':'operational_space_inverse_dynamics_effort',
         'velocity_reference':'next observed joint velocity' if plan.get('reference')=='recorded-motion' else 'measured-state position-error fallback',
         'reference_path':'saved/converted joint goals -> shared physics-rate viability generator -> original certified model-effort executor'}
@@ -155,6 +208,12 @@ def patch_worker(source):
          '            rec["ee_pos"].append(ee_p); rec["ee_quat"].append(np.asarray(ee_q, np.float32))\n            from capstone_vla.hgwind_effort_probe import check_assistance\n            check_assistance(stage, robot_path, objects, attach_state)'),
         ('"skill_terminations": _jsonify(skill_terminations),',
          '"skill_terminations": _jsonify(skill_terminations),\n            "capstone_effort_probe": __import__("capstone_vla.hgwind_effort_probe", fromlist=["summary"]).summary(),'),
+        ('                    operational_reference = segment.get(\n                        "operational_space_reference"\n                    )',
+         '                    operational_reference = segment.get(\n                        "operational_space_reference"\n                    )\n                    if repair_actions is not None:\n                        from capstone_vla.hgwind_effort_probe import physics_task_reference\n                        operational_reference = physics_task_reference(pol.expert, measured_position_before, measured_velocity_before, reference_position, reference_velocity, reference_acceleration)'),
+        ('                            segment["elapsed_s"]\n                        )\n                        previous_acceleration = (',
+         '                            0.0 if operational_reference.get("physics_rate_reference", False) else segment["elapsed_s"]\n                        )\n                        previous_acceleration = ('),
+        ('                                secondary_task_jacobian=secondary_jacobian,',
+         '                                jacobian_dot_velocity=operational_reference.get("jacobian_dot_velocity"),\n                                secondary_task_jacobian=secondary_jacobian,'),
     ]
     # The upstream repair branch already discards the shadow operational
     # reference. Refuse a worker where that guarantee disappeared.

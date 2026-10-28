@@ -141,3 +141,69 @@ def test_analysis_finds_actual_collector_output_layout(tmp_path):
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
     ep=tmp_path/'1s1p'/'task'/'failed_00000';ep.mkdir(parents=True);(ep/'replay.hdf5').touch()
     assert module.find_probe_episodes(tmp_path)==[ep]
+
+
+class SimpleTaskKinematics:
+    def __init__(self, nonlinear=False):self.nonlinear=nonlinear
+    def pose_jacobian(self,q):
+        from scipy.spatial.transform import Rotation
+        p=np.asarray(q[:3]).copy();j=np.zeros((6,7));j[:3,:3]=np.eye(3);j[5,3]=1
+        if self.nonlinear:p[0]=q[0]**2;j[0,0]=2*q[0]
+        return p,Rotation.from_euler('z',q[3]),j
+
+
+def test_task_reference_uses_world_frame_for_pose_twist_and_jacobian():
+    from scipy.spatial.transform import Rotation
+    a=SimpleTaskKinematics();q=np.zeros(7);target=q.copy();target[[0,3]]=[.02,.03]
+    v=q.copy();v[0]=.1;acc=q.copy();acc[0]=.2;base=Rotation.from_euler('z',np.pi/2).as_matrix()
+    t=probe.task_reference_terms(a,q,q,target,v,acc,base)
+    np.testing.assert_allclose(t['task_position_error'],[0,.02,0,0,0,.03],atol=1e-12)
+    np.testing.assert_allclose(t['commanded_task_velocity'],[0,.1,0,0,0,0],atol=1e-12)
+    np.testing.assert_allclose(t['feedforward_task_acceleration'],[0,.2,0,0,0,0],atol=1e-12)
+    np.testing.assert_allclose(t['jacobian'][:3,0],base[:,0]);assert t['physics_rate_reference']
+
+
+def test_task_reference_includes_jacobian_rate_products():
+    a=SimpleTaskKinematics(nonlinear=True);q=np.zeros(7);q[0]=.4;v=np.zeros(7);v[0]=.3;acc=np.zeros(7);acc[0]=.2
+    t=probe.task_reference_terms(a,q,v,q,v,acc,np.eye(3))
+    np.testing.assert_allclose(t['task_position_error'],0,atol=1e-12)
+    assert t['feedforward_task_acceleration'][0]==pytest.approx(2*.4*.2+2*.3**2,abs=1e-9)
+    assert t['jacobian_dot_velocity'][0]==pytest.approx(2*.3**2,abs=1e-9)
+
+
+def test_joint_tracking_branch_does_not_consume_expert_reference(monkeypatch):
+    monkeypatch.setattr(probe,'_STATE',{'plan':{'tracking':'joint'}})
+    assert probe.physics_task_reference(None,None,None,None,None,None) is None
+
+
+def test_task_tracking_rejects_wrong_live_tool_frame(monkeypatch):
+    q=np.zeros(7);expert=SimpleNamespace(_base_pose=lambda:(np.zeros(3),[1,0,0,0]),ee_pose=lambda:(np.ones(3),[1,0,0,0]))
+    monkeypatch.setattr(probe,'_STATE',{'plan':{'tracking':'task-space'},'adapter':SimpleTaskKinematics(),'task_reference_checks':[]})
+    with pytest.raises(ValueError,match='tool frames differ'):probe.physics_task_reference(expert,q,q,q,q,q)
+
+
+def test_task_tracking_rejects_wrong_live_jacobian(monkeypatch):
+    q=np.zeros(7);expert=SimpleNamespace(_base_pose=lambda:(np.zeros(3),[1,0,0,0]),ee_pose=lambda:(np.zeros(3),[1,0,0,0]),measured_ee_jacobian=lambda:np.zeros((6,7)))
+    monkeypatch.setattr(probe,'_STATE',{'plan':{'tracking':'task-space'},'adapter':SimpleTaskKinematics(),'task_reference_checks':[]})
+    with pytest.raises(ValueError,match='Jacobians differ'):probe.physics_task_reference(expert,q,q,q,q,q)
+
+
+def test_task_reference_invalid_robot_vectors_or_base_are_rejected():
+    a=SimpleTaskKinematics();q=np.zeros(7);bad=q.copy();bad[0]=np.nan
+    with pytest.raises(ValueError,match='joint vectors'):probe.task_reference_terms(a,bad,q,q,q,q,np.eye(3))
+    with pytest.raises(ValueError,match='base rotation'):probe.task_reference_terms(a,q,q,q,q,q,np.zeros((3,3)))
+
+
+def test_task_tracking_requires_explicit_recorded_motion_semantics():
+    p,m,a,t=source();p['tracking']='task-space'
+    with pytest.raises(ValueError,match='requires recorded-motion'):probe.validate_source(p,m,a,t)
+    p['reference']='recorded-motion';probe.validate_source(p,m,a,t)
+
+
+def test_task_tracking_accepts_consistent_frame_and_counts_physics_updates(monkeypatch):
+    a=SimpleTaskKinematics();q=np.zeros(7);expert=SimpleNamespace(_base_pose=lambda:(np.zeros(3),[1,0,0,0]),ee_pose=lambda:(np.zeros(3),[1,0,0,0]),measured_ee_jacobian=lambda:a.pose_jacobian(q)[2])
+    state={'plan':{'tracking':'task-space'},'adapter':a,'task_reference_checks':[]};monkeypatch.setattr(probe,'_STATE',state)
+    for _ in range(2):
+        ref=probe.physics_task_reference(expert,q,q,q,q,q)
+        np.testing.assert_allclose(ref['task_position_error'],0)
+    assert np.asarray(state['task_reference_checks']).shape==(2,4)
