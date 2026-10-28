@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Clean CI dependency correction
+
+- The first GitHub run passed dependency installation and publication checks, then reported 35 passed / 1 failed because `huggingface_hub` was absent from the CPU dependency list. The earlier local test used an environment where it was already installed.
+- Added the missing pinned dependency, selected Node-24-compatible Actions versions and fixed the runner OS to Ubuntu 24.04. Simulator and training environments are unchanged.
+- Validation: all 36 focused tests passed in a newly created Python environment using only `requirements-cpu.txt`; `pip check` passed. Remote CI status is reported separately.
+
 ## 2026-10-28 — Initial research repository preparation
 
 - Documented the RoboPhys-to-VLA workflow, independent research scope and upstream attribution.
