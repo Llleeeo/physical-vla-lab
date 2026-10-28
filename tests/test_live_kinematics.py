@@ -191,3 +191,52 @@ def test_native_geometry_rejects_unexpected_state_or_frozen_source():
     unsafe=native_fixture_source().replace('offset=np.asarray(self._pinch_offset_local,float)','offset=np.asarray(self.target_object_position,float)')
     with pytest.raises(ValueError,match='non-geometry'):compile_native_pinch_jacobian(unsafe)
     with pytest.raises(ValueError,match='step changed'):compile_native_pinch_jacobian(native_fixture_source().replace('1.e-4','1.e-5'))
+
+
+def test_logged_task_feedforward_keeps_reference_identity_and_none():
+    from capstone_vla.live_kinematics import task_feedforward_reference
+    ref={'feedforward_task_acceleration':[0,0,-9.81,0,0,0]}
+    assert task_feedforward_reference(ref,'logged') is ref
+    assert task_feedforward_reference(None,'zero') is None
+
+
+def test_zero_task_feedforward_preserves_other_commands_and_input():
+    from capstone_vla.live_kinematics import task_feedforward_reference
+    ref={'jacobian':np.eye(6,7),'commanded_task_velocity':np.arange(6),
+         'feedforward_task_acceleration':np.array([0,0,-9.81,0,0,0]),
+         'joint_velocity_constraint_matrix':np.eye(7)}
+    original=copy.deepcopy(ref);zeroed=task_feedforward_reference(ref,'zero')
+    assert not zeroed['feedforward_task_acceleration'].any()
+    for key in ref:
+        np.testing.assert_array_equal(ref[key],original[key])
+        if key!='feedforward_task_acceleration':np.testing.assert_array_equal(zeroed[key],ref[key])
+    # The existing executor extrapolates twist with this very same field.
+    np.testing.assert_array_equal(zeroed['commanded_task_velocity']+zeroed['feedforward_task_acceleration']/180,ref['commanded_task_velocity'])
+
+
+def test_unknown_task_feedforward_mode_is_rejected():
+    from capstone_vla.live_kinematics import task_feedforward_reference
+    with pytest.raises(ValueError):task_feedforward_reference(None,'invented')
+
+
+@pytest.mark.parametrize('value',[[0]*3,[float('nan')]*6])
+def test_zero_task_feedforward_rejects_invalid_reference_acceleration(value):
+    from capstone_vla.live_kinematics import task_feedforward_reference
+    with pytest.raises(ValueError):task_feedforward_reference({'feedforward_task_acceleration':value},'zero')
+
+
+def test_zero_task_feedforward_reaches_physics_callback_with_audit(monkeypatch):
+    state={'plan':{'tracking':'live-jacobian','jacobian_method':'native-pinch',
+            'operational_orientation_length_scale_m':.03,'task_feedforward':'zero'},
+        'native_jacobian_callable':lambda expert:np.eye(6,7),'live_jacobian_records':[]}
+    monkeypatch.setattr(probe,'_STATE',state)
+    ref={'jacobian':np.eye(6,7).tolist(),'commanded_task_velocity':list(range(6)),
+         'feedforward_task_acceleration':[0,0,-9.81,0,0,0],'joint_velocity_limit_rad_s':[1.8]*7}
+    actual=probe.live_reference(None,ref,15);state['active_live_reference']=actual
+    applied=probe.physics_task_reference(None,None,None,None,None,None)
+    assert not applied['feedforward_task_acceleration'].any()
+    np.testing.assert_array_equal(applied['commanded_task_velocity'],ref['commanded_task_velocity'])
+    np.testing.assert_array_equal(applied['joint_velocity_limit_rad_s'],ref['joint_velocity_limit_rad_s'])
+    assert ref['feedforward_task_acceleration'][2]==-9.81
+    record=state['task_feedforward_records'][0]
+    assert record['original'][2]==-9.81 and not record['applied'].any()

@@ -28,6 +28,8 @@ The first current-Jacobian component diagnostic aborted after 150 completed inte
 
 The subsequent native-geometry live-Jacobian run passes all 209 intervals, safety and independent grasp checks. Its 194 recomputed Jacobians and all 15 core numeric arrays match the source exactly. This certifies the live geometry component for one exposed case, with other logged command references and shadow bookkeeping still retained. See [the live-geometry success evidence](../../results/summaries/2026-10-28-live-native-geometry-success.json).
 
+An opt-in task-acceleration feedforward ablation is now CPU-ready (129 regression passes and the matching 209-frame baseline/scene preflight); physical execution is pending. It preserves gravity compensation and the other logged references, so it cannot independently validate the full VLA action contract.
+
 ## Earlier DynamicVLA integration: irregular egg-object task
 
 Task: `grasp_sliding_motion_on_flat_surface_1s1p_g9wvkk1`. Earlier shorthand called the object a ball; the target is an egg. This task remains a difficult development case.

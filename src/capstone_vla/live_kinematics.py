@@ -107,3 +107,19 @@ def compile_native_pinch_jacobian(source, namespace=None):
     scope={key:namespace[key] for key in ['np','time','utils','shortest_quaternion_rotation_vector']}
     exec(code,scope)
     return scope['recompute']
+
+
+def task_feedforward_reference(reference, mode):
+    """Optional diagnostic: zero task acceleration, preserving other fields.
+
+    This is separate from the effort executor's gravity compensation and
+    nullspace/joint acceleration. It also zeroes the original within-segment
+    task-velocity extrapolation, which consumes this same acceleration field.
+    """
+    if mode not in ('logged','zero'):raise ValueError('Unknown task feedforward mode')
+    if reference is None or mode=='logged':return reference
+    acceleration=np.asarray(reference['feedforward_task_acceleration'],float)
+    if acceleration.shape!=(6,) or not np.isfinite(acceleration).all():
+        raise ValueError('Invalid coupled task acceleration')
+    result=dict(reference);result['feedforward_task_acceleration']=np.zeros_like(acceleration)
+    return result

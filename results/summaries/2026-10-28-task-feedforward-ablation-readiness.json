@@ -1,0 +1,37 @@
+{
+  "schema": "physical-vla-lab.hgwind-task-feedforward-ablation-readiness.v1",
+  "date": "2026-10-28",
+  "status": "CPU_READY_PHYSICAL_RUN_PENDING",
+  "source_sha256": "e1b54faae644b64f8148b0fe0397d74287f06d7c48fa97ee34a054339a72e3d3",
+  "task_sha256": "83330198e8a5a70758eda7b8ead447f61b3289c4206d738507ab6c77a806a6c7",
+  "control_log_sha256": "78b6ea934b8266aa428f47b95d9eb3be94d3bf8bce723fd5de99e402c054e140",
+  "passing_live_geometry_report_sha256": "37b0e68bf0fcf4f6ce3ce168886b61a43276a2e2400e41de609bddb94e015090",
+  "intervention": "Zero only feedforward_task_acceleration in each coupled OSC reference. The existing within-segment task-velocity extrapolation consumes the same field and is consequently zero as well.",
+  "expected_nonzero_source_commands_changed": 110,
+  "coupled_references": 194,
+  "total_control_intervals": 209,
+  "unchanged": [
+    "native pinch-point Jacobian recomputed from current robot state",
+    "original effort executor gravity/coriolis compensation",
+    "original joint goals and paired velocities",
+    "task velocity at control boundary and task metric",
+    "geometry constraints and velocity caps",
+    "gripper signals, timing, scene and physics",
+    "manufacturer and runtime safety limits"
+  ],
+  "baseline_gate": "Require matching passing native-pinch live-geometry report with original logged task feedforward and matching source/task/controller/worker/URDF/control log.",
+  "new_result_field": "task_feedforward_ablation_passed",
+  "original_kinematics_gate_scoped_null_for_ablation": true,
+  "portable_cpu_tests_passed": 129,
+  "real_scene_cpu_preflight_frames": 209,
+  "python310_syntax_passed": true,
+  "physical_run_started": false,
+  "ablation_passed": null,
+  "vla_evaluated": false,
+  "limits": [
+    "Logged joint references, twist, constraints and shadow task bookkeeping remain.",
+    "Passing would show dispensability only under the retained inputs for this exposed episode, not a sufficient seven-dimensional policy contract.",
+    "Failure would not prove that a seven-dimensional learned controller is impossible; an alternative runtime acceleration/control rule could still be investigated.",
+    "No ball-cohort training or bulk conversion started."
+  ]
+}

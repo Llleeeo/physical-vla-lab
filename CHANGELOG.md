@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Task feedforward ablation prepared
+
+- Added an opt-in zero-task-acceleration comparison gated on the passing native-geometry baseline. Default logged references, gravity compensation and all safety limits are preserved.
+- Record original/applied acceleration and use a separate ablation outcome; physical run is pending. This remains a partial expert-reference diagnostic, not a complete seven-dimensional policy contract.
+- Six added regressions bring the portable suite to 129 passes. Matching baseline, scene and 209-frame CPU preflight pass.
+
 ## 2026-10-28 — Live native robot kinematics verified
 
 - Native pinch geometry completes 209 intervals / 627 physics updates and passes independent grasp checks: 1.2 s bilateral contact and at least 74.861 mm retained lift.

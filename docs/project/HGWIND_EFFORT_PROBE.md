@@ -220,3 +220,23 @@ Independent grasp evidence passes: 72 bilateral bins (1.2 s), final-window minim
 This verifies the live geometry component for one exposed seed. The preceding metric-corrected shifted-tool calculation diverged after contact; replacing its numerical geometry construction with the native one recovers exact reproduction in this case. It does not isolate a general contact/optimizer sensitivity mechanism or establish robustness to small policy errors. Logged joint goals, paired velocities, task velocity/feedforward, constraints and gripper timing still provide the command content; the shadow FSM remains for bookkeeping and safety. No VLA has been evaluated in this experiment.
 
 The next gate is an explicit policy output/execution contract that removes the remaining logged motor-reference dependencies. Validate an expert-derived stream through that interface before converting the ball cohort or training a model. A live Jacobian alone does not certify the complete learned-policy executor.
+
+
+## Next single-factor check: task-acceleration feedforward
+
+The successful native-geometry reference still includes task acceleration feedforward in 110 of its 194 OSC commands. A new opt-in `--task-feedforward zero` comparison removes only that explicit acceleration field, retaining the matching native geometry and all other command inputs. The original physics-rate executor extrapolates task velocity as `v + a * elapsed`; zeroing the field also removes this within-segment extrapolation. This is one field intervention with both downstream uses disclosed. Gravity/coriolis compensation, nullspace/joint acceleration and physical safety limits are unchanged.
+
+The default remains `logged`. The zero variant requires `--tracking live-jacobian --jacobian-method native-pinch` and a matching passing `--kinematics-run` that retained original feedforward. Source, task, worker, URDF, controller and control-log hashes must match. The experiment records original/applied acceleration per command, removed-nonzero count and maximum applied magnitude. Acceptance requires the usual full-length/safety/grasp checks, 110 changed nonzero commands, complete acceleration auditing and zero applied task acceleration. Its scoped result is `task_feedforward_ablation_passed`; the already established geometry-component gate is null for this new experiment.
+
+```bash
+data/derived/hf_pilot_render_repo/.venv/bin/python \
+  scripts/run_hgwind_effort_probe.py --tracking live-jacobian \
+  --jacobian-method native-pinch --task-feedforward zero \
+  --reference-run data/derived/hgwind_effort_probes/20261028_191242_476137_joint_online-expert_native-expert \
+  --kinematics-run data/derived/hgwind_effort_probes/20261028_222613_782577_joint_control-log_live-jacobian \
+  --run
+```
+
+Six new regression cases bring the portable CPU suite to 129 passes; the actual 209-frame baseline/scene/metric preflight and simulator-source Python 3.10 parsing pass. Physical execution is pending. Output directories carry an `_ff-zero` suffix; omit the new feedforward option to restore the original reference behavior. No upstream code or source data is edited.
+
+A passing result would only show that this explicit field can be removed while the other logged references remain in this case. It would not establish that a seven-dimensional VLA output suffices, since the retained joint/constraint inputs could compensate. A failure would likewise not rule out seven-dimensional policies with different runtime acceleration handling. The purpose is to reduce one documented interface dependency before selecting final action labels, not to count another learned-policy success. See the [readiness record](../../results/summaries/2026-10-28-task-feedforward-ablation-readiness.json).
