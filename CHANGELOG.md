@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Upper target capture verified; association audit corrected
+
+- Original expert succeeds over 209 intervals, captures 194 upper Cartesian calls and exactly reproduces all 15 core arrays.
+- Fixed an audit error: native reference consumption copies dictionary/array objects, so identity matching falsely rejected every call. Unique exact same-frame arm/full-reference content matching recovers all links offline; raw data and the old report are preserved.
+- Four added regressions bring the portable suite to 141 passes. Inventory identifies changing gains/settings and callable safety dependencies; complete feedback execution remains pending. No simulation rerun for this correction.
+
 ## 2026-10-28 — Saved probe visualization helper
 
 - Added a small wrapper around the existing frozen renderer for saved successful or failed HGwind probes, with a separate work copy, recorded camera scene and original-evidence hash checks.

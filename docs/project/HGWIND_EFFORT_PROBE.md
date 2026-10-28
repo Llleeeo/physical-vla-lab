@@ -256,3 +256,10 @@ Next, define the full Cartesian target feedback contract using the original uppe
 ## Visualize an already saved probe
 
 `scripts/render_hgwind_effort_probe.py --probe-run <run> --run` renders saved states with the recorded camera-v2 task through the existing frozen renderer. It accepts failed episodes, verifies the task/bundle/SDK, stages the core episode files under `<run>/visualization/Trajectory/1s1p/<task>/<episode>`, and checks original evidence hashes afterward. This is exact-state visualization of a past physical rollout, not a new control experiment or training sample. The default 30 Hz preview uses the existing calibrated views; video files appear in the staged episode's `video/` directory. Without `--run`, the command performs CPU preparation/preflight only. The zero-task-feedforward failed episode passed this preflight with `tasks=1 trajectories=1`; GPU rendering is pending.
+
+
+## Upper Cartesian capture verified — 2026-10-29
+
+The read-only original expert capture succeeds over 209 intervals; all 194 upper calls align and all 15 core numeric arrays exactly match the source. Its initial target-capture flag was false because the new audit incorrectly assumed native reference consumption preserves object identity. The native method copies its dictionary and arrays. Exact same-frame arm/full-reference content matching recovers all links offline, with the old report preserved and raw evidence unchanged. The corrected `cartesian_target_capture_verified` is true; 141 CPU regressions pass. There was no simulation rerun for this correction.
+
+Actual upper inputs now expose variable controller settings and two callable safety dependencies. See [capture details and next interface gate](CARTESIAN_TARGET_CAPTURE.md) and the [source-hashed result](../../results/summaries/2026-10-29-cartesian-target-capture-result.json). This is successful expert target capture, not a complete standalone Cartesian policy executor.

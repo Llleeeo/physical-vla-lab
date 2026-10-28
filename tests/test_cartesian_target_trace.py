@@ -9,7 +9,7 @@ class ToyExpert:
     def __init__(self):self.calls=[];self._pending_operational_space_reference=None
     def operational_space_pinch_action(self,target_position,target_quaternion,*,gain=6.,projector=None):
         self.calls.append((target_position,target_quaternion,gain,projector))
-        self._pending_operational_space_reference={'jacobian':np.eye(6,7)}
+        self._pending_operational_space_reference={'jacobian':np.eye(6,7),'commanded_task_velocity':np.r_[np.asarray(target_position,float),[0,0,0]]}
         self.last_result=SimpleNamespace(joint_indices=np.arange(7),joint_positions=np.zeros(7),joint_velocities=np.ones(7))
         return self.last_result
 
@@ -90,3 +90,47 @@ def test_nonfinite_or_unknown_values_are_explicit_not_invalid_json():
     value=encode({'a':np.float64('nan'),'b':object(),'c':np.int64(2)})
     assert value['a']['unsupported_type']=='nonfinite_float' and 'unsupported_type' in value['b']
     json.dumps(value,allow_nan=False)
+
+
+def test_native_consumption_copy_matches_without_identity(monkeypatch):
+    import copy
+    expert=ToyExpert();recorder=CartesianTargetRecorder();recorder.begin_frame(expert,0)
+    expert.operational_space_pinch_action([0,0,0],[1,0,0,0])
+    original=expert._pending_operational_space_reference
+    copied=copy.deepcopy(original)
+    assert copied is not original
+    row={'frame':0,'goal_position':[0]*7,'goal_velocity':[1]*7,'operational_space_reference':copied}
+    row.update(recorder.segment_links(0,row))
+    assert row['selected_cartesian_call_ids']==[0]
+    assert audit_capture(recorder.payload(),[row],1)['capture_alignment_passed']
+
+
+def test_old_empty_identity_links_are_recoverable_from_exact_recorded_contents():
+    import copy
+    expert=ToyExpert();recorder=CartesianTargetRecorder();recorder.begin_frame(expert,0)
+    expert.operational_space_pinch_action([0,0,0],[1,0,0,0])
+    row={'frame':0,'goal_position':[0]*7,'goal_velocity':[1]*7,'operational_space_reference':copy.deepcopy(expert._pending_operational_space_reference),'selected_cartesian_call_ids':[]}
+    result=audit_capture(recorder.payload(),[row],1)
+    assert result['capture_alignment_passed'] and result['recovered_selection_frames']==[0]
+    assert row['selected_cartesian_call_ids']==[]  # Audit does not rewrite evidence.
+
+
+def test_duplicate_full_references_remain_ambiguous():
+    expert=ToyExpert();recorder=CartesianTargetRecorder();recorder.begin_frame(expert,0)
+    for _ in range(2):expert.operational_space_pinch_action([0,0,0],[1,0,0,0])
+    row={'frame':0,'goal_position':[0]*7,'goal_velocity':[1]*7,'operational_space_reference':expert._pending_operational_space_reference}
+    row.update(recorder.segment_links(0,row))
+    assert row['reference_matching_cartesian_call_ids']==[0,1] and not row['selected_cartesian_call_ids']
+    assert not audit_capture(recorder.payload(),[row],1)['capture_alignment_passed']
+
+
+def test_full_reference_mismatch_and_nonfinite_cannot_create_a_link():
+    import copy
+    from capstone_vla.cartesian_target_trace import reference_content_equal
+    expert=ToyExpert();recorder=CartesianTargetRecorder();recorder.begin_frame(expert,0)
+    expert.operational_space_pinch_action([0,0,0],[1,0,0,0])
+    wrong=copy.deepcopy(expert._pending_operational_space_reference);wrong['jacobian'][0,0]+=1e-12
+    row={'frame':0,'goal_position':[0]*7,'goal_velocity':[1]*7,'operational_space_reference':wrong}
+    assert not recorder.segment_links(0,row)['selected_cartesian_call_ids']
+    assert not reference_content_equal([float('nan')],[float('nan')])
+    assert not reference_content_equal({'unsupported_type':'nonfinite_float'},{'unsupported_type':'nonfinite_float'})

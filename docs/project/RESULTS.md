@@ -1,6 +1,6 @@
 # Results and limitations
 
-Snapshot: **2026-10-28, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
+Snapshot: **2026-10-29, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
 ## Wind-driven spherical-object cohort
 
@@ -30,7 +30,7 @@ The subsequent native-geometry live-Jacobian run passes all 209 intervals, safet
 
 The task-acceleration feedforward ablation completed 209 intervals safely but produced no finger/object contact; EE difference reached 50.122 mm by frame 15. The audit confirms 110 changed nonzero commands and otherwise unchanged requested joint references and control/scene fingerprints. Direct velocity differencing does not recover the original acceleration. Retain the passing reference while defining the complete Cartesian feedback contract; the result does not independently establish a required VLA action dimension. See [the dependency audit](../../results/summaries/2026-10-28-task-feedforward-result.json). Latest runtime CPU regression suite: 129 passes.
 
-A read-only [upper Cartesian target capture](CARTESIAN_TARGET_CAPTURE.md) is CPU-ready (137 checks and real frozen scene/patch preflight). It will observe original target/feedback arguments and associate them with actual motor segments; physical capture and standalone feedback execution are pending.
+The read-only [upper Cartesian target capture](CARTESIAN_TARGET_CAPTURE.md) succeeds over 209 intervals, records 194 upper calls and preserves exact equality of all 15 core arrays. The initial identity-based association check was incorrect because native consumption copies references; corrected exact-content matching recovers all 194 links offline, with raw records unchanged and the original report preserved. `cartesian_target_capture_verified=true`; 141 CPU checks pass. Standalone feedback execution remains pending. See [verified capture evidence](../../results/summaries/2026-10-29-cartesian-target-capture-result.json).
 
 ## Earlier DynamicVLA integration: irregular egg-object task
 

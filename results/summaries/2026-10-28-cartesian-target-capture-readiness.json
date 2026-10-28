@@ -41,5 +41,7 @@
     "Full controller feedback/state dependencies remain to be audited after actual capture.",
     "Recorded expert targets may be privileged labels; no claim that they are permissible VLA observations.",
     "No ball training or bulk data conversion has started."
-  ]
+  ],
+  "subsequent_result": "2026-10-29-cartesian-target-capture-result.json",
+  "initial_identity_association_rule_corrected": true
 }

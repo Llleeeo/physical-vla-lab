@@ -33,9 +33,29 @@ def match_calls(events,segment):
     return matches
 
 
+def reference_content_equal(left,right):
+    """Exact finite contents; native consumption copies dictionaries/arrays."""
+    if isinstance(left,dict) or isinstance(right,dict):
+        if not isinstance(left,dict) or not isinstance(right,dict) or set(left)!=set(right):return False
+        if {'unsupported_type','callable_descriptor_only'} & set(left):return False
+        return all(reference_content_equal(left[key],right[key]) for key in left)
+    if left is None or right is None:return left is None and right is None
+    try:
+        a,b=np.asarray(left,float),np.asarray(right,float)
+        return bool(a.shape==b.shape and np.isfinite(a).all() and np.isfinite(b).all() and np.array_equal(a,b))
+    except (TypeError,ValueError):return False
+
+
+def reference_matches(events,segment):
+    candidates=set(match_calls(events,segment));reference=segment.get('operational_space_reference')
+    if reference is None:return []
+    return [event['call_id'] for event in events if event['call_id'] in candidates
+        and event['frame']==segment['frame'] and reference_content_equal(event.get('pending_operational_reference'),reference)]
+
+
 class CartesianTargetRecorder:
     def __init__(self):
-        self.events=[];self.pending_references=[];self.frame=None;self.frames=[];self.expert=None;self.original=None
+        self.events=[];self.frame=None;self.frames=[];self.expert=None;self.original=None
 
     def begin_frame(self,expert,index):
         if self.expert is None:
@@ -47,14 +67,13 @@ class CartesianTargetRecorder:
                 # original objects and argument spelling, exactly once.
                 bound=signature.bind(*args,**kwargs);bound.apply_defaults()
                 event={'call_id':len(self.events),'frame':self.frame,'inputs':encode(bound.arguments),'completed':False}
-                self.events.append(event);self.pending_references.append(None)
+                self.events.append(event)
                 try:result=original(*args,**kwargs)
                 except Exception as exc:
                     event['exception_type']=type(exc).__name__;raise
                 event['completed']=True
                 event['returned_action']=None if result is None else encode({key:getattr(result,key,None) for key in ['joint_indices','joint_positions','joint_velocities']})
                 pending=getattr(expert,'_pending_operational_space_reference',None)
-                self.pending_references[event['call_id']]=pending
                 event['pending_operational_reference']=encode(pending)
                 return result
             expert.operational_space_pinch_action=observed
@@ -67,8 +86,10 @@ class CartesianTargetRecorder:
     def segment_links(self,index,segment):
         events=[x for x in self.events if x['frame']==int(index)]
         matches=match_calls(events,segment)
-        selected=[i for i in matches if self.pending_references[i] is segment['operational_space_reference']] if segment.get('operational_space_reference') is not None else []
-        return {'cartesian_call_ids':[x['call_id'] for x in events],'matching_cartesian_call_ids':matches,'selected_cartesian_call_ids':selected}
+        full=reference_matches(events,segment);selected=full if len(full)==1 else []
+        return {'cartesian_call_ids':[x['call_id'] for x in events],'matching_cartesian_call_ids':matches,
+            'reference_matching_cartesian_call_ids':full,'selected_cartesian_call_ids':selected,
+            'selection_rule':'unique_same_frame_arm_and_full_reference_content'}
 
     def payload(self):
         return {'schema':'physical-vla-lab.cartesian-target-capture.v1','frames':list(self.frames),'calls':self.events,
@@ -76,21 +97,25 @@ class CartesianTargetRecorder:
 
 
 def audit_capture(payload,segments,frames):
-    calls=payload['calls'];by_id={x['call_id']:x for x in calls}
+    calls=payload['calls']
     coverage=payload['frames']==list(range(frames)) and [x['frame'] for x in segments]==list(range(frames))
     call_order=[x['call_id'] for x in calls]==list(range(len(calls))) and all(isinstance(x['frame'],int) and 0<=x['frame']<frames for x in calls)
-    unmatched=[];bad_links=[];osc=0
+    unmatched=[];bad_links=[];recovered=[];selected_by_frame={};osc=0
     for row in segments:
         if row['operational_space_reference'] is None:continue
-        osc+=1;ids=row.get('selected_cartesian_call_ids',[])
-        if len(ids)!=1:unmatched.append(row['frame'])
-        for i in ids:
-            event=by_id.get(i)
-            if event is None or event['frame']!=row['frame'] or i not in match_calls([event],row):bad_links.append(i)
+        osc+=1
+        candidates=reference_matches([x for x in calls if x['frame']==row['frame']],row)
+        ids=candidates if len(candidates)==1 else []
+        if not ids:unmatched.append(row['frame'])
+        else:selected_by_frame[str(row['frame'])]=ids[0]
+        persisted=row.get('selected_cartesian_call_ids',[])
+        if persisted and persisted!=ids:bad_links.extend(persisted)
+        elif not persisted and ids:recovered.append(row['frame'])
     callable_fields=sorted({key for event in calls for key,value in event['inputs'].items() if isinstance(value,dict) and value.get('callable_descriptor_only')})
     failed=[x['call_id'] for x in calls if not x['completed']]
     return {'frame_coverage_complete':coverage,'call_count':len(calls),'osc_segment_count':osc,'unmatched_osc_frames':unmatched,
-        'invalid_call_links':bad_links,'failed_call_ids':failed,'callable_input_fields':callable_fields,
+        'invalid_call_links':bad_links,'failed_call_ids':failed,'recovered_selection_frames':recovered,
+        'selection_rule':'unique_same_frame_arm_and_full_reference_content','selected_call_ids_by_frame':selected_by_frame,'callable_input_fields':callable_fields,
         'call_order_valid':call_order,'capture_alignment_passed':bool(coverage and call_order and calls and osc and not unmatched and not bad_links),
         'standalone_cartesian_replay_verified':False,'vla_evaluated':False}
 

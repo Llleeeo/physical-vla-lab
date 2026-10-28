@@ -1,0 +1,237 @@
+{
+  "schema": "physical-vla-lab.hgwind-cartesian-target-capture-result.v1",
+  "date": "2026-10-29",
+  "run_date": "2026-10-28",
+  "status": "CARTESIAN_TARGET_CAPTURE_VERIFIED_OFFLINE",
+  "source_sha256": "e1b54faae644b64f8148b0fe0397d74287f06d7c48fa97ee34a054339a72e3d3",
+  "task_sha256": "83330198e8a5a70758eda7b8ead447f61b3289c4206d738507ab6c77a806a6c7",
+  "raw_target_inputs_sha256": "f5d390272567b776a54e898643748e9784e334ad76ac40b4b1d7b334ac1ea16c",
+  "raw_control_log_sha256": "a9b9c5ef9840f9ddea949291804ad926fb2bf0fbbd9fb14a14ce462b51b7aae7",
+  "original_report_sha256": "b7b02d1150891ddc6c564678045b2107d42358fd4efe9b4a07af2064573c6b3a",
+  "revalidated_report_sha256": "2fa81a81937367a51dca19de6bcebabfbb0e23a9a6422fe2bcc6b88070f0dd0a",
+  "frames": 209,
+  "calls": 194,
+  "aligned_osc_segments": 194,
+  "joint_only_fallback_frames": 15,
+  "call_failures": 0,
+  "native_expert_reference_passed": true,
+  "cartesian_target_capture_verified": true,
+  "runtime_safety_passed": true,
+  "core_array_exact_equality": {
+    "actions": true,
+    "timestamp": true,
+    "is_first": true,
+    "is_last": true,
+    "is_terminal": true,
+    "obs/ee_pos": true,
+    "obs/ee_quat": true,
+    "obs/ee_vel": true,
+    "obs/finger_segment_world": true,
+    "obs/joint_pos": true,
+    "obs/joint_vel": true,
+    "obs/object_ang_vel": true,
+    "obs/object_pos": true,
+    "obs/object_quat": true,
+    "obs/object_vel": true
+  },
+  "grasp_measurements": {
+    "frames": 209,
+    "sample_hz": 60.00000000000021,
+    "bilateral_frames": 72,
+    "longest_bilateral_duration_s": 1.1999999999999957,
+    "first_contact_frame": 135,
+    "first_bilateral_frame": 137,
+    "minimum_final_lift_from_first_bilateral_m": 0.07486140727996826,
+    "final_relative_position_jitter_m": 0.00012297761503474774,
+    "object_speed_before_first_contact_m_s": 0.22630296647548676,
+    "object_angular_speed_before_first_contact_rad_s": null,
+    "final_relative_spin_p95_rad_s": null
+  },
+  "initial_verification_defect": "The recorder selected by Python object identity, but native consume_operational_space_reference returns a copied dictionary and arrays. Physical execution and raw capture were already successful.",
+  "corrected_rule": "Unique same-frame match of returned joint position/velocity under original float32 merge semantics plus exact full finite OSC reference contents; duplicate matches remain unresolved.",
+  "offline_recovered_links": 194,
+  "raw_capture_rewritten": false,
+  "simulation_rerun_for_correction": false,
+  "old_report_preserved": true,
+  "portable_cpu_tests_passed": 141,
+  "observed_settings": {
+    "position_gain": {
+      "calls": 194,
+      "none_count": 0,
+      "unique_values": 2,
+      "value_counts": [
+        {
+          "value": 9.0,
+          "count": 173
+        },
+        {
+          "value": 4.0,
+          "count": 21
+        }
+      ],
+      "numeric_shape": [],
+      "numeric_min": 4.0,
+      "numeric_max": 9.0
+    },
+    "orientation_gain": {
+      "calls": 194,
+      "none_count": 0,
+      "unique_values": 2,
+      "value_counts": [
+        {
+          "value": 8.0,
+          "count": 173
+        },
+        {
+          "value": 4.0,
+          "count": 21
+        }
+      ],
+      "numeric_shape": [],
+      "numeric_min": 4.0,
+      "numeric_max": 8.0
+    },
+    "posture_target": {
+      "calls": 194,
+      "none_count": 21,
+      "unique_values": 2,
+      "value_counts": [
+        {
+          "value": [
+            0.011471979073696903,
+            -0.6436579037310401,
+            -0.20007359221858406,
+            -2.3780206070223158,
+            -0.019913602115793627,
+            1.66914839262795,
+            0.7726889636329496
+          ],
+          "count": 173
+        },
+        {
+          "value": null,
+          "count": 21
+        }
+      ],
+      "numeric_shape": [
+        7
+      ],
+      "numeric_min": [
+        0.011471979073696903,
+        -0.6436579037310401,
+        -0.20007359221858406,
+        -2.3780206070223158,
+        -0.019913602115793627,
+        1.66914839262795,
+        0.7726889636329496
+      ],
+      "numeric_max": [
+        0.011471979073696903,
+        -0.6436579037310401,
+        -0.20007359221858406,
+        -2.3780206070223158,
+        -0.019913602115793627,
+        1.66914839262795,
+        0.7726889636329496
+      ]
+    },
+    "joint_limit_margin_rad": {
+      "calls": 194,
+      "none_count": 0,
+      "unique_values": 2,
+      "value_counts": [
+        {
+          "value": 0.0,
+          "count": 173
+        },
+        {
+          "value": 0.08,
+          "count": 21
+        }
+      ],
+      "numeric_shape": [],
+      "numeric_min": 0.0,
+      "numeric_max": 0.08
+    },
+    "orientation_roll_weight": {
+      "calls": 194,
+      "none_count": 0,
+      "unique_values": 2,
+      "value_counts": [
+        {
+          "value": 0.0,
+          "count": 135
+        },
+        {
+          "value": 1.0,
+          "count": 59
+        }
+      ],
+      "numeric_shape": [],
+      "numeric_min": 0.0,
+      "numeric_max": 1.0
+    },
+    "preserve_orientation_during_translation": {
+      "calls": 194,
+      "none_count": 0,
+      "unique_values": 2,
+      "value_counts": [
+        {
+          "value": false,
+          "count": 69
+        },
+        {
+          "value": true,
+          "count": 125
+        }
+      ],
+      "numeric_shape": [],
+      "numeric_min": 0.0,
+      "numeric_max": 1.0
+    },
+    "coupled_operational_pose_task": {
+      "calls": 194,
+      "none_count": 0,
+      "unique_values": 1,
+      "value_counts": [
+        {
+          "value": true,
+          "count": 194
+        }
+      ],
+      "numeric_shape": [],
+      "numeric_min": 1.0,
+      "numeric_max": 1.0
+    },
+    "operational_orientation_length_scale_m": {
+      "calls": 194,
+      "none_count": 0,
+      "unique_values": 1,
+      "value_counts": [
+        {
+          "value": 0.03,
+          "count": 194
+        }
+      ],
+      "numeric_shape": [],
+      "numeric_min": 0.03,
+      "numeric_max": 0.03
+    }
+  },
+  "gain_transition_frames": [
+    173
+  ],
+  "unresolved_callable_inputs": [
+    "cartesian_velocity_projector",
+    "joint_velocity_projector"
+  ],
+  "standalone_cartesian_replay_verified": false,
+  "vla_evaluated": false,
+  "training_started": false,
+  "next_step": "Use actual captured upper goals/motion fields to regenerate arm/OSC commands from current robot state; explicitly resolve callable safety, variable controller settings and terminal fallback behavior before a model action contract.",
+  "limits": [
+    "One exposed expert episode, not a learned-policy success or generalization rate.",
+    "Callables are names only; no callable object or privileged-state controller has been approved as a runtime policy input.",
+    "Observed pose targets, motion references, phase-varying settings and posture reference are separate interface dependencies."
+  ]
+}
