@@ -1,0 +1,125 @@
+{
+  "schema": "physical-vla-lab.hgwind-task-feedforward-result.v1",
+  "date": "2026-10-28",
+  "status": "ZERO_TASK_FEEDFORWARD_GRASP_FAIL_SAFE_COMPLETE",
+  "source_sha256": "e1b54faae644b64f8148b0fe0397d74287f06d7c48fa97ee34a054339a72e3d3",
+  "task_sha256": "83330198e8a5a70758eda7b8ead447f61b3289c4206d738507ab6c77a806a6c7",
+  "control_log_sha256": "78b6ea934b8266aa428f47b95d9eb3be94d3bf8bce723fd5de99e402c054e140",
+  "baseline_report_sha256": "37b0e68bf0fcf4f6ce3ce168886b61a43276a2e2400e41de609bddb94e015090",
+  "ablation_report_sha256": "6f0e5be8c28abca3d6ce6ebc320912634be239e896c19365ba60ddee0ae2998c",
+  "execution": {
+    "completed_frames": 209,
+    "physics_callback_count": 627,
+    "attempted_osc_commands": 582,
+    "initial_state_match": true,
+    "runtime_safety_passed": true,
+    "task_feedforward_ablation_passed": false
+  },
+  "intervention_audit": {
+    "original_acceleration_matches_source_log": true,
+    "osc_commands": 194,
+    "nonzero_commands_zeroed": 110,
+    "first_changed_frame": 2,
+    "maximum_applied_acceleration_abs": 0.0,
+    "requested_joint_and_velocity_arrays_unchanged": {
+      "requested_joints": true,
+      "requested_velocity": true
+    },
+    "source_scene_controller_and_limit_fingerprints_match": true,
+    "gravity_compensation_unchanged": true
+  },
+  "grasp_evidence": {
+    "schema": "capstone_grasp_evidence_v1",
+    "status": "fail",
+    "official_benchmark_success": null,
+    "criteria": {
+      "minimum_bilateral_duration_s": 0.25,
+      "final_hold_duration_s": 0.25,
+      "minimum_lift_m": 0.05,
+      "maximum_relative_position_jitter_m": 0.02,
+      "minimum_precontact_speed_m_s": 0.05,
+      "motion_requirement": "linear",
+      "minimum_precontact_angular_speed_rad_s": 0.1,
+      "maximum_final_relative_spin_rad_s": 0.5,
+      "require_lift": true
+    },
+    "checks": {
+      "continuous_bilateral_contact": false,
+      "final_bilateral_hold": false,
+      "sustained_lift": false,
+      "relative_position_retention": false,
+      "bilateral_nonzero_impulses": false,
+      "object_moving_before_first_contact": null,
+      "no_grasp_assistance": true
+    },
+    "measurements": {
+      "frames": 209,
+      "sample_hz": 60.00000000000021,
+      "bilateral_frames": 0,
+      "longest_bilateral_duration_s": 0.0,
+      "first_contact_frame": null,
+      "first_bilateral_frame": null,
+      "minimum_final_lift_from_first_bilateral_m": null,
+      "final_relative_position_jitter_m": 0.026843423173735368,
+      "object_speed_before_first_contact_m_s": null,
+      "object_angular_speed_before_first_contact_rad_s": null,
+      "final_relative_spin_p95_rad_s": null
+    },
+    "scope": "independent engineering check on recorded states; not full geometry/physics-generalization certification"
+  },
+  "ee_position_difference_mm_at_frames": {
+    "0": 0.0,
+    "3": 0.30593764781951904,
+    "4": 1.4857994318008423,
+    "5": 3.3238391876220703,
+    "15": 50.12249755859375,
+    "90": 215.07891845703125,
+    "135": 230.87457275390625,
+    "208": 189.0577392578125
+  },
+  "source_state_comparison": {
+    "ee_position_mean_mm": 188.47483825683594,
+    "ee_position_p95_mm": 230.16525268554688,
+    "ee_orientation_p95_deg": 73.21651147692994,
+    "first_position_discrepancy_above_0_01mm_frame": 3,
+    "position_error_at_frame_90_mm": 215.07891845703125
+  },
+  "naive_velocity_derivative_audit": {
+    "backward": {
+      "comparisons": 193,
+      "per_component_rmse_m_s2": 14.577138175366876,
+      "residual_vector_norm_p95_m_s2": 57.75275714393312,
+      "residual_vector_norm_max_m_s2": 105.00872785806158,
+      "candidate_acceleration_norm_max_m_s2": 105.00872785806158,
+      "exact_matches_at_1e_6_m_s2": 0,
+      "causality_scope": "Uses current and previous command only; first frame has no derivative."
+    },
+    "forward": {
+      "comparisons": 193,
+      "per_component_rmse_m_s2": 14.915996530522037,
+      "residual_vector_norm_p95_m_s2": 58.7592815308126,
+      "residual_vector_norm_max_m_s2": 105.00872785806158,
+      "candidate_acceleration_norm_max_m_s2": 105.00872785806158,
+      "exact_matches_at_1e_6_m_s2": 0,
+      "causality_scope": "Requires next command; unavailable to a current-command-only interface unless that command was already predicted."
+    }
+  },
+  "maximum_original_linear_feedforward_norm_m_s2": 9.834207211980937,
+  "source_semantics": "Expert.operational_space_pinch_action logs bounded_task_velocity=jacobian@command_qdot while task feedforward separately uses target_linear_acceleration; no derivative identity is guaranteed.",
+  "conclusions": [
+    "Under the retained frozen commands, removing explicit task acceleration and its within-segment velocity extrapolation prevents contact in this exposed episode.",
+    "Safe completion does not mean grasp success.",
+    "Simple backward or forward differencing of the logged bounded velocity does not reconstruct the original feedforward.",
+    "This experiment does not establish that DynamicVLA must predict acceleration: the command stream has no renewed high-level target feedback after the intervention."
+  ],
+  "next_direction": "Keep the passing native-geometry/logged-feedforward case as diagnostic baseline. Design a complete Cartesian target feedback interface and matching labels instead of silently dropping signals or declaring a larger policy action head necessary.",
+  "new_control_code_modified": false,
+  "additional_gpu_run_started": false,
+  "vla_evaluated": false,
+  "training_started": false,
+  "limits": [
+    "One exposed development episode, not a success-rate estimate or a disturbance robustness benchmark.",
+    "No finite-difference acceleration candidate was executed; its numeric mismatch does not rule out a separately designed controller.",
+    "Source joint references, twist, constraints and shadow task bookkeeping remain in the experiment."
+  ]
+}

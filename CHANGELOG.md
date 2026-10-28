@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Task feedforward ablation outcome and dependency audit
+
+- Zero-task-acceleration experiment completes all 209 intervals safely but makes no finger/object contact. Verified 110 altered commands, zero applied task acceleration and otherwise matching requested joint references/control fingerprints.
+- Position divergence begins before contact; error reaches 50.122 mm at frame 15. CPU differencing of bounded task velocity does not reconstruct the separately supplied target acceleration.
+- Preserve the passing reference and prioritize the complete Cartesian feedback contract. No controller changes, new simulation or policy-dimension increase in this evidence update; latest runtime suite remains 129 CPU passes.
+
 ## 2026-10-28 — Task feedforward ablation prepared
 
 - Added an opt-in zero-task-acceleration comparison gated on the passing native-geometry baseline. Default logged references, gravity compensation and all safety limits are preserved.

@@ -28,7 +28,7 @@ The first current-Jacobian component diagnostic aborted after 150 completed inte
 
 The subsequent native-geometry live-Jacobian run passes all 209 intervals, safety and independent grasp checks. Its 194 recomputed Jacobians and all 15 core numeric arrays match the source exactly. This certifies the live geometry component for one exposed case, with other logged command references and shadow bookkeeping still retained. See [the live-geometry success evidence](../../results/summaries/2026-10-28-live-native-geometry-success.json).
 
-An opt-in task-acceleration feedforward ablation is now CPU-ready (129 regression passes and the matching 209-frame baseline/scene preflight); physical execution is pending. It preserves gravity compensation and the other logged references, so it cannot independently validate the full VLA action contract.
+The task-acceleration feedforward ablation completed 209 intervals safely but produced no finger/object contact; EE difference reached 50.122 mm by frame 15. The audit confirms 110 changed nonzero commands and otherwise unchanged requested joint references and control/scene fingerprints. Direct velocity differencing does not recover the original acceleration. Retain the passing reference while defining the complete Cartesian feedback contract; the result does not independently establish a required VLA action dimension. See [the dependency audit](../../results/summaries/2026-10-28-task-feedforward-result.json). Latest runtime CPU regression suite: 129 passes.
 
 ## Earlier DynamicVLA integration: irregular egg-object task
 
