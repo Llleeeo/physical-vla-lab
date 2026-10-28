@@ -1,0 +1,34 @@
+{
+  "schema": "physical-vla-lab.hgwind-effort-probe-readiness.v1",
+  "date": "2026-10-28",
+  "status": "CPU_READY_PHYSICAL_RUN_PENDING",
+  "selected_source": {
+    "host": "local",
+    "episode": "traj_00000",
+    "frames": 209,
+    "source_sha256": "e1b54faae644b64f8148b0fe0397d74287f06d7c48fa97ee34a054339a72e3d3",
+    "base_seed": 202610280,
+    "attempt_index": 43
+  },
+  "task_sha256": "83330198e8a5a70758eda7b8ead447f61b3289c4206d738507ab6c77a806a6c7",
+  "physics_sha256": "6d147dbf49e5132c459cad3cf9cd9aa9b8e12160721f42b761ccecec56ad1a19",
+  "frozen_worker_sha256": "a0c1a9431fb679cb7b2b5f3416243b86557ca8890edcc45053a5fbbcdb084989",
+  "render_manifest_sha256": "637c59426bea9700d1d8a60fee405f9c9fbb0f67838520cc1298df4bda151feb",
+  "source_actuator_mode": "operational_space_inverse_dynamics_effort",
+  "command_hz": 60,
+  "physics_hz": 180,
+  "focused_tests_passed": 14,
+  "portable_tests_passed": 73,
+  "cpu_preflight": "pass",
+  "simulation_started": false,
+  "original_control_reference_reconstructed": false,
+  "physics_grasp_verified": false,
+  "vla_policy_evaluated": false,
+  "training_started": false,
+  "upstream_files_modified": false,
+  "limits": [
+    "Original native operational references are not saved; this compares shared joint-goal references through the original effort executor.",
+    "Initial state agreement and grasp retention still need the new physical simulation.",
+    "Cartesian execution requires a matching full joint baseline and independent engineering evidence; no official benchmark success is certified."
+  ]
+}

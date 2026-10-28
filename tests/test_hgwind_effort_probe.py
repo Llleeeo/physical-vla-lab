@@ -1,0 +1,104 @@
+import copy
+import importlib.util
+from pathlib import Path
+from types import SimpleNamespace
+import h5py
+import numpy as np
+import pytest
+
+import capstone_vla.hgwind_effort_probe as probe
+from capstone_vla.hgwind_cohort import TASK_ID
+
+
+def source():
+    plan={'schema':'physical-vla-lab.hgwind-effort-probe.v1','mode':'joint'}
+    meta={'task':{'id':TASK_ID},'task_plan':{'steps':[{'skill':'Grasp','target_role':'A'}]},
+          'robot':{'type':'franka'},'arm_execution':{'mode':'operational_space_inverse_dynamics_effort'},
+          'joint_names':[f'panda_joint{i}' for i in range(1,8)]+['panda_finger_joint1','panda_finger_joint2'],
+          'success':True,'runtime_safety':{'passed':True},'grasp_mode':'physical_finger_contact_only',
+          'fix_joint':False,'fixedforce':False,'control_hz':60}
+    actions=np.zeros((3,9));actions[:,7:]=.04
+    return plan,meta,actions,np.arange(3)/60
+
+
+def test_valid_effort_source_accepted():
+    probe.validate_source(*source())
+
+
+@pytest.mark.parametrize('field,value',[('grasp_mode','fixedforce'),('fixedforce',True),('control_hz',30),('success',False)])
+def test_ineligible_reference_rejected(field,value):
+    p,m,a,t=source();m[field]=value
+    with pytest.raises(ValueError):probe.validate_source(p,m,a,t)
+
+
+def test_position_drive_source_and_wrong_task_rejected():
+    p,m,a,t=source();m['arm_execution']['mode']='position_drive'
+    with pytest.raises(ValueError,match='actuation'):probe.validate_source(p,m,a,t)
+    p,m,a,t=source();m['task']['id']='another-task'
+    with pytest.raises(ValueError,match='HGwind'):probe.validate_source(p,m,a,t)
+
+
+def test_gripper_or_clock_corruption_rejected():
+    p,m,a,t=source();a[0,8]=0
+    with pytest.raises(ValueError,match='gripper'):probe.validate_source(p,m,a,t)
+    p,m,a,t=source();t[1]=t[0]
+    with pytest.raises(ValueError,match='clock'):probe.validate_source(p,m,a,t)
+
+
+def test_joint_branch_keeps_source_goals_and_uses_no_shadow_velocity(monkeypatch):
+    p,m,a,t=source();monkeypatch.setattr(probe,'_STATE',{'plan':p,'requests':[],'poses':np.zeros((3,7))})
+    target,velocity=probe.reference_frame(a,0,m['joint_names'],m['joint_names'],measured_positions=np.zeros(9))
+    np.testing.assert_array_equal(target,a[0].astype(np.float32));assert np.isnan(velocity).all()
+    target[0]=123;assert a[0,0]==0
+
+
+def test_cartesian_branch_uses_measured_robot_joints(monkeypatch):
+    p,m,a,t=source();p['mode']='cartesian';seen=[]
+    def ik(q,action):seen.append(q.copy());return q+.01,0.
+    monkeypatch.setattr(probe,'_STATE',{'plan':p,'requests':[],'poses':np.zeros((3,7)),
+                                     'adapter':SimpleNamespace(joint_target=ik)})
+    q=np.r_[np.full(7,.2),.04,.04]
+    target,velocity=probe.reference_frame(a,1,m['joint_names'],m['joint_names'],measured_positions=q)
+    np.testing.assert_array_equal(seen[0],q[:7]);np.testing.assert_allclose(target[:7],.21);np.testing.assert_array_equal(target[7:],0);assert np.isnan(velocity).all()
+
+
+def test_reference_rejects_reordered_runtime_joints(monkeypatch):
+    p,m,a,t=source();monkeypatch.setattr(probe,'_STATE',{'plan':p})
+    with pytest.raises(ValueError,match='joint order'):
+        probe.reference_frame(a,0,m['joint_names'],m['joint_names'][::-1],measured_positions=np.zeros(9))
+
+
+def test_initial_state_comparison_handles_object_order_and_quaternion_sign():
+    d={'joint_pos':np.zeros(9),'joint_vel':np.zeros(9),'object_pos':np.arange(6).reshape(2,3),
+       'object_vel':np.zeros((2,3)),'object_ang_vel':np.zeros((2,3)),'object_quat':np.tile([1,0,0,0],(2,1))}
+    c={k:(v[::-1].copy() if k.startswith('object_') else v.copy()) for k,v in d.items()};c['object_quat']*=-1
+    assert not any(probe.initial_state_differences(d,c,['a','b'],['b','a']).values())
+    c['object_vel'][0,0]=.1
+    assert probe.initial_state_differences(d,c,['a','b'],['b','a'])['object_vel_max_norm']==pytest.approx(.1)
+
+
+def test_unknown_worker_source_is_not_silently_patched():
+    with pytest.raises(ValueError,match='suppression changed'):probe.patch_worker('print("unrelated")')
+
+
+def test_substep_contact_alternation_is_reported_in_control_bins(tmp_path):
+    spec=importlib.util.spec_from_file_location('effort_analysis',Path(__file__).resolve().parents[1]/'scripts/analyze_hgwind_effort_probe.py')
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    p=tmp_path/'contacts.hdf5'
+    with h5py.File(p,'w') as f:
+        c=f.create_group('evidence/contacts');c['paths']=np.asarray(['/ball','/robot/panda_leftfinger','/robot/panda_rightfinger'],dtype=h5py.string_dtype())
+        c['step_time']=np.arange(1,7)/180;c['step_dt']=np.full(6,1/180)
+        c['headers']=np.asarray([[i,0,1+i%2,0,1+i%2,2,i,1] for i in range(6)])
+        points=np.zeros((6,10));points[:,6]=1;c['points']=points
+        l,r=module.control_contact_arrays(f,'/ball',np.arange(2)/60)
+        np.testing.assert_array_equal(l,[2,1]);np.testing.assert_array_equal(r,[1,2])
+
+
+def test_absent_finger_contact_is_zero_not_an_analysis_exception(tmp_path):
+    spec=importlib.util.spec_from_file_location('effort_analysis_zero',Path(__file__).resolve().parents[1]/'scripts/analyze_hgwind_effort_probe.py')
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    with h5py.File(tmp_path/'empty.hdf5','w') as f:
+        c=f.create_group('evidence/contacts');c['paths']=np.asarray(['/floor'],dtype=h5py.string_dtype());c['step_time']=np.arange(1,7)/180;c['step_dt']=np.full(6,1/180)
+        c['headers']=np.zeros((0,8),np.int64);c['points']=np.zeros((0,10))
+        l,r=module.control_contact_arrays(f,'/ball',np.arange(2)/60)
+        assert not l.any() and not r.any()
