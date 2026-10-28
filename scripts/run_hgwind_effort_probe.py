@@ -32,6 +32,7 @@ def main():
     parser.add_argument('--kinematics-run',type=Path,help='Passing native live-kinematics baseline required for zero task feedforward')
     parser.add_argument('--trace-cartesian-targets',action='store_true',help='Read-only original upper Cartesian requests; native-expert only')
     parser.add_argument('--cartesian-target-run',type=Path,help='Passing upper-target capture; regenerate native inner commands from current robot state (expert diagnostic)')
+    parser.add_argument('--packet-baseline-run',type=Path,help='Passing upper-feedback run; execute explicit packets without online task/skill steps')
     parser.add_argument('--reference',choices=('saved-targets','recorded-motion'),default='saved-targets')
     parser.add_argument('--host',choices=('local','hongtao'),default='local')
     parser.add_argument('--episode',default='traj_00000')
@@ -44,6 +45,13 @@ def main():
     require(args.task_feedforward!='zero' or (args.tracking=='live-jacobian' and args.jacobian_method=='native-pinch' and args.kinematics_run is not None),'First provide a passing native-pinch --kinematics-run for zero task feedforward')
     require(not args.trace_cartesian_targets or args.tracking=='native-expert','Upper target capture requires the unchanged original expert')
     require(args.cartesian_target_run is None or (args.tracking=='native-expert' and not args.trace_cartesian_targets),'Upper target replay requires native-expert and excludes read-only capture')
+    if args.packet_baseline_run is not None:
+        require(args.tracking=='native-expert' and args.cartesian_target_run is None and not args.trace_cartesian_targets,'Packet probe requires native-expert and a single passing baseline')
+        packet_baseline=args.packet_baseline_run.resolve()
+        packet_report=json.loads((packet_baseline/'report.json').read_text())
+        packet_plan=json.loads((packet_baseline/'plan.json').read_text())
+        require(packet_report.get('cartesian_feedback_replay_passed') is True,'First supply the passing upper-feedback reference')
+        args.cartesian_target_run=Path(packet_plan['cartesian_target_capture']).parent
     manifest_path=ROOT/'data/derived/hgwind_40_camera_v2_20261028/render_manifest.json'
     cohort=json.loads(manifest_path.read_text());matches=[r for r in cohort['rows'] if r['host']==args.host and r['episode']==args.episode]
     require(len(matches)==1,'Unknown source episode');row=matches[0];source=Path(row['source'])/'replay.hdf5';meta=json.loads((source.parent/'meta.json').read_text())
@@ -64,8 +72,9 @@ def main():
     output=ROOT/'data/derived/hgwind_effort_probes'/(stamp+'_'+args.mode+'_'+({'native-expert':'online-expert','logged-command':'control-log','live-jacobian':'control-log'}.get(args.tracking,args.reference))+'_'+args.tracking)
     if args.task_feedforward=='zero':output=output.with_name(output.name+'_ff-zero')
     if args.cartesian_target_run is not None:output=output.with_name(output.name+'_target-reexecution')
+    if args.packet_baseline_run is not None:output=output.with_name(output.name+'_packets')
     if args.trace_cartesian_targets:output=output.with_name(output.name+'_target-capture')
-    plan={'trace_cartesian_targets':args.trace_cartesian_targets,'task_feedforward':args.task_feedforward,'schema':'physical-vla-lab.hgwind-effort-probe.v1','mode':args.mode,'host':args.host,'episode':args.episode,
+    plan={'independent_packets':args.packet_baseline_run is not None,'trace_cartesian_targets':args.trace_cartesian_targets,'task_feedforward':args.task_feedforward,'schema':'physical-vla-lab.hgwind-effort-probe.v1','mode':args.mode,'host':args.host,'episode':args.episode,
           'tracking':args.tracking,'reference':args.reference,'reference_frames':len(reference_actions),'frames':n,'source_frames':len(actions),'source':str(source),'source_files':row['files'],'source_reference_sha256':sha256(source),
           'task':cohort['task_usd'],'task_sha256':cohort['task_sha256'],'physics_sha256':cohort['physics_sha256'],
           'worker':str(worker),'worker_sha256':sha256(worker),'patch_sha256':hashlib.sha256(patched.encode()).hexdigest(),
@@ -85,7 +94,12 @@ def main():
         require(original_text.count(anchor)==1,'Original profile metadata insertion changed')
         original_text=original_text.replace(anchor,anchor+'\n            "capstone_expert_control": CAPSTONE_PROFILE_SUMMARY(pol),')
         patched=patch_collector(original_text) if args.tracking=='native-expert' else patch_worker(original_text)
-        if args.trace_cartesian_targets or args.cartesian_target_run is not None:
+        if args.packet_baseline_run is not None:
+            from capstone_vla.cartesian_packets import patch_packet_collector
+            patched=patch_packet_collector(patched)
+            for name in ['src/capstone_vla/cartesian_packets.py','src/capstone_vla/cartesian_target_trace.py']:
+                plan['adapter_sha256'][str(ROOT/name)]=sha256(ROOT/name)
+        elif args.trace_cartesian_targets or args.cartesian_target_run is not None:
             from capstone_vla.cartesian_target_trace import patch_capture_collector
             patched=patch_capture_collector(patched)
             path=ROOT/'src/capstone_vla/cartesian_target_trace.py';plan['adapter_sha256'][str(path)]=sha256(path)
@@ -113,7 +127,7 @@ def main():
         # Verify the actual native API and safety implementation against the
         # frozen bundle, not merely the bundle manifest file itself.
         frozen_files={entry['path']:entry['sha256'] for entry in json.loads(bundle_manifest.read_text())['files']}
-        for dependency in [worker.parent/'expert.py',worker.parent/'collision_safety.py']:
+        for dependency in [worker.parent/'expert.py',worker.parent/'collision_safety.py', *([worker.parent/'skills/catch.py'] if args.packet_baseline_run is not None else [])]:
             expected=frozen_files.get(str(dependency.relative_to(bundle)))
             require(expected is not None and sha256(dependency)==expected,'Frozen native feedback implementation changed: '+dependency.name)
             plan['adapter_sha256'][str(dependency)]=expected
@@ -130,6 +144,15 @@ def main():
             cartesian_target_source_segments_sha256=sha256(previous/'original_expert_control_references.json'),
             reference_fidelity='Recorded upper goals/motion/settings through current-state native feedback; live native safety callbacks, expert call timing/gripper/terminal joint fallback retained. No saved inner q/qdot/Jacobian/OSC commands execute. Not a standalone VLA controller.')
         path=ROOT/'src/capstone_vla/cartesian_target_replay.py';plan['adapter_sha256'][str(path)]=sha256(path)
+    if args.packet_baseline_run is not None:
+        from capstone_vla.cartesian_packets import build_packets
+        for key in ['source_reference_sha256','task_sha256','physics_sha256','worker_sha256','controller_config_sha256','urdf_sha256','cartesian_target_capture_sha256']:
+            require(packet_plan[key]==plan[key],'Packet reference differs: '+key)
+        require(not packet_plan.get('independent_packets'),'Packet baseline must be the retained-context successful comparison')
+        packets=build_packets(capture,actions[:,7:])
+        plan.update(frames=len(packets),reference_frames=len(packets),packet_baseline_report=str(packet_baseline/'report.json'),
+            packet_baseline_report_sha256=sha256(packet_baseline/'report.json'),
+            reference_fidelity='Explicit recorded upper/motion/settings and binary gripper packets; no online task/skill step or expert joint tail. Terminal pose held through native Cartesian feedback. Non-target geometry safety only; not a learned policy contract.')
     if args.tracking in ('logged-command','live-jacobian'):
         require(args.reference_run is not None,'Provide the passing original-expert reference run')
         ref_root=args.reference_run.resolve();ref_report=ref_root/'report.json';ref=json.loads(ref_report.read_text())
@@ -194,12 +217,13 @@ def main():
         command[2]=str(ROOT/'scripts/sim/run_hgwind_native_expert_worker.py')
         if args.tracking=='native-expert':
             i=command.index('--repair-action-reference');del command[i:i+2]
-        command.extend(['--episode_s','12','--no-expert-config'])
+        command.extend(['--episode_s',str(plan['frames']/60) if plan.get('independent_packets') else '12','--no-expert-config'])
         n=plan['frames']
     print(f'CPU_PREFLIGHT_OK mode={args.mode} reference={plan['reference']} source={args.host}/{args.episode} frames={n} effort_pipeline=true primary_tracking={args.tracking} exact_state_replay=false',flush=True)
     if args.tracking=='live-jacobian':print(f"TASK_METRIC_OK orientation_length_scale_m={plan['operational_orientation_length_scale_m']} coupled_rows={plan['source_coupled_task_metric_rows_verified']} jacobian_method={args.jacobian_method}",flush=True)
     if args.task_feedforward=='zero':print(f"TASK_FEEDFORWARD_ABLATION mode=zero nonzero_source_commands={plan['expected_removed_feedforward_commands']} gravity_compensation=unchanged",flush=True)
-    if args.cartesian_target_run is not None:print('CARTESIAN_TARGET_REEXECUTION enabled=true saved_inner_outputs=false native_safety_and_fallback=retained',flush=True)
+    if args.packet_baseline_run is not None:print('PACKET_CONTROLLER no_online_skill_step=true explicit_gripper=true terminal_cartesian_hold=true',flush=True)
+    if args.cartesian_target_run is not None and args.packet_baseline_run is None:print('CARTESIAN_TARGET_REEXECUTION enabled=true saved_inner_outputs=false native_safety_and_fallback=retained',flush=True)
     if args.trace_cartesian_targets:print('CARTESIAN_TARGET_CAPTURE enabled=true motor_overrides=false callable_descriptors_only=true',flush=True)
     print('REFERENCE_LIMIT '+plan['reference_fidelity'],flush=True);print('OUTPUT '+str(output),flush=True);print('COMMAND '+shlex.join(command),flush=True)
     if not args.run:print('DRY_RUN_ONLY: add --run');return 0

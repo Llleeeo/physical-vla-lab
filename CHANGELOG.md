@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Explicit request stream without online expert decisions prepared
+
+- Added a packet boundary around native Cartesian feedback with explicit binary jaws and a 15-frame Cartesian hold replacing the expert joint tail. The online task/skill decision call is bypassed.
+- Reuse native fixed jaw-drive initialization and geometry-only safety helpers; block target/subpath truth queries and reject missing non-target geometry. Recorded numeric settings/motion remain explicit dependencies, not a finalized VLA action contract.
+- 160 portable CPU tests and real source/scene/native API preflight pass. Frozen cold geometry/jaw-drive initialization and actual patched decision execution were checked. The physical packet run is pending.
+
 ## 2026-10-29 — Upper-target live-feedback reexecution succeeds
 
 - User-executed physical rollout completes 209 intervals / 627 physics updates / 582 OSC callbacks with safe, independently verified grasping. All 194 upper calls align; regenerated references and all 15 core arrays exactly match the source.

@@ -38,7 +38,10 @@ def profile_summary(policy):
 
 def fixed_trace_patch(source):
     patched=trace.patch_collector(source) if plan['tracking']=='native-expert' else probe.patch_worker(source)
-    if plan.get('trace_cartesian_targets') or plan.get('cartesian_target_capture'):
+    if plan.get('independent_packets'):
+        from capstone_vla.cartesian_packets import patch_packet_collector
+        patched=patch_packet_collector(patched)
+    elif plan.get('trace_cartesian_targets') or plan.get('cartesian_target_capture'):
         from capstone_vla.cartesian_target_trace import patch_capture_collector
         patched=patch_capture_collector(patched)
     if hashlib.sha256(patched.encode()).hexdigest()!=plan['patch_sha256']:raise RuntimeError('Native trace assembly differs from preflight')
@@ -46,7 +49,7 @@ def fixed_trace_patch(source):
 
 os.environ['CAPSTONE_HGWIND_CONTROL_PROFILE']='smooth-lift';os.environ.pop('CAPSTONE_HGWIND_CAPTURE_SPEED_GATE',None)
 wrapper=Path(plan['original_profile_wrapper']);source=trace.patch_profile_wrapper(wrapper.read_text())
-print('HGWIND_EFFORT_PROBE_ACTIVE tracking='+plan['tracking']+' original_profile=smooth-lift depth_m='+str(plan['original_depth_bias_m'])+' source_motor_reference='+('live_expert' if plan['tracking']=='native-expert' else 'original_command_log'),flush=True)
+print('HGWIND_EFFORT_PROBE_ACTIVE tracking='+plan['tracking']+' original_profile=smooth-lift depth_m='+str(plan['original_depth_bias_m'])+' source_motor_reference='+('explicit_packets_no_skill_step' if plan.get('independent_packets') else ('live_expert' if plan['tracking']=='native-expert' else 'original_command_log')),flush=True)
 exec(compile(source,str(wrapper),'exec'),{'__name__':'__main__','__file__':str(wrapper),
     'CAPSTONE_TRACE_PATCH':fixed_trace_patch,'CAPSTONE_TRACE_RECORD':trace.record_segment,
-    'CAPSTONE_TRACE_SUMMARY':trace.summary,'CAPSTONE_DEPTH_PROFILE_SUMMARY':profile_summary,'CAPSTONE_BEGIN_CARTESIAN_FRAME':trace.begin_cartesian_frame})
+    'CAPSTONE_TRACE_SUMMARY':trace.summary,'CAPSTONE_DEPTH_PROFILE_SUMMARY':profile_summary,'CAPSTONE_BEGIN_CARTESIAN_FRAME':trace.begin_cartesian_frame,'CAPSTONE_PACKET_DECISION':trace.packet_decision})

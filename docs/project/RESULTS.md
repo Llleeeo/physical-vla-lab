@@ -44,6 +44,13 @@ component result; a standalone policy contract and VLA success remain unverified
 See [the protocol](CARTESIAN_TARGET_CAPTURE.md) and [source-hashed result](../../results/summaries/2026-10-29-cartesian-target-reexecution-result.json).
 Latest runtime CPU suite remains 149 passes; no runtime code changed in this result update.
 
+The next [explicit packet probe](CARTESIAN_PACKET_INTERFACE.md) bypasses online task/skill
+decisions, commands jaws explicitly and replaces the terminal joint fallback with
+a Cartesian hold. Native geometry helpers and fixed actuator initialization remain;
+target truth access is blocked at their safety-world boundary. Numeric settings and
+motion still come from the recorded stream. 160 portable CPU checks and real
+preflight pass; its physical result and learned-policy contract remain pending.
+
 ## Earlier DynamicVLA integration: irregular egg-object task
 
 Task: `grasp_sliding_motion_on_flat_surface_1s1p_g9wvkk1`. Earlier shorthand called the object a ball; the target is an egg. This task remains a difficult development case.

@@ -1,0 +1,154 @@
+import copy
+import sys
+from types import SimpleNamespace
+import numpy as np
+import pytest
+from capstone_vla.cartesian_packets import (TargetBlindSafetyWorld, build_packets,
+    execute_request, PacketStreamExecutor, audit_packets, patch_packet_collector)
+from capstone_vla.cartesian_target_trace import encode
+
+
+class GeometryOwner:
+    target='/ball'
+    def __init__(self):self.refreshes=0;self.drive_configurations=0
+    def _ensure_gripper_drive(self):
+        self.drive_configurations+=1;self._gripper_drive_configured=True
+    def _update_environment_obstacles(self,world):
+        self.refreshes+=1
+        world.pose('/fan')
+    def _project_keep_clear_joint_velocity(self,*args,**kwargs):raise AssertionError('not expected in toy servo')
+    def _environment_safe_translation(self,*args,**kwargs):raise AssertionError('not expected in toy servo')
+    def step(self,*args):raise AssertionError('Online skill step must not run')
+
+for name in ['_project_keep_clear_joint_velocity','_environment_safe_translation']:
+    method=getattr(GeometryOwner,name)
+    method.__module__='expert_data.collision_safety'
+    method.__qualname__='CollisionSafety.'+name
+
+
+class Robot:
+    def __init__(self):self.position=np.zeros(3);self.arms=0;self.jaws=[]
+    def operational_space_pinch_action(self,**inputs):
+        self.arms+=1
+        v=np.r_[np.asarray(inputs['target_position'])-self.position,np.zeros(4)]
+        self._pending_operational_space_reference={'jacobian':np.eye(6,7),'commanded_task_velocity':v[:6]}
+        return SimpleNamespace(joint_indices=np.arange(7),joint_positions=v.copy(),joint_velocities=v.copy())
+    def gripper_action(self,*,width,close):
+        assert width==0.
+        self.jaws.append(close)
+        return SimpleNamespace(joint_indices=np.array([7,8]),joint_positions=np.full(2,0. if close else .04))
+
+
+def capture():
+    owner=GeometryOwner()
+    inputs=dict(target_position=[.1,.2,.3],target_quaternion=[1.,0.,0.,0.],dt=1/60,
+        target_linear_velocity=[.1,0,0],target_linear_acceleration=[1.,0,0],target_angular_velocity=[0,0,0],
+        linear_velocity_reference=None,maximum_relative_linear_speed_mps=None,joint_velocity_reference=None,
+        joint_velocity_projector=encode(owner._project_keep_clear_joint_velocity),
+        cartesian_velocity_projector=encode(owner._environment_safe_translation))
+    return dict(schema='physical-vla-lab.cartesian-target-capture.v1',frames=[0,1,2],
+        calls=[dict(call_id=i,frame=i,completed=True,inputs=copy.deepcopy(inputs),returned_action={'do_not_use':True}) for i in range(2)])
+
+
+def setup(monkeypatch):
+    monkeypatch.setitem(sys.modules,'expert_data.skills.base',SimpleNamespace(role_path=lambda x:x))
+    robot=Robot();owner=GeometryOwner();world=SimpleNamespace(pose=lambda path:([0,0,0],[1,0,0,0]))
+    policy=SimpleNamespace(expert=robot,active_primitives=lambda:[owner],step=lambda *args:pytest.fail('online task step called'))
+    packets=build_packets(capture(),[[.04,.04],[0,0],[0,0]])
+    return packets,robot,owner,world,policy
+
+
+def test_packets_own_jaws_and_cartesian_tail_without_skill_decisions(monkeypatch):
+    packets,robot,owner,world,policy=setup(monkeypatch);executor=PacketStreamExecutor(packets);segments=[]
+    for i in range(3):
+        decision=executor.step(policy,world,i,1/60);arm,jaw=decision.actions
+        segment=dict(frame=i,goal_position=arm.joint_positions,goal_velocity=arm.joint_velocities,
+            operational_space_reference=robot._pending_operational_space_reference)
+        segment.update(executor.segment_links(i,segment));segments.append(segment)
+    assert robot.jaws==[False,True,True] and owner.refreshes==3 and robot.arms==3 and owner.drive_configurations==1
+    payload=executor.payload();audit=audit_packets(payload,packets,segments,3)
+    assert audit['packet_execution_verified'] and audit['terminal_cartesian_hold_frames']==1
+    assert payload['non_target_safety_geometry_paths']==['/fan']
+    assert not payload['online_skill_step_called'] and not payload['expert_joint_fallback_used']
+    assert 'do_not_use' not in str(packets)
+
+
+def test_terminal_hold_zeroes_motion_without_copying_joint_tail():
+    source=capture();packets=build_packets(source,np.zeros((3,2)))
+    np.testing.assert_array_equal(packets[-1]['inputs']['target_position'],source['calls'][-1]['inputs']['target_position'])
+    np.testing.assert_array_equal(packets[-1]['inputs']['target_linear_velocity'],[0,0,0])
+    np.testing.assert_array_equal(packets[-1]['inputs']['target_linear_acceleration'],[0,0,0])
+    assert packets[-1]['terminal_cartesian_hold'] and not packets[1]['terminal_cartesian_hold']
+    assert source['calls'][-1]['inputs']['target_linear_acceleration']==[1.,0,0]
+
+
+def test_native_feedback_uses_current_robot_state_and_returns_separate_grip():
+    packet=build_packets(capture(),np.zeros((3,2)))[0];owner=GeometryOwner()
+    callbacks=dict(joint_velocity_projector=owner._project_keep_clear_joint_velocity,cartesian_velocity_projector=owner._environment_safe_translation)
+    a,b=Robot(),Robot();b.position[:]=.03
+    first=execute_request(a,packet,callbacks);second=execute_request(b,packet,callbacks)
+    np.testing.assert_allclose(first[0].joint_velocities[:3]-second[0].joint_velocities[:3],.03)
+    np.testing.assert_array_equal(first[1].joint_indices,[7,8])
+
+
+def test_safety_target_and_descendants_are_blocked_before_read():
+    reads=[];world=SimpleNamespace(pose=lambda path:reads.append(path))
+    blind=TargetBlindSafetyWorld(world,'/ball')
+    for path in ['/ball','/ball/mesh']:
+        with pytest.raises(ValueError,match='Target truth'):blind.pose(path)
+    assert not reads
+    blind.pose('/fan');assert reads==['/fan']
+    with pytest.raises(ValueError,match='Unsupported safety'):blind.contact('/a','/b')
+
+
+def test_caught_target_access_or_missing_geometry_stops_before_motor(monkeypatch):
+    packets,robot,owner,world,policy=setup(monkeypatch)
+    def unsafe(blind):
+        try:blind.pose('/ball')
+        except ValueError:pass
+    owner._update_environment_obstacles=unsafe
+    with pytest.raises(ValueError,match='attempted target'):PacketStreamExecutor(packets).step(policy,world,0,1/60)
+    assert robot.arms==0
+    owner._update_environment_obstacles=lambda blind:None
+    owner._environment_missing_narrow_phase=['/fan']
+    with pytest.raises(ValueError,match='incomplete'):PacketStreamExecutor(packets).step(policy,world,0,1/60)
+    assert robot.arms==0
+
+
+@pytest.mark.parametrize('jaws',[[[0,.04]]*3,[[.01,.01]]*3,[[0,0]]*2])
+def test_unsupported_jaw_contract_rejected(jaws):
+    with pytest.raises(ValueError):build_packets(capture(),jaws)
+
+
+def test_missing_call_gaps_and_clock_exhaustion_rejected(monkeypatch):
+    source=capture();source['calls'][1]['frame']=2
+    with pytest.raises(ValueError,match='one source call'):build_packets(source,np.zeros((3,2)))
+    packets,robot,owner,world,policy=setup(monkeypatch);executor=PacketStreamExecutor(packets)
+    with pytest.raises(ValueError,match='clock'):executor.step(policy,world,1,1/60)
+    with pytest.raises(ValueError,match='cadence'):executor.step(policy,world,0,1/30)
+
+
+def test_collector_patch_bypasses_decision_call_and_refuses_unknown_source():
+    with pytest.raises(ValueError):patch_packet_collector('unrelated')
+    anchor='                policy_step_started = time.perf_counter()\n                decision = controller.step(frame, world, dt_control)'
+    source='def worker():\n    if True:\n        if True:\n            if True:\n'+anchor
+    patched=patch_packet_collector(source)
+    assert 'controller.step(' not in patched
+    assert 'CAPSTONE_PACKET_DECISION(pol, world, k, dt_control)' in patched
+    seen=[]
+    namespace=dict(time=SimpleNamespace(perf_counter=lambda:0.),pol='policy',world='world',k=0,dt_control=1/60,
+        controller=SimpleNamespace(step=lambda *args:pytest.fail('original decision was called')),
+        CAPSTONE_PACKET_DECISION=lambda *args:seen.append(args) or 'packet decision')
+    exec(compile(patched+'\n                return decision\n','<packet-branch-test>','exec'),namespace)
+    assert namespace['worker']()=='packet decision' and seen==[('policy','world',0,1/60)]
+
+
+def test_audit_rejects_wrong_gripper_action_and_short_stream(monkeypatch):
+    packets,robot,owner,world,policy=setup(monkeypatch);executor=PacketStreamExecutor(packets);segments=[]
+    for i in range(3):
+        arm,_=executor.step(policy,world,i,1/60).actions
+        segments.append(dict(frame=i,goal_position=arm.joint_positions,goal_velocity=arm.joint_velocities,
+            operational_space_reference=robot._pending_operational_space_reference))
+    payload=executor.payload();payload['calls'][1]['jaw_action']['joint_positions']=[.04,.04]
+    assert not audit_packets(payload,packets,segments,3)['packet_execution_verified']
+    assert not audit_packets(executor.payload(),packets,segments[:1],1)['packet_execution_verified']
