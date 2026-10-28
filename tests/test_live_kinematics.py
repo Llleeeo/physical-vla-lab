@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from capstone_vla.live_kinematics import live_pinch_jacobian
+from capstone_vla.live_kinematics import live_pinch_jacobian,operational_task_jacobian,validate_logged_task_metric
 from capstone_vla import hgwind_effort_probe as probe
 
 
@@ -40,13 +40,13 @@ def test_invalid_live_robot_geometry_is_rejected(fault):
 
 
 def test_saved_jacobian_has_no_effect_on_current_reference_and_other_signals_survive(monkeypatch):
-    monkeypatch.setattr(probe,'_STATE',{'live_jacobian_records':[]})
+    monkeypatch.setattr(probe,'_STATE',{'plan':{'operational_orientation_length_scale_m':.03},'live_jacobian_records':[]})
     reference={'jacobian':np.eye(6,7).tolist(),'commanded_task_velocity':list(range(6)),
         'feedforward_task_acceleration':[0,0,9.81,0,0,0],'task_position_error':[0]*6,
         'joint_velocity_constraint_matrix':np.eye(7).tolist(),
         'joint_velocity_constraint_lower_bound':[-1]*7}
     original=copy.deepcopy(reference);first=probe.live_reference(robot(),reference,15)
-    np.testing.assert_array_equal(first['jacobian'],live_pinch_jacobian(robot()))
+    np.testing.assert_array_equal(first['jacobian'],operational_task_jacobian(live_pinch_jacobian(robot()),.03))
     for key in reference:
         if key!='jacobian':np.testing.assert_array_equal(first[key],reference[key])
     assert reference==original
@@ -58,12 +58,12 @@ def test_saved_jacobian_has_no_effect_on_current_reference_and_other_signals_sur
     assert reference['feedforward_task_acceleration'][2]==9.81
 
 
-def test_joint_only_startup_does_not_query_missing_robot():
+def test_joint_only_fallback_does_not_query_missing_robot():
     assert probe.live_reference(None,None,0) is None
 
 
 def test_live_reference_reaches_physics_callback_with_original_velocity_caps(monkeypatch):
-    p={'tracking':'live-jacobian','mode':'joint'};actions=np.zeros((2,9));vel=np.ones((2,9));poses=np.zeros((2,7))
+    p={'tracking':'live-jacobian','mode':'joint','operational_orientation_length_scale_m':.03};actions=np.zeros((2,9));vel=np.ones((2,9));poses=np.zeros((2,7))
     ref={'jacobian':np.eye(6,7).tolist()}
     rows=[{'operational_space_reference':None,'policy_joint_velocity_limit':None},
           {'operational_space_reference':ref,'policy_joint_velocity_limit':[1.8]*7}]
@@ -76,10 +76,47 @@ def test_live_reference_reaches_physics_callback_with_original_velocity_caps(mon
     target,velocity=probe.reference_frame(actions,1,names,names,measured_positions=np.zeros(9),expert=robot())
     np.testing.assert_array_equal(target,actions[1]);np.testing.assert_array_equal(velocity,vel[1])
     actual=probe.physics_task_reference(None,None,None,None,None,None)
-    np.testing.assert_array_equal(actual['jacobian'],live_pinch_jacobian(robot()))
+    np.testing.assert_array_equal(actual['jacobian'],operational_task_jacobian(live_pinch_jacobian(robot()),.03))
     assert 'physics_rate_reference' not in actual  # Original 60 Hz update, held for three physics ticks.
     caps=probe.reference_policy_velocity_limit();np.testing.assert_allclose(caps,1.8)
     caps[0]=99;assert rows[1]['policy_joint_velocity_limit'][0]==1.8
     actual['jacobian'][0,0]=99
     assert probe.physics_task_reference(None,None,None,None,None,None)['jacobian'][0,0]!=99
     assert len(state['live_jacobian_records'])==1
+
+
+def test_coupled_angular_metric_preserves_equation_with_physical_joint_velocity():
+    physical=np.zeros((6,7));physical[:3,:3]=np.eye(3);physical[3:,:3]=2*np.eye(3)
+    original=physical.copy();qd=np.arange(7,dtype=float)
+    scaled=operational_task_jacobian(physical,.03)
+    expected=physical@qd;expected[3:]*=.03
+    np.testing.assert_allclose(scaled@qd,expected)
+    np.testing.assert_array_equal(scaled[:3],physical[:3])
+    np.testing.assert_array_equal(physical,original)
+    # A raw Jacobian paired with a weighted twist is the rejected convention.
+    assert not np.allclose(physical@qd,expected)
+
+
+@pytest.mark.parametrize('scale',[0,-1,float('nan'),float('inf')])
+def test_coupled_task_rejects_invalid_metric(scale):
+    with pytest.raises(ValueError):operational_task_jacobian(np.zeros((6,7)),scale)
+
+
+def test_all_logged_revolute_axes_must_match_configured_task_metric():
+    j=np.zeros((6,7));j[5,:]=.03
+    rows=[{'operational_space_reference':{'jacobian':j.tolist()}}, {'operational_space_reference':None}]
+    assert validate_logged_task_metric(rows,.03)==1
+    with pytest.raises(ValueError,match='metric'):validate_logged_task_metric(rows,1.)
+    rows[0]['operational_space_reference']['jacobian'][5][6]=1.
+    with pytest.raises(ValueError,match='metric'):validate_logged_task_metric(rows,.03)
+
+
+def test_live_boundary_applies_metric_before_pairing_original_velocity(monkeypatch):
+    state={'plan':{'operational_orientation_length_scale_m':.03},'live_jacobian_records':[]}
+    monkeypatch.setattr(probe,'_STATE',state)
+    raw=live_pinch_jacobian(robot());qd=np.ones(7)
+    weighted=operational_task_jacobian(raw,.03)
+    reference={'jacobian':weighted.tolist(),'commanded_task_velocity':(weighted@qd).tolist()}
+    actual=probe.live_reference(robot(),reference,0)
+    np.testing.assert_allclose(actual['jacobian']@qd,actual['commanded_task_velocity'])
+    assert state['live_jacobian_records'][0]['comparison_max_abs']==0

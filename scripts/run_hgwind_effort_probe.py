@@ -89,7 +89,17 @@ def main():
         plan.update(reference='control-log',frames=len(targets),reference_frames=len(targets),control_log=str(control_log),control_log_sha256=sha256(control_log),control_log_report=str(ref_report),control_log_report_sha256=sha256(ref_report),reference_fidelity='Diagnostic replay of logged original q/qdot/OSC references, including cached original Jacobians; not a deployed policy controller.')
     if args.tracking=='live-jacobian':
         require(all(x['operational_space_reference'] is None or (np.asarray(x['operational_space_reference']['jacobian']).shape==(6,7) and 'secondary_jacobian' not in x['operational_space_reference']) for x in json.loads(Path(plan['control_log']).read_text())),'Live component check requires six-dimensional task references')
-        plan['reference_fidelity']='Current robot pinch Jacobian at each control boundary; original joint goals, twist, feed-forward and constraints retained for component diagnosis. Not a standalone policy controller.'
+        from capstone_vla.live_kinematics import validate_logged_task_metric
+        # Catch explicitly passes max(r_A, 1e-6) as its coupled orientation
+        # length scale. This is a frozen controller configuration, not a live
+        # object observation. Require the source task metrics to agree.
+        scale=max(float(meta['success_parameters']['1']['r_A']),1.e-6)
+        metric_rows=json.loads(Path(plan['control_log']).read_text())
+        metric_count=validate_logged_task_metric(metric_rows,scale)
+        plan.update(operational_orientation_length_scale_m=scale,
+            operational_metric_provenance='frozen Catch operational_orientation_length_scale_m=max(success_parameters[1].r_A,1e-6)',
+            source_coupled_task_metric_rows_verified=metric_count)
+        plan['reference_fidelity']='Current robot pinch Jacobian with original coupled angular length scale at each control boundary; original joint goals, twist, feed-forward and constraints retained for component diagnosis. Not a standalone policy controller.'
     validate_source(plan,meta,actions,times)
     if args.mode=='cartesian':
         require(args.baseline_run is not None,'First run/inspect the joint baseline; provide --baseline-run for Cartesian')
@@ -119,6 +129,7 @@ def main():
         command.extend(['--episode_s','12','--no-expert-config'])
         n=plan['frames']
     print(f'CPU_PREFLIGHT_OK mode={args.mode} reference={plan['reference']} source={args.host}/{args.episode} frames={n} effort_pipeline=true primary_tracking={args.tracking} exact_state_replay=false',flush=True)
+    if args.tracking=='live-jacobian':print(f"TASK_METRIC_OK orientation_length_scale_m={plan['operational_orientation_length_scale_m']} coupled_rows={plan['source_coupled_task_metric_rows_verified']}",flush=True)
     print('REFERENCE_LIMIT '+plan['reference_fidelity'],flush=True);print('OUTPUT '+str(output),flush=True);print('COMMAND '+shlex.join(command),flush=True)
     if not args.run:print('DRY_RUN_ONLY: add --run');return 0
     output.mkdir(parents=True,exist_ok=False);(output/'plan.json').write_text(json.dumps(plan,indent=2)+'\n')

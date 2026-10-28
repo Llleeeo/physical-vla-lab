@@ -5,7 +5,6 @@
   "control_log_sha256": "78b6ea934b8266aa428f47b95d9eb3be94d3bf8bce723fd5de99e402c054e140",
   "reference_rows": 209,
   "six_dimensional_osc_rows": 194,
-  "joint_only_startup_rows": 0,
   "rows_with_nonzero_task_acceleration_feedforward": 110,
   "task_acceleration_feedforward_max_abs": [
     0.6895840842283116,
@@ -21,7 +20,7 @@
     "original joint goals and paired velocities",
     "original task velocity and acceleration feedforward",
     "original task constraints and policy velocity caps",
-    "original gripper commands and joint-only startup",
+    "original gripper commands and joint-only fallback",
     "shadow task FSM for bookkeeping and safety"
   ],
   "portable_cpu_tests_passed": 113,
@@ -36,5 +35,24 @@
     "One exposed source case; future physical run is a component diagnostic, not policy evaluation.",
     "Stored Jacobians are compared for audit only; remaining source references still own most command content.",
     "Seven-dimensional pose/gripper and twist/gripper labels have different semantics and must not be interchanged."
-  ]
+  ],
+  "joint_only_fallback_rows": 15,
+  "joint_only_fallback_frames": [
+    194,
+    195,
+    196,
+    197,
+    198,
+    199,
+    200,
+    201,
+    202,
+    203,
+    204,
+    205,
+    206,
+    207,
+    208
+  ],
+  "subsequent_diagnosis": "2026-10-28-task-metric-correction.json"
 }

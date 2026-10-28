@@ -1,0 +1,58 @@
+{
+  "schema": "physical-vla-lab.hgwind-task-metric-correction.v1",
+  "date": "2026-10-28",
+  "status": "INTERFACE_BUG_IDENTIFIED_CORRECTED_RERUN_PENDING",
+  "source_control_log_sha256": "78b6ea934b8266aa428f47b95d9eb3be94d3bf8bce723fd5de99e402c054e140",
+  "failed_run_report_sha256": "d8a24c6a47bc3a815e2d048d6c35963c13901a6abaf5e17a5e2236e745ce5420",
+  "failed_run": {
+    "requested_frames": 209,
+    "recorded_states": 151,
+    "completed_intervals": 150,
+    "initial_state_match": true,
+    "runtime_safety_passed": false,
+    "live_kinematics_component_passed": false,
+    "joint_5_velocity_rad_s": -2.6872,
+    "joint_5_velocity_limit_abs_rad_s": 2.61,
+    "grasp_status": "fail",
+    "continuous_bilateral_duration_s": 0.2666666666666657
+  },
+  "verified_interface_error": "Original coupled task uses [J_linear; 0.03*J_angular] and equally weighted angular task velocity; previous live branch substituted unweighted J_angular while retaining weighted task velocity.",
+  "orientation_length_scale_m": 0.03,
+  "scale_provenance": "Frozen Catch calls pass max(r_A,1e-6); source success_parameters[1].r_A=0.03. Original expert operational reference builder weights angular Jacobian and velocity with that same scale.",
+  "first_control_boundary": {
+    "frame": 0,
+    "raw_jacobian_max_abs_difference": 0.969999999986834,
+    "after_metric_correction_max_abs_difference": 7.886130082290776e-10,
+    "linear_rows_max_abs_difference": 7.886130082290776e-10
+  },
+  "coupled_source_rows_verified": 194,
+  "maximum_source_angular_column_norm_difference": 1.0095396740794627e-13,
+  "joint_only_fallback_frames": [
+    194,
+    195,
+    196,
+    197,
+    198,
+    199,
+    200,
+    201,
+    202,
+    203,
+    204,
+    205,
+    206,
+    207,
+    208
+  ],
+  "joint_only_fallback_location_correction": "Last 15 frames (194..208), not initial startup.",
+  "physics_limits_relaxed": false,
+  "source_data_modified": false,
+  "corrected_simulation_started": false,
+  "corrected_live_kinematics_component_passed": null,
+  "cpu_regression_tests_passed": 120,
+  "vla_evaluated": false,
+  "limitations": [
+    "A confirmed metric mismatch explains immediate command non-equivalence; a corrected physical run is still required to establish grasp success.",
+    "The corrected component retains logged joint goals, task twist/feedforward, constraints and shadow FSM; it is not a standalone learned-policy interface."
+  ]
+}

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Coupled task-metric adapter correction
+
+- The first live-Jacobian diagnostic aborted after 150 completed intervals. Identified an adapter error: raw angular Jacobian rows were paired with task velocities already weighted by the original 0.03 m length scale.
+- Restored the explicit native task metric; first-boundary matrix error decreases from 0.97 to 7.886e-10. Added all-source metric preflight and seven regressions; 120 portable CPU checks pass. Corrected physical execution is pending.
+- Corrected the source-sequence narrative: its 15 joint-only fallback frames are the last frames (194–208), not startup. Preserved the failed run and original safety/physics/data.
+
 ## 2026-10-28 — Live kinematics component diagnostic prepared
 
 - Added an opt-in current robot/pinch Jacobian branch around the passing full-control reference. Other logged signals, physics cadence and safety limits stay fixed; physical execution is pending.
