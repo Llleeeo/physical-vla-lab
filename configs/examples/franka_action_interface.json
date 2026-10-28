@@ -1,0 +1,79 @@
+{
+  "schema": "capstone_franka_action_interface_v1",
+  "robot_usd": "/YOUR_ROBOPHYS_ROOT/robo_phys_v1.3_build/Robots/Franka/franka.usd",
+  "urdf": "/YOUR_ROBOPHYS_ROOT/isaacsim/exts/isaacsim.robot_motion.motion_generation/motion_policy_configs/franka/lula_franka_gen.urdf",
+  "isaaclab_root": "/YOUR_ROBOPHYS_ROOT/isaaclab",
+  "action": {
+    "frame": "robot_base:panda_link0",
+    "representation": "absolute_xyz_m_euler_xyz_rad_binary_gripper",
+    "ee_offset_m": 0.1034,
+    "damping": 0.01,
+    "max_joint_target_delta_rad": 0.15,
+    "finger_open_m": 0.04
+  },
+  "timing": {
+    "physics_hz": 180,
+    "servo_hz": 180,
+    "command_hz": 60
+  },
+  "actuators": {
+    "stiffness": [
+      400,
+      400,
+      400,
+      400,
+      400,
+      400,
+      400
+    ],
+    "damping": [
+      80,
+      80,
+      80,
+      80,
+      80,
+      80,
+      80
+    ],
+    "effort_limit_nm": [
+      87,
+      87,
+      87,
+      87,
+      12,
+      12,
+      12
+    ],
+    "velocity_limit_rad_s": [
+      2.175,
+      2.175,
+      2.175,
+      2.175,
+      2.61,
+      2.61,
+      2.61
+    ],
+    "disable_gravity": true,
+    "finger_stiffness": 2000,
+    "finger_damping": 100,
+    "finger_effort_limit_n": 200,
+    "velocity_target": "zero"
+  },
+  "initial_arm_joints_rad": [
+    0.0,
+    -0.569,
+    0.0,
+    -2.81,
+    0.0,
+    3.037,
+    0.741
+  ],
+  "acceptance": {
+    "static_position_error_m": 0.002,
+    "static_rotation_error_rad": 0.034906585,
+    "circle_position_p95_m": 0.005,
+    "finger_position_error_m": 0.002,
+    "fk_live_position_error_m": 0.001,
+    "fk_live_rotation_error_rad": 0.001
+  }
+}

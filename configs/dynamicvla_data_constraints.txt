@@ -1,0 +1,10 @@
+# Keep training/data packages separate from the Isaac/render environment.
+torch==2.7.1
+torchvision==0.22.1
+torchcodec==0.5.0
+lerobot==0.3.3
+numpy==1.26.4
+transformers==5.2.0
+pyarrow==19.0.1
+pandas==2.2.3
+av==14.2.0

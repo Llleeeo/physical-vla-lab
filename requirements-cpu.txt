@@ -1,0 +1,6 @@
+# CPU contract tests only; do not install into an Isaac or VLA environment.
+numpy==2.5.1
+scipy==1.18.0
+h5py==3.16.0
+pytest==9.1.1
+pillow==12.3.0

@@ -1,0 +1,13 @@
+{
+  "schema": "capstone.private_hf_archive.v1",
+  "owner": "YOUR_ACCOUNT",
+  "repo_id": "YOUR_ACCOUNT/YOUR_PRIVATE_DATASET",
+  "repo_type": "dataset",
+  "private_required": true,
+  "original_team_upload_module_used": false,
+  "collection_or_render_launch_enabled": false,
+  "remote_credentials_copied": false,
+  "default_stage": "raw",
+  "source_retention": "Never delete local or remote source files automatically",
+  "episode_path": "episodes/{task_id}/{cohort}/{host}/{trajectory}/{stage}/"
+}

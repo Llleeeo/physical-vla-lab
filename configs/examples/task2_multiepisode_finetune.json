@@ -1,0 +1,29 @@
+{
+  "purpose": "same_task_multiepisode_development",
+  "steps": 2000,
+  "batch_size": 8,
+  "learning_rate": 0.0001,
+  "gradient_clip_norm": 10.0,
+  "seed": 0,
+  "cache_frames": 64,
+  "image_size": [
+    360,
+    480
+  ],
+  "log_every": 50,
+  "validation_every": 500,
+  "probe_times": [
+    0.2,
+    0.5,
+    0.8
+  ],
+  "probe_seed": 20261026,
+  "probe_fractions": [
+    0.15,
+    0.5,
+    0.85
+  ],
+  "action_eval_batch_size": 8,
+  "test_evaluation_enabled": false,
+  "action_label_version": "wrapped_euler_delta_v1"
+}

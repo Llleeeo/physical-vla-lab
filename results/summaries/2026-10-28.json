@@ -1,0 +1,102 @@
+{
+  "schema": "physical-vla-lab.results.v1",
+  "as_of_date": "2026-10-28",
+  "timezone": "Asia/Hong_Kong",
+  "source_reports": {
+    "ball_collection": {
+      "relative_path": "data/derived/hgwind_overnight_20261027_230043/production_report.json",
+      "sha256": "3b652155a77850ba4f35acb32e51fd4fbe5767ffa8dc7f608d637efeedbda7b0"
+    },
+    "ball_recording_audit": {
+      "relative_path": "data/derived/hgwind_40_20261028/raw_audit.json",
+      "sha256": "f472597e2bfa5f10643fb3f93003b42ff4993146703c5d812831cae0bd525939"
+    },
+    "camera_v2_sample_delivery": {
+      "relative_path": "data/derived/hgwind_40_camera_v2_20261028/dual_runs/20261028_124852_233643/report.json",
+      "sha256": "4a4714caf1b645f2a3f897023955750c0e116ae1f06247d1c84ddff11987defc"
+    },
+    "egg_finetuning": {
+      "relative_path": "data/derived/task2_multiepisode_20261026/training_runs/20261026_185108_323227/report.json",
+      "sha256": "3220d110e90761857609e7feb0fcb3039e8419e5009475b3fd8d2b582e186f6c"
+    }
+  },
+  "ball_cohort": {
+    "task_id": "grasp_wind_driven_motion_1s1p_hgprgew",
+    "accepted_successes": 40,
+    "saved_failures": 579,
+    "saved_attempts": 619,
+    "source_groups": {
+      "main": 21,
+      "remote": 19
+    },
+    "frames": 12154,
+    "numeric_duplicates": 0,
+    "held_out_evaluation_defined": false,
+    "vla_training_completed": false
+  },
+  "camera_v2_sample_delivery": {
+    "hosts_exit_codes": [
+      0,
+      0
+    ],
+    "contracts_equal": true,
+    "verified_sample_episodes": 2,
+    "source_frames": [
+      209,
+      335
+    ],
+    "all_indices_and_timestamps_match": true,
+    "render_hz": 60,
+    "remaining_cohort_rendering": "in_progress_at_snapshot"
+  },
+  "egg_finetuning": {
+    "optimizer_steps": 2000,
+    "batch_size": 8,
+    "train_episodes": 40,
+    "validation_episodes": 8,
+    "normalization_fitted_on_train_only": true,
+    "validation_flow_history": [
+      {
+        "step": 0,
+        "train_fixed_flow_mse": 13.377817359235552,
+        "validation_fixed_flow_mse": 12.149231990178427
+      },
+      {
+        "step": 500,
+        "train_fixed_flow_mse": 1.553686809208658,
+        "validation_fixed_flow_mse": 0.9696583028675781
+      },
+      {
+        "step": 1000,
+        "train_fixed_flow_mse": 0.8228996203591427,
+        "validation_fixed_flow_mse": 0.6451838264862696
+      },
+      {
+        "step": 1500,
+        "train_fixed_flow_mse": 0.5824584587373667,
+        "validation_fixed_flow_mse": 0.44740639130274457
+      },
+      {
+        "step": 2000,
+        "train_fixed_flow_mse": 0.43164781915644806,
+        "validation_fixed_flow_mse": 0.41970133693474865
+      }
+    ],
+    "reserved_test_evaluated": false,
+    "task_success_verified": false,
+    "final_offline_first_action": {
+      "valid_targets": 1848,
+      "position_mean_mm": 9.159851525164775,
+      "position_median_mm": 8.66311200843763,
+      "position_p95_mm": 17.36211702576844,
+      "orientation_mean_deg": 2.488207192244717,
+      "orientation_p95_deg": 4.762891980144117,
+      "gripper_sign_accuracy": 0.8852813852813853
+    }
+  },
+  "claim_limits": [
+    "Expert data are not learned-policy successes.",
+    "Offline metrics are not closed-loop grasp scores.",
+    "No robustness or sim-to-real result is established."
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "purpose": "single_episode_development_overfit",
+  "steps": 200,
+  "batch_size": 2,
+  "learning_rate": 0.0001,
+  "gradient_clip_norm": 10.0,
+  "seed": 0,
+  "probe_seed": 20261025,
+  "probe_frames": [
+    0,
+    60,
+    112,
+    114,
+    160,
+    225
+  ],
+  "probe_times": [
+    0.2,
+    0.5,
+    0.8
+  ],
+  "cache_frames": 32,
+  "image_size": [
+    360,
+    480
+  ],
+  "log_every": 10,
+  "checkpoint_frequency": 100,
+  "heldout_evaluation": false
+}

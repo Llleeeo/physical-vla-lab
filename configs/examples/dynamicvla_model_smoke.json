@@ -1,0 +1,10 @@
+{
+  "repo_id": "hzxie/dynamic-vla-DOM",
+  "revision": "c9609d94c5940eb42436a31927d7e80ae454279e",
+  "backbone_repo": "HuggingFaceTB/SmolLM2-360M",
+  "backbone_revision": "f8027fd0eaeea54caa13c31d31b9fdc459c38b49",
+  "upstream_commit": "434dc7105cf6d559018d15af5fecbcdad44f036e",
+  "freeze_backbone": true,
+  "optimizer_step": false,
+  "default_frame": 225
+}
