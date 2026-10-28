@@ -10,7 +10,7 @@ This is an independent research integration, not the upstream RoboPhys benchmark
 
 | Workstream | Verified progress | Remaining work |
 |---|---|---|
-| Franka action interface | Cartesian/joint adapters, timing and action-convention checks, simulation diagnostics | Reliable end-to-end learned dynamic grasping |
+| Franka action interface | Cartesian/joint adapters, timing checks, recorded-tool FK verified across all 40 ball episodes | Reliable end-to-end learned dynamic grasping |
 | DynamicVLA baseline | Pretrained-model loading, fine-tuning and offline evaluation on an earlier egg-object task | Offline prediction improvements have not established robust closed-loop success |
 | Wind-driven ball demonstrations | 40 collector-accepted physical grasps; recording/contact checks and descriptive quality screen completed | Full visual review and downstream training conversion |
 | Visual data pipeline | All 40 revised-camera episodes verified at 60 Hz (12,154 frames); all 19 remote episodes delivered through the private Hub to the main machine | Trajectory quality/visibility review and downstream action conversion |
@@ -51,7 +51,7 @@ Use a separate Python 3.12 environment. This command does not launch simulation,
 ```bash
 python3.12 -m venv .venv_cpu
 .venv_cpu/bin/python -m pip install -r requirements-cpu.txt
-PYTHONPATH=src .venv_cpu/bin/python -m pytest -q   tests/test_hgwind_cohort.py tests/test_hgwind_render_delivery.py   tests/test_hf_archive.py tests/test_prediction_metrics.py tests/test_chunk_execution.py tests/test_publication.py tests/test_trajectory_quality.py
+PYTHONPATH=src .venv_cpu/bin/python -m pytest -q   tests/test_hgwind_cohort.py tests/test_hgwind_render_delivery.py   tests/test_hf_archive.py tests/test_prediction_metrics.py tests/test_chunk_execution.py tests/test_publication.py tests/test_trajectory_quality.py tests/test_recorded_franka.py
 ```
 
 These tests use synthetic fixtures. They verify software contracts, not grasp success. Other tests may require local data, USD assets or Isaac installations.

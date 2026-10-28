@@ -1,0 +1,35 @@
+{
+  "status": "CPU_RECORDED_TOOL_FK_PASS",
+  "episodes": 40,
+  "frames": 12154,
+  "maximum_corrected_position_error_mm": 0.001592956544430615,
+  "maximum_corrected_rotation_error_deg": 0.00012632801053680557,
+  "urdf_sha256": "e9024642e7952cbcaec0ae14425bf1cd19d674d3c98eeef3793913f63a8101b6",
+  "manifest_sha256": "637c59426bea9700d1d8a60fee405f9c9fbb0f67838520cc1298df4bda151feb",
+  "selected_probe": {
+    "host": "local",
+    "episode": "traj_00000",
+    "frames": 209,
+    "gripper_transition_frames": [
+      118
+    ]
+  },
+  "source_mode": "operational_space_inverse_dynamics_effort",
+  "source_scene_unchanged": true,
+  "simulation_started": false,
+  "physics_replay_verified": false,
+  "training_started": false,
+  "camera_inputs_frozen": false,
+  "limits": [
+    "Legacy and recorded tools are different valid coordinate conventions; their difference is not itself a controller failure.",
+    "The previous position-drive replay runner is incompatible with this source mode; its actuator settings must not be substituted.",
+    "No VLA-input images, LeRobot export, simulation grasp result or camera selection is certified by this CPU probe."
+  ],
+  "schema": "physical-vla-lab.recorded-tool-summary.v1",
+  "date": "2026-10-28",
+  "source_report_sha256": "831779239e3786b5f1a7427c37ab82dcc2d13f6ce08c1939dbf5c3728dfb4a33",
+  "legacy_to_recorded_tool_difference": {
+    "approx_position_mm": 3.4,
+    "approx_rotation_deg": 180.0
+  }
+}

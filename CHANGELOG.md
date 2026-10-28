@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-28 — Recorded tool-frame compatibility
+
+- Added a metadata-defined Franka tool adapter and six synthetic regressions; all 40 ball episodes / 12,154 frames pass real-data FK checks, with maximum position discrepancy 0.001593 mm.
+- Prepared one independent CPU action probe while preserving original data. Recorded effort-control execution differs from the old position-drive runner; no physics replay or training success is claimed.
+
 ## 2026-10-28 — Descriptive trajectory-quality screen
 
 - Added independent CPU metrics for rotating-hand retention, recorded relative velocity, physical-substep versus control-bin contact and sampled target visibility; generated per-episode review sheets and video links for all 40 episodes.

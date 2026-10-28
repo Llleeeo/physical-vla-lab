@@ -17,6 +17,8 @@ RoboPhys remains a separate dependency. Its task USDs, scene assets, Franka conf
 
 Module paths in the table are under `src/capstone_vla/` unless a full path is given.
 
+The wind-driven-ball cohort uses a recorded right-gripper frame and effort-control source mode. Its separate [tool-frame audit](RECORDED_TOOL_FRAME.md) must be respected; the earlier position-drive replay helper is not interchangeable.
+
 ## Data and timing contract
 
 Raw recordings contain timestamps, 9-dimensional Franka joint targets, robot/object states and contact evidence. They are not directly a DynamicVLA action dataset. Conversion must document the robot-base frame, orientation convention, units, absolute/delta semantics, gripper interpretation and observation-to-action causality.
