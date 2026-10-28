@@ -4,7 +4,7 @@
 
 The wind-driven-ball recordings use `operational_space_inverse_dynamics_effort`. The earlier egg-task position-drive probe does not establish compatibility with them. This diagnostic first executes saved joint commands through the frozen RoboPhys effort pipeline, then permits a Cartesian/IK comparison using the same executor.
 
-The first saved-target physical probe aborted during its 109th control interval. Recorded-motion joint tracking then completed 208 intervals safely, briefly held and lifted the ball, but lost it before the end. A task-space tracking comparison is CPU-checked and awaits simulation. No ball-task training or learned-policy result is claimed.
+The first saved-target physical probe aborted during its 109th control interval. Recorded-motion joint tracking then completed 208 intervals safely, briefly held and lifted the ball, but lost it before the end. The constructed task-space comparison completed but performed worse. CPU endpoint-semantics checks identify an incompatible interpretation of its inputs; a native outer-pose-servo adapter is prepared for the next physical check. No ball-task training or learned-policy result is claimed.
 
 ## Execution and recording boundary
 
@@ -90,3 +90,25 @@ data/derived/hf_pilot_render_repo/.venv/bin/python \
 ```
 
 Here `--mode joint` describes how the diagnostic goals are supplied; `--tracking task-space` selects their physical tracking controller. The mode does not perform IK or evaluate a learned policy. CPU checks cover transforms, rotation error, derivative terms, branch isolation and live-frame rejection. A call into the frozen native OSC implementation also passed at five source poses with an artificial identity-inertia model; this checks the software interface, not real robot dynamics. Physical success of the new branch remains unverified.
+
+## Constructed task reference rejected; use the native command tuple
+
+The task-space run verified 624 native OSC calls, completed safely, and had matching initial conditions, but formed no bilateral grip. Position/orientation discrepancy p95 increased from the joint run's 22.933 mm / 7.094 degrees to 42.259 mm / 22.408 degrees. This is a rejected diagnostic construction, not a policy or benchmark failure.
+
+Inspection of `sim_common.motion_safety.DynamicDriveReferenceTracker.advance()` establishes that its position output is a control endpoint, while its velocity is independently filtered. The existing expert normally converts pose correction to a bounded twist and sets the inner OSC position error to zero. The earlier adapter instead interpreted endpoint position and filtered velocity/acceleration as derivatives of a differentiable trajectory.
+
+`scripts/diagnose_hgwind_reference_clock.py` checks this boundary on CPU using the frozen generator and an explicitly assumed ideal measured motion. Over 624 updates, 412 had held endpoints with nonzero velocity. The endpoint finite-difference versus supplied-velocity residual had RMS 1.319 rad/s. This counterfactual is not a recorded physical-substep trace. Direct cubic-Hermite interpolation of measured q/qdot is not a ready replacement: among 625 sampled points, acceleration exceeded the reference limit at 282 and within-interval jerk at 80; acceleration can also jump at knots. These interpolation properties do not invalidate the source's measured physical motion or its original commanded-limit certificate.
+
+The proposed `--tracking native-pose` branch reuses `Expert.operational_space_pinch_action()` to generate its matched q endpoint, qdot and OSC reference together. It maps the source robot waypoint into the world tool/pinch frame, including the offset velocity `omega × offset`, then invokes the existing pose servo. Its own pose correction remains in the outer servo, so the returned inner OSC pose error must be zero. Missing/nonfinite paired outputs stop the probe; stale shadow references are cleared before the call. Gripper commands at k remain unchanged.
+
+The native API's default pose gains and speed settings are retained, with `preserve_orientation_during_translation=True`, `coupled_operational_pose_task=True`, `use_operational_space_inverse_dynamics=True`, source next-q posture and dt=1/60. The same physics-rate viability, inverse-dynamics and final effort/geometry checks remain in place. The report requires 208 native pose commands and 624 OSC callbacks for the full diagnostic. This changes the outer command construction as well as the inner-reference convention; it is not a pure controller-gain comparison or a recovered original expert.
+
+```bash
+data/derived/hf_pilot_render_repo/.venv/bin/python \
+  scripts/run_hgwind_effort_probe.py --mode joint \
+  --reference recorded-motion --tracking native-pose --run
+```
+
+The new branch passes CPU adapter tests and real-data preflight; its physical outcome remains pending. The earlier `task-space` branch is retained for provenance and is not the recommended continuation. Original source episodes and upstream code are unchanged.
+
+Native-pose runs additionally save each returned OSC-reference dictionary alongside waypoint/twist inputs in `native_pose_references.json`, and the actual requested q/qdot in `command_diagnostics.npz`. This avoids repeating the earlier omission of the paired reference signals. These local diagnostic records are not published or declared training data.

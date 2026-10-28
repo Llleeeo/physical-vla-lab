@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Reject constructed task reference; reuse native pose servo
+
+- The constructed OSC probe completed safely but had no bilateral grasp and worse pose tracking than joint tracking. Preserved both outcomes.
+- Added a CPU endpoint/velocity semantics audit; naive cubic-Hermite interpolation also fails a sampled reference-limit check and is not installed as a replacement controller.
+- Added native-pose delegation to the existing RoboPhys outer servo, preserving its matched endpoint/velocity/OSC tuple and source gripper timing. Seven regressions added; 93 portable CPU tests pass. Native-pose physical validation is pending.
+
 ## 2026-10-28 — Recorded-motion retention failure and task-space comparison
 
 - Verified 208 completed control intervals, 624 callbacks and passing runtime safety, but contact was lost after a 0.65 s bilateral span; final lift/retention failed. Tracking error remains a candidate contributor, not a demonstrated sole cause.

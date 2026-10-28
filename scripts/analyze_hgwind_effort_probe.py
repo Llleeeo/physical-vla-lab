@@ -50,6 +50,7 @@ def analyze(output):
     n=int(meta['num_steps']);require(n>=2,'Probe saved fewer than two states; inspect simulation.log');callback_count=int(meta.get('arm_execution',{}).get('dynamic_drive',{}).get('physics_callback_count',-1));cadence_ok=callback_count==3*n;full=(n==plan['frames'] and plan['frames']==plan.get('reference_frames',plan['source_frames']))
     task_callbacks=int(meta.get('arm_execution',{}).get('dynamic_drive',{}).get('operational_space_callback_count',0))
     branch_verified=(task_callbacks==callback_count and tag.get('task_reference_callback_count')==callback_count) if plan.get('tracking')=='task-space' else task_callbacks==0
+    if plan.get('tracking')=='native-pose':branch_verified=(task_callbacks==callback_count and tag.get('native_pose_command_count')==n)
     completed_segments=int(meta.get('arm_execution',{}).get('dynamic_drive',{}).get('completed_segment_count',0))
     full=full and completed_segments==n
     state_keys=['joint_pos','joint_vel','object_pos','object_quat','object_vel','object_ang_vel']

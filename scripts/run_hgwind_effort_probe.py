@@ -25,7 +25,7 @@ from capstone_vla.recorded_franka import RecordedFrankaAdapter
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--mode',choices=('joint','cartesian'),default='joint')
-    parser.add_argument('--tracking',choices=('joint','task-space'),default='joint')
+    parser.add_argument('--tracking',choices=('joint','task-space','native-pose'),default='joint')
     parser.add_argument('--reference',choices=('saved-targets','recorded-motion'),default='saved-targets')
     parser.add_argument('--host',choices=('local','hongtao'),default='local')
     parser.add_argument('--episode',default='traj_00000')

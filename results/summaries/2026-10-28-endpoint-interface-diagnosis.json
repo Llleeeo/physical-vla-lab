@@ -1,0 +1,76 @@
+{
+  "schema": "physical-vla-lab.hgwind-endpoint-interface-diagnosis.v1",
+  "date": "2026-10-28",
+  "status": "CONSTRUCTED_TASK_REFERENCE_REJECTED",
+  "source_sha256": "e1b54faae644b64f8148b0fe0397d74287f06d7c48fa97ee34a054339a72e3d3",
+  "task_sha256": "83330198e8a5a70758eda7b8ead447f61b3289c4206d738507ab6c77a806a6c7",
+  "joint_motion_probe": {
+    "position_p95_mm": 22.93340301513672,
+    "orientation_p95_deg": 7.094000187720327,
+    "bilateral_control_bins": 39
+  },
+  "constructed_task_probe": {
+    "position_p95_mm": 42.258644104003906,
+    "orientation_p95_deg": 22.40835429448172,
+    "bilateral_control_bins": 0,
+    "physics_callbacks": 624,
+    "tracking_branch_verified": true,
+    "runtime_safety_passed": true
+  },
+  "cpu_counterfactual": {
+    "counterfactual_model": "native generator with ideal measured motion assumed from source CubicHermiteSpline; not a physical rollout",
+    "physics_rate_calls": 624,
+    "held_position_updates_with_nonzero_velocity": 412,
+    "native_endpoint_consistency": {
+      "maximum_abs_rad_s": 4.760189474771112,
+      "rms_rad_s": 1.3192744892978756,
+      "per_joint_abs_p95_rad_s": [
+        3.2647864001462534,
+        3.077205811587998,
+        3.1430883275391617,
+        1.7696875401707381,
+        4.218479716060729,
+        3.7113231364139234,
+        2.884453439233187
+      ]
+    },
+    "unexecuted_hermite_candidate_limits": {
+      "velocity": {
+        "maximum_limit_ratio": 0.9694982936406777,
+        "samples_above_limit": 0,
+        "samples": 625
+      },
+      "acceleration": {
+        "maximum_limit_ratio": 23.00221776962281,
+        "samples_above_limit": 282,
+        "samples": 625
+      },
+      "within_interval_jerk": {
+        "maximum_limit_ratio": 14.995078086853086,
+        "samples_above_limit": 80,
+        "samples": 625
+      }
+    },
+    "candidate_acceleration_knot_jump_max_rad_s2": 552.4317960220048
+  },
+  "source_hashes": {
+    "task_probe_report": "b8104caa5ade1e664977ae770ef4863a3a4b93c37823a6b7e0adbe77848ea906",
+    "joint_probe_report": "b3d1b791fee32bdcf81ffb3fd6eb5e4b28fc3cdd247bacd29e19f84269e9aa11",
+    "clock_report": "ac2c76676fbe67a856eaa539d4e5b615aee7e9afec398f48e54d33ae39749d85",
+    "native_generator": "5178f254406a001ff7df29f5f66fea7e010248c9db8bdfe752e23236f2eaea9f"
+  },
+  "next_probe": {
+    "tracking": "native-pose",
+    "api": "Expert.operational_space_pinch_action",
+    "position_velocity_and_operational_reference_from_same_call": true,
+    "uses_robot_only_reference_inputs": true,
+    "simulation_started": false,
+    "portable_cpu_tests_passed": 93
+  },
+  "limits": [
+    "Held position endpoints plus independently filtered velocity are valid control-API semantics, not a differentiable path guarantee.",
+    "The rejected adapter interpreted those outputs as derivatives of a single path. This is not a benchmark defect claim.",
+    "The CPU interpolation is an assumed curve through measured states, not the actual 180 Hz plant trajectory or a commanded-limit violation by the source.",
+    "Neither IK conversion nor a learned VLA was evaluated. Native-pose physical performance remains unverified."
+  ]
+}

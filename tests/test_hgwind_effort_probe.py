@@ -207,3 +207,54 @@ def test_task_tracking_accepts_consistent_frame_and_counts_physics_updates(monke
         ref=probe.physics_task_reference(expert,q,q,q,q,q)
         np.testing.assert_allclose(ref['task_position_error'],0)
     assert np.asarray(state['task_reference_checks']).shape==(2,4)
+
+
+class NativePoseExpertFixture:
+    def __init__(self,failure=None):
+        self.failure=failure;self.pending={'stale':True};self.calls=[]
+    def _base_pose(self):return np.zeros(3),np.array([1,0,0,0])
+    def ee_pose(self):return np.zeros(3),np.array([1,0,0,0])
+    def ee_target_to_pinch(self,p,q):return np.asarray(p)+np.array([.1,0,0])
+    def consume_operational_space_reference(self):
+        value=self.pending;self.pending=None;return value
+    def operational_space_pinch_action(self,p,q,**kwargs):
+        self.calls.append((p.copy(),q.copy(),kwargs))
+        if self.failure=='action':return None
+        if self.failure!='reference':self.pending={'jacobian':np.zeros((6,7)),'task_position_error':np.zeros(6),'commanded_task_velocity':np.zeros(6),'feedforward_task_acceleration':np.zeros(6)}
+        return SimpleNamespace(joint_indices=np.arange(7),joint_positions=np.full(7,.2),joint_velocities=None if self.failure=='velocity' else np.full(7,.01))
+
+
+def test_native_pose_servo_owns_position_velocity_reference_and_preserves_grip(monkeypatch):
+    expert=NativePoseExpertFixture();state={'plan':{'tracking':'native-pose'},'adapter':SimpleTaskKinematics(),'native_pose_calls':[]}
+    monkeypatch.setattr(probe,'_STATE',state);target=np.r_[np.zeros(7),.04,.04];v=np.zeros(9);v[3]=2
+    q,velocity=probe.native_pose_frame(expert,target,v,np.zeros(7))
+    np.testing.assert_allclose(q[:7],.2);np.testing.assert_allclose(q[7:],.04);np.testing.assert_allclose(velocity[:7],.01)
+    args=expert.calls[0][2];np.testing.assert_allclose(args['target_linear_velocity'],[0,.2,0]);np.testing.assert_allclose(args['target_angular_velocity'],[0,0,2])
+    assert args['dt']==1/60 and args['coupled_operational_pose_task'] and args['use_operational_space_inverse_dynamics']
+    assert len(state['native_pose_calls'])==1 and expert.pending is None
+    assert probe.physics_task_reference(None,None,None,None,None,None) is state['native_operational_reference']
+
+
+@pytest.mark.parametrize('failure',['action','velocity','reference'])
+def test_native_pose_rejects_missing_paired_native_commands(monkeypatch,failure):
+    monkeypatch.setattr(probe,'_STATE',{'plan':{'tracking':'native-pose'},'adapter':SimpleTaskKinematics(),'native_pose_calls':[]})
+    with pytest.raises(ValueError):probe.native_pose_frame(NativePoseExpertFixture(failure),np.r_[np.zeros(7),.04,.04],np.zeros(9),np.zeros(7))
+
+
+def clock_module():
+    spec=importlib.util.spec_from_file_location('clock_analysis',Path(__file__).resolve().parents[1]/'scripts/diagnose_hgwind_reference_clock.py')
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+
+
+def test_reference_clock_constant_velocity_is_consistent():
+    dt=1/180;v=np.ones((7,2));q=np.arange(7)[:,None]*dt*v
+    assert clock_module().position_velocity_consistency(q,v,dt)['maximum_abs_rad_s']<1e-12
+
+
+def test_reference_clock_held_positions_do_not_describe_supplied_nonzero_velocity():
+    result=clock_module().position_velocity_consistency(np.zeros((7,2)),np.ones((7,2)),1/180)
+    assert result['rms_rad_s']==pytest.approx(1.) and result['maximum_abs_rad_s']==pytest.approx(1.)
+
+
+def test_reference_clock_invalid_timing_is_rejected():
+    with pytest.raises(ValueError):clock_module().position_velocity_consistency(np.zeros((3,2)),np.zeros((3,2)),0)
