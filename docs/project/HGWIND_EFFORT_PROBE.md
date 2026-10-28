@@ -4,7 +4,7 @@
 
 The wind-driven-ball recordings use `operational_space_inverse_dynamics_effort`. The earlier egg-task position-drive probe does not establish compatibility with them. This diagnostic first executes saved joint commands through the frozen RoboPhys effort pipeline, then permits a Cartesian/IK comparison using the same executor.
 
-The first saved-target physical probe aborted during its 109th control interval. Recorded-motion joint tracking then completed 208 intervals safely, briefly held and lifted the ball, but lost it before the end. The constructed task-space comparison completed but performed worse. CPU endpoint-semantics checks identify an incompatible interpretation of its inputs; the native outer-pose-servo adapter subsequently aborted after contact. A trace-only original-expert reference is prepared for the next physical check. No ball-task training or learned-policy result is claimed.
+The first saved-target physical probe aborted during its 109th control interval. Recorded-motion joint tracking then completed 208 intervals safely, briefly held and lifted the ball, but lost it before the end. The constructed task-space comparison completed but performed worse. CPU endpoint-semantics checks identify an incompatible interpretation of its inputs; the native outer-pose-servo adapter subsequently aborted after contact. The original expert and complete-control replay now both reproduce the source episode exactly. The live policy action contract remains pending. No ball-task training or learned-policy result is claimed.
 
 ## Execution and recording boundary
 
@@ -147,3 +147,11 @@ data/derived/hf_pilot_render_repo/.venv/bin/python \
 ```
 
 The 209-step physical replay is pending. It intentionally uses cached original Jacobians/constraints and is limited to diagnostic reproduction; it is not a VLA observation/action contract. Its independent result is `control_reference_replay_passed`. A deployable policy adapter must generate its references from current robot state and the policy's documented outputs, after this integrity check.
+
+## Complete-control reference replay passes
+
+The logged-command physical replay completed 209 intervals with 627 physics updates, 582 OSC calls, matching initial state and passing runtime safety. Independent grasp evidence passes: 72 bilateral control bins (1.2 s), at least 74.861 mm retained lift in the final window and 0.123 mm hand-frame jitter. All 15 core datasets again equal the source exactly elementwise. Both the online original expert and complete-control replay reproduce this one source trajectory. This verifies execution/data integrity for one exposed case; no VLA ran.
+
+Robot/object states were not overwritten. The replay nevertheless used original cached Jacobians/constraints and retained the shadow task FSM for bookkeeping/safety. It does not certify a standalone live Cartesian policy adapter. Earlier failed variants differed in multiple respects, so this result does not isolate one missing signal as the sole cause of all earlier failures.
+
+The next gate is a documented policy action contract: define pose versus twist, frame, units, gripper semantics and timing; construct matching labels; derive runtime kinematics from current robot state; and validate an expert-derived Cartesian command stream through that live executor. Cached control matrices and source FSM timing must not become hidden policy inputs. Existing episodes/cameras are preserved; ball-task training and split assignment remain pending. Check a small set of additional episodes after the single-episode action gate before batch conversion.

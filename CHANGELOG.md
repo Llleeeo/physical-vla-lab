@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Complete-control physical replay verified
+
+- Logged q/qdot/OSC/limit replay completed 209 intervals / 627 physics updates and passed independent grasp checks. All 15 core datasets exactly match the original episode again.
+- Preserved source-hashed evidence. Original cached Jacobians/constraints and shadow bookkeeping/safety remain; no live VLA interface or model success is claimed.
+- No runtime control changes. Next verify matching action labels/execution using current robot kinematics before batch conversion or training.
+
 ## 2026-10-28 — Native expert episode reproduced exactly
 
 - Original expert completed 209 intervals and independent grasp checks passed. All 15 core numeric datasets exactly match the source; this is one exposed expert case, not a VLA result.

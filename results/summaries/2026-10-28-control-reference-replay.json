@@ -1,0 +1,90 @@
+{
+  "schema": "physical-vla-lab.hgwind-complete-control-replay.v1",
+  "date": "2026-10-28",
+  "status": "COMPLETE_CONTROL_REFERENCE_REPLAY_PASS",
+  "source_sha256": "e1b54faae644b64f8148b0fe0397d74287f06d7c48fa97ee34a054339a72e3d3",
+  "task_sha256": "83330198e8a5a70758eda7b8ead447f61b3289c4206d738507ab6c77a806a6c7",
+  "frames": 209,
+  "physics_callbacks": 627,
+  "osc_callbacks": 582,
+  "initial_state_match": true,
+  "runtime_safety_passed": true,
+  "control_reference_replay_passed": true,
+  "identical_core_arrays": [
+    "actions",
+    "is_first",
+    "is_last",
+    "is_terminal",
+    "obs/ee_pos",
+    "obs/ee_quat",
+    "obs/ee_vel",
+    "obs/finger_segment_world",
+    "obs/joint_pos",
+    "obs/joint_vel",
+    "obs/object_ang_vel",
+    "obs/object_pos",
+    "obs/object_quat",
+    "obs/object_vel",
+    "timestamp"
+  ],
+  "core_array_comparison": "exact elementwise numerical equality to original episode, not HDF5 file-byte equality",
+  "grasp_evidence": {
+    "schema": "capstone_grasp_evidence_v1",
+    "status": "pass",
+    "official_benchmark_success": null,
+    "criteria": {
+      "minimum_bilateral_duration_s": 0.25,
+      "final_hold_duration_s": 0.25,
+      "minimum_lift_m": 0.05,
+      "maximum_relative_position_jitter_m": 0.02,
+      "minimum_precontact_speed_m_s": 0.05,
+      "motion_requirement": "linear",
+      "minimum_precontact_angular_speed_rad_s": 0.1,
+      "maximum_final_relative_spin_rad_s": 0.5,
+      "require_lift": true
+    },
+    "checks": {
+      "continuous_bilateral_contact": true,
+      "final_bilateral_hold": true,
+      "sustained_lift": true,
+      "relative_position_retention": true,
+      "bilateral_nonzero_impulses": true,
+      "object_moving_before_first_contact": true,
+      "no_grasp_assistance": true
+    },
+    "measurements": {
+      "frames": 209,
+      "sample_hz": 60.00000000000021,
+      "bilateral_frames": 72,
+      "longest_bilateral_duration_s": 1.1999999999999957,
+      "first_contact_frame": 135,
+      "first_bilateral_frame": 137,
+      "minimum_final_lift_from_first_bilateral_m": 0.07486140727996826,
+      "final_relative_position_jitter_m": 0.00012297761503474774,
+      "object_speed_before_first_contact_m_s": 0.22630296647548676,
+      "object_angular_speed_before_first_contact_rad_s": null,
+      "final_relative_spin_p95_rad_s": null
+    },
+    "scope": "independent engineering check on recorded states; not full geometry/physics-generalization certification"
+  },
+  "source_state_comparison": {
+    "ee_position_mean_mm": 0.0,
+    "ee_position_p95_mm": 0.0,
+    "ee_orientation_p95_deg": 0.0,
+    "first_position_discrepancy_above_0_01mm_frame": null,
+    "position_error_at_frame_90_mm": 0.0
+  },
+  "control_log_sha256": "78b6ea934b8266aa428f47b95d9eb3be94d3bf8bce723fd5de99e402c054e140",
+  "source_report_sha256": "eaf457f8c8405ed32933f484dc052c7133aa25cefc7007af59953af5ed41285f",
+  "probe_replay_sha256": "272f5c9ceb49768d97015278ab07ffe3ae597799e3e9237f4c707b7435bf8548",
+  "vla_evaluated": false,
+  "training_started": false,
+  "live_policy_action_contract_verified": false,
+  "limits": [
+    "One exposed episode and seed, not a policy success rate or physical generalization result.",
+    "Original cached Jacobians and constraints are replayed.",
+    "Shadow expert remains active for bookkeeping and safety; this is not a standalone deployable policy controller.",
+    "Robot/object states evolve physically; exact-state rendering and object-state overwrite were not used.",
+    "Earlier failed variants changed multiple execution details; no single missing signal is isolated as their sole cause."
+  ]
+}

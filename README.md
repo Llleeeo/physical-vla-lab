@@ -10,14 +10,14 @@ This is an independent research integration, not the upstream RoboPhys benchmark
 
 | Workstream | Verified progress | Remaining work |
 |---|---|---|
-| Franka action interface | Cartesian/joint adapters, timing checks, recorded-tool FK verified across all 40 ball episodes; isolated effort-control probe prepared | Reliable end-to-end learned dynamic grasping |
+| Franka action interface | Cartesian/joint adapters, timing checks, recorded-tool FK verified across all 40 ball episodes; original expert and full control replay verified on one seed | Live policy action contract and learned dynamic grasping |
 | DynamicVLA baseline | Pretrained-model loading, fine-tuning and offline evaluation on an earlier egg-object task | Offline prediction improvements have not established robust closed-loop success |
 | Wind-driven ball demonstrations | 40 collector-accepted physical grasps; recording/contact checks and descriptive quality screen completed | Full visual review and downstream training conversion |
 | Visual data pipeline | All 40 revised-camera episodes verified at 60 Hz (12,154 frames); all 19 remote episodes delivered through the private Hub to the main machine | Trajectory quality/visibility review and downstream action conversion |
 | Physical generalization | Evaluation questions and failure-analysis workflow defined | Independent held-out physical conditions and systematic experiments |
 | UR10e | Later-stage research direction | Embodiment adaptation, simulation validation and supervised hardware experiments |
 
-The 40 ball episodes are **expert development data, not 40 VLA successes**. No disturbance-robustness improvement or sim-to-real transfer is claimed. The [effort-control probes](docs/project/HGWIND_EFFORT_PROBE.md) exposed an action-reference mismatch: recorded-motion joint tracking runs safely but loses the ball during lift. A constructed task-space reference performed worse; endpoint semantics were audited and the native pose-servo adapter aborted after contact. The original expert has now reproduced one recorded episode exactly across all 15 core numeric arrays; a replay of its complete control references awaits simulation. See [results and limitations](docs/project/RESULTS.md).
+The 40 ball episodes are **expert development data, not 40 VLA successes**. No disturbance-robustness improvement or sim-to-real transfer is claimed. The [effort-control probes](docs/project/HGWIND_EFFORT_PROBE.md) exposed an action-reference mismatch: recorded-motion joint tracking runs safely but loses the ball during lift. A constructed task-space reference performed worse; endpoint semantics were audited and the native pose-servo adapter aborted after contact. The original expert and complete-control physical replay both reproduce one source episode exactly across all 15 core numeric arrays. A live policy action contract remains unverified. See [results and limitations](docs/project/RESULTS.md).
 
 ## Workflow
 
