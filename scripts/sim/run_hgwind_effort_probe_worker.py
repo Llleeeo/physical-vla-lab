@@ -12,6 +12,8 @@ sys.path.insert(0,str(ROOT/'src'))
 from capstone_vla.hgwind_effort_probe import patch_worker
 from capstone_vla.hf_archive import sha256
 plan=json.loads(Path(os.environ['HGWIND_EFFORT_PROBE_MANIFEST']).read_text())
+for name,digest in plan.get('adapter_sha256',{}).items():
+    if sha256(ROOT/name)!=digest:raise RuntimeError('Probe adapter changed after preparation: '+name)
 parser=argparse.ArgumentParser(add_help=False)
 parser.add_argument('--task');parser.add_argument('--grasp_mode');parser.add_argument('--arm_execution')
 args,_=parser.parse_known_args()

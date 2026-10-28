@@ -1,0 +1,57 @@
+{
+  "schema": "physical-vla-lab.hgwind-effort-probe-outcome.v1",
+  "date": "2026-10-28",
+  "status": "SAVED_TARGET_JOINT_PROBE_SAFETY_ABORT",
+  "source": {
+    "host": "local",
+    "episode": "traj_00000",
+    "source_sha256": "e1b54faae644b64f8148b0fe0397d74287f06d7c48fa97ee34a054339a72e3d3"
+  },
+  "requested_frames": 209,
+  "recorded_frames": 109,
+  "completed_control_intervals": 108,
+  "physics_callbacks": 324,
+  "initial_state_differences": {
+    "joint_pos_max_abs": 0.0,
+    "joint_vel_max_abs": 0.0,
+    "object_pos_max_norm": 0.0,
+    "object_vel_max_norm": 0.0,
+    "object_ang_vel_max_norm": 0.0,
+    "object_quaternion_sign_invariant_max": 0.0
+  },
+  "runtime_safety_passed": false,
+  "control_context": {
+    "source_first_close_frame": 118,
+    "probe_closed_command_frames": 0,
+    "source_operational_space_callbacks": 582,
+    "probe_operational_space_callbacks": 0,
+    "abort_reason": "no feasible arm command: hardware constraints infeasible during velocity reserve recovery"
+  },
+  "source_state_comparison": {
+    "ee_position_mean_mm": 20.234952926635742,
+    "ee_position_p95_mm": 60.374698638916016,
+    "ee_orientation_p95_deg": 8.859254618833086,
+    "first_position_discrepancy_above_0_01mm_frame": 1,
+    "position_error_at_frame_90_mm": 57.465057373046875
+  },
+  "grasp_engineering_status": "fail",
+  "source_success_relabelled": false,
+  "ik_tested": false,
+  "vla_policy_evaluated": false,
+  "next_diagnostic": {
+    "reference": "recorded-motion",
+    "transitions": 208,
+    "velocity": "recorded next-state measured arm velocity, not recovered original actuator velocity",
+    "simulation_started": false,
+    "portable_cpu_tests_passed": 78
+  },
+  "source_report_sha256": "e29cdbb0076985d8f9b46b4abafad634d40af834fa71c15ea8df8ddb1e7dc982",
+  "simulation_log_sha256": "1725036e3ce252d9cc08606700339d9eea2fed8f09516986c25ea1a6355d86c5",
+  "probe_replay_sha256": "21031ce3b71839e85aa05e83a3cd0246390efcc92f9ace08a84067f57efb631c",
+  "limits": [
+    "Original native operational references and paired actuator velocity were not saved.",
+    "Same effort/limit chain does not ensure the same primary tracking branch.",
+    "Recorded-motion changes both position reference semantics and velocity supply; any improvement will not isolate their individual effects.",
+    "This is diagnostic development data, not a policy benchmark."
+  ]
+}

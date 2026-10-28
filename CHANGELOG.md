@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Saved-target probe abort diagnosed
+
+- Recorded a physical safety abort before jaw closure despite identical first states. Processed actuator references, missing original operational references and a different primary tracking branch prevent faithful replay; this is not an IK/VLA failure.
+- Fixed aborted-run reporting and the collector output layout; distinguish 109 recorded states from 108 completed intervals. Added adapter-code fingerprint checks.
+- Added a separate 208-transition recorded-motion diagnostic with explicit observed robot position/velocity references and unchanged gripper timing/constraints. Five regressions added; 78 portable CPU tests pass. New simulation remains pending.
+
 ## 2026-10-28 — Isolated effort-control comparison prepared
 
 - Added a task-scoped saved-joint versus Cartesian/IK probe around the frozen RoboPhys effort executor, without editing upstream files or replacing effort control with position drives.

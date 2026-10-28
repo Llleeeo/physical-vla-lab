@@ -8,7 +8,7 @@ Gate: immutable source manifests, complete visuals and explicit accepted/exclude
 
 ## 2. Establish learned closed-loop grasping
 
-Validate the ball-task action conversion by replaying expert-derived commands before attributing failures to the policy. The isolated [effort-control comparison](HGWIND_EFFORT_PROBE.md) is prepared; first require a complete physical saved-joint baseline, then test Cartesian/IK with matching execution fingerprints. Physical probe results remain pending. Freeze episode-level train/validation partitions and fit normalization on training data only. Train a pretrained DynamicVLA baseline and evaluate actual camera-feedback rollouts. Offline fitting and synchronous simulation latency are reported separately.
+Validate the ball-task action conversion by replaying expert-derived commands before attributing failures to the policy. The isolated [effort-control comparison](HGWIND_EFFORT_PROBE.md) is prepared; first require a complete physical saved-joint baseline, then test Cartesian/IK with matching execution fingerprints. The first saved-target baseline aborted before closure; a separate observed-motion joint-tracking diagnostic is now pending. Do not attribute this failure to IK or the policy. Freeze episode-level train/validation partitions and fit normalization on training data only. Train a pretrained DynamicVLA baseline and evaluate actual camera-feedback rollouts. Offline fitting and synchronous simulation latency are reported separately.
 
 A uniform episode-sampling baseline comes first. If quality review supports it, compare modest quality-aware weighting under the same training budget and fixed evaluation distribution. A possible 60:40 source-group mixture is a proposal, not an implemented or proven improvement.
 

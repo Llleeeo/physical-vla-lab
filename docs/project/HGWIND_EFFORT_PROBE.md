@@ -4,7 +4,7 @@
 
 The wind-driven-ball recordings use `operational_space_inverse_dynamics_effort`. The earlier egg-task position-drive probe does not establish compatibility with them. This diagnostic first executes saved joint commands through the frozen RoboPhys effort pipeline, then permits a Cartesian/IK comparison using the same executor.
 
-The implementation and CPU preflight are checked. No physical rollout has yet been run with this adapter. No ball-task training or learned-policy result is claimed.
+The first saved-target physical probe aborted during its 109th control interval. Its initial robot and object states matched the source exactly. The new recorded-motion tracking diagnostic is CPU-checked and awaits simulation. No ball-task training or learned-policy result is claimed.
 
 ## Execution and recording boundary
 
@@ -54,3 +54,21 @@ data/derived/hf_pilot_render_repo/.venv/bin/python \
 ```
 
 The runner also prints the exact command after a passing baseline. It rejects a baseline from a different source, scene or execution fingerprint. Neither branch evaluates a learned policy, real-time inference, physical generalization or cross-embodiment transfer.
+
+## First physical result and revised diagnostic
+
+The saved-target joint probe recorded 109 states and completed 108 control intervals. It then stopped with `hardware constraints infeasible during velocity reserve recovery`. Source and probe first joint/object positions, velocities and orientations matched exactly. The source closes at frame 118; the probe issued no closed-jaw commands. It had already diverged from the source at frame 1, with 57.465 mm EE position difference at frame 90. The probe encountered finger/ball contact around 1.806 s; the source's first robot/ball contact was around 2.267 s. Contact preceded the abort, but this temporal association alone does not isolate the infeasibility's complete cause.
+
+The collector overwrites saved arm `actions` with each interval's last drive-position reference. The source ran 582 operational-space controller callbacks; the probe ran zero after deliberately discarding the unrecorded expert reference, selecting joint inverse-dynamics fallback. A shared limit/effort pipeline therefore does not imply an identical primary tracking law. Reinserting the saved processed targets with a position-error-based velocity guess is not faithful original command replay. This result does not test IK or DynamicVLA. The source data's success label is unchanged.
+
+`--reference recorded-motion` is a separate, offline desired-motion tracking diagnostic:
+
+```bash
+data/derived/hf_pilot_render_repo/.venv/bin/python \
+  scripts/run_hgwind_effort_probe.py --mode joint \
+  --reference recorded-motion --run
+```
+
+For each source row k it requests the observed arm joint position and velocity at k+1, keeping the original binary gripper request at k. There are 208 transitions from 209 observed states; the missing final state is not invented. Neither simulator state nor object motion is overwritten. The existing viability generator, physical gripper, effort feasibility checks and limits remain active. This uses recorded desired robot motion as diagnostic input, not a learned policy and not recovered native controller references. It changes both reference-position semantics and velocity supply; it cannot isolate their individual causal effects. A pass would support motion executability under this diagnostic, not full action-interface equivalence.
+
+The mode currently supports joint tracking only and cannot unlock the saved-target Cartesian gate. Its result is reported separately as `motion_tracking_passed`; a future Cartesian reference/velocity contract still requires design and validation. Aborted runs with saved episodes now receive independent reports while preserving the nonzero worker exit code. The analyzer uses the collector's actual output layout and distinguishes recorded states from fully completed control intervals.

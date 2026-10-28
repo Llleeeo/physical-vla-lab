@@ -102,3 +102,42 @@ def test_absent_finger_contact_is_zero_not_an_analysis_exception(tmp_path):
         c['headers']=np.zeros((0,8),np.int64);c['points']=np.zeros((0,10))
         l,r=module.control_contact_arrays(f,'/ball',np.arange(2)/60)
         assert not l.any() and not r.any()
+
+
+def test_recorded_motion_targets_next_state_with_matching_velocity_and_current_grip():
+    p,m,a,t=source();a[1,7:]=0
+    q=np.arange(27,dtype=float).reshape(3,9)/100;v=q/10
+    target,velocity=probe.build_reference(a,q,v,'recorded-motion')
+    assert target.shape==(2,9)  # There is no observed state 3.
+    np.testing.assert_allclose(target[:,:7],q[1:,:7])
+    np.testing.assert_array_equal(target[:,7:],a[:-1,7:].astype(np.float32))
+    np.testing.assert_allclose(velocity[:,:7],v[1:,:7]);assert not velocity[:,7:].any()
+    assert np.isfinite(velocity).all()
+
+
+def test_recorded_motion_rejects_invalid_robot_state():
+    p,m,a,t=source();q=a.copy();q[1,0]=np.nan
+    with pytest.raises(ValueError,match='robot-motion'):
+        probe.build_reference(a,q,a,'recorded-motion')
+    with pytest.raises(ValueError,match='Unknown reference'):
+        probe.build_reference(a,a,a,'invented')
+
+
+def test_saved_targets_reference_remains_unchanged_and_copied():
+    p,m,a,t=source();target,velocity=probe.build_reference(a,None,None,'saved-targets')
+    np.testing.assert_array_equal(target,a.astype(np.float32));assert np.isnan(velocity).all()
+    target[0,0]=12;assert a[0,0]==0
+
+
+def test_explicit_motion_velocity_is_not_replaced_by_position_error(monkeypatch):
+    p,m,a,t=source();p['reference']='recorded-motion';v=np.full((3,9),.12)
+    monkeypatch.setattr(probe,'_STATE',{'plan':p,'requests':[],'poses':np.zeros((3,7)),'velocities':v})
+    _,actual=probe.reference_frame(a,1,m['joint_names'],m['joint_names'],measured_positions=np.zeros(9))
+    np.testing.assert_array_equal(actual,v[1]);actual[0]=3;assert v[1,0]==.12
+
+
+def test_analysis_finds_actual_collector_output_layout(tmp_path):
+    spec=importlib.util.spec_from_file_location('effort_paths',Path(__file__).resolve().parents[1]/'scripts/analyze_hgwind_effort_probe.py')
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    ep=tmp_path/'1s1p'/'task'/'failed_00000';ep.mkdir(parents=True);(ep/'replay.hdf5').touch()
+    assert module.find_probe_episodes(tmp_path)==[ep]
