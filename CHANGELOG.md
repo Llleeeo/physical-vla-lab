@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Live native robot kinematics verified
+
+- Native pinch geometry completes 209 intervals / 627 physics updates and passes independent grasp checks: 1.2 s bilateral contact and at least 74.861 mm retained lift.
+- All 194 Jacobians recomputed from live robot state and all 15 core numeric arrays exactly match the exposed source episode. No cached original Jacobian executes.
+- Other logged motor references and shadow bookkeeping remain; standalone policy execution and robustness are unverified. Documentation/evidence update only; latest runtime suite remains 123 CPU passes.
+
 ## 2026-10-28 — Post-contact divergence isolated for diagnosis
 
 - Metric-corrected live-Jacobian run completes 174 intervals, with matching contact timing and 0.633 s bilateral contact, but fails lift and aborts during velocity-reserve recovery. Appreciable motion divergence begins after contact.

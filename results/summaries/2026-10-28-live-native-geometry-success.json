@@ -1,0 +1,205 @@
+{
+  "schema": "physical-vla-lab.hgwind-live-native-geometry-success.v1",
+  "date": "2026-10-28",
+  "status": "LIVE_NATIVE_KINEMATICS_COMPONENT_PASS",
+  "source_sha256": "e1b54faae644b64f8148b0fe0397d74287f06d7c48fa97ee34a054339a72e3d3",
+  "task_sha256": "83330198e8a5a70758eda7b8ead447f61b3289c4206d738507ab6c77a806a6c7",
+  "report_sha256": "37b0e68bf0fcf4f6ce3ce168886b61a43276a2e2400e41de609bddb94e015090",
+  "control_log_sha256": "78b6ea934b8266aa428f47b95d9eb3be94d3bf8bce723fd5de99e402c054e140",
+  "native_geometry_source_sha256": "27b864d7dd4a33d621bf6e22f1e615fa0ca143cfaf744425829c666f9752ac58",
+  "frames": 209,
+  "physics_callbacks": 627,
+  "osc_callbacks": 582,
+  "live_jacobian_updates": 194,
+  "live_jacobian_comparison_max_abs": 0.0,
+  "jacobian_method": "native-pinch",
+  "initial_state_match": true,
+  "runtime_safety_passed": true,
+  "live_kinematics_component_passed": true,
+  "grasp_evidence": {
+    "schema": "capstone_grasp_evidence_v1",
+    "status": "pass",
+    "official_benchmark_success": null,
+    "criteria": {
+      "minimum_bilateral_duration_s": 0.25,
+      "final_hold_duration_s": 0.25,
+      "minimum_lift_m": 0.05,
+      "maximum_relative_position_jitter_m": 0.02,
+      "minimum_precontact_speed_m_s": 0.05,
+      "motion_requirement": "linear",
+      "minimum_precontact_angular_speed_rad_s": 0.1,
+      "maximum_final_relative_spin_rad_s": 0.5,
+      "require_lift": true
+    },
+    "checks": {
+      "continuous_bilateral_contact": true,
+      "final_bilateral_hold": true,
+      "sustained_lift": true,
+      "relative_position_retention": true,
+      "bilateral_nonzero_impulses": true,
+      "object_moving_before_first_contact": true,
+      "no_grasp_assistance": true
+    },
+    "measurements": {
+      "frames": 209,
+      "sample_hz": 60.00000000000021,
+      "bilateral_frames": 72,
+      "longest_bilateral_duration_s": 1.1999999999999957,
+      "first_contact_frame": 135,
+      "first_bilateral_frame": 137,
+      "minimum_final_lift_from_first_bilateral_m": 0.07486140727996826,
+      "final_relative_position_jitter_m": 0.00012297761503474774,
+      "object_speed_before_first_contact_m_s": 0.22630296647548676,
+      "object_angular_speed_before_first_contact_rad_s": null,
+      "final_relative_spin_p95_rad_s": null
+    },
+    "scope": "independent engineering check on recorded states; not full geometry/physics-generalization certification"
+  },
+  "core_array_comparison": {
+    "actions": {
+      "shape": [
+        209,
+        9
+      ],
+      "exact_elementwise_equal": true,
+      "max_abs_difference": 0.0
+    },
+    "timestamp": {
+      "shape": [
+        209
+      ],
+      "exact_elementwise_equal": true,
+      "max_abs_difference": 0.0
+    },
+    "is_first": {
+      "shape": [
+        209
+      ],
+      "exact_elementwise_equal": true,
+      "max_abs_difference": 0.0
+    },
+    "is_last": {
+      "shape": [
+        209
+      ],
+      "exact_elementwise_equal": true,
+      "max_abs_difference": 0.0
+    },
+    "is_terminal": {
+      "shape": [
+        209
+      ],
+      "exact_elementwise_equal": true,
+      "max_abs_difference": 0.0
+    },
+    "obs/ee_pos": {
+      "shape": [
+        209,
+        3
+      ],
+      "exact_elementwise_equal": true,
+      "max_abs_difference": 0.0
+    },
+    "obs/ee_quat": {
+      "shape": [
+        209,
+        4
+      ],
+      "exact_elementwise_equal": true,
+      "max_abs_difference": 0.0
+    },
+    "obs/ee_vel": {
+      "shape": [
+        209,
+        3
+      ],
+      "exact_elementwise_equal": true,
+      "max_abs_difference": 0.0
+    },
+    "obs/finger_segment_world": {
+      "shape": [
+        209,
+        2,
+        3
+      ],
+      "exact_elementwise_equal": true,
+      "max_abs_difference": 0.0
+    },
+    "obs/joint_pos": {
+      "shape": [
+        209,
+        9
+      ],
+      "exact_elementwise_equal": true,
+      "max_abs_difference": 0.0
+    },
+    "obs/joint_vel": {
+      "shape": [
+        209,
+        9
+      ],
+      "exact_elementwise_equal": true,
+      "max_abs_difference": 0.0
+    },
+    "obs/object_ang_vel": {
+      "shape": [
+        209,
+        2,
+        3
+      ],
+      "exact_elementwise_equal": true,
+      "max_abs_difference": 0.0
+    },
+    "obs/object_pos": {
+      "shape": [
+        209,
+        2,
+        3
+      ],
+      "exact_elementwise_equal": true,
+      "max_abs_difference": 0.0
+    },
+    "obs/object_quat": {
+      "shape": [
+        209,
+        2,
+        4
+      ],
+      "exact_elementwise_equal": true,
+      "max_abs_difference": 0.0
+    },
+    "obs/object_vel": {
+      "shape": [
+        209,
+        2,
+        3
+      ],
+      "exact_elementwise_equal": true,
+      "max_abs_difference": 0.0
+    }
+  },
+  "comparison_scope": "exact numeric array equality for 15 core datasets; not HDF5 file-byte identity",
+  "remaining_logged_inputs": [
+    "joint position goals and paired velocities",
+    "task twist and acceleration feedforward",
+    "geometry constraints and velocity caps",
+    "gripper commands and command timing"
+  ],
+  "shadow_task_fsm_retained": true,
+  "original_cached_jacobians_executed": false,
+  "object_state_overwritten": false,
+  "standalone_policy_controller_verified": false,
+  "vla_evaluated": false,
+  "robustness_improvement_established": false,
+  "conclusions": [
+    "The frozen native geometry calculation can recompute all 194 task Jacobians from current robot state and exactly reproduce this exposed source episode.",
+    "The preceding metric-corrected shifted-tool calculation diverged after contact, so mathematically close Jacobian constructions were not behaviorally interchangeable in this frozen-reference experiment.",
+    "The underlying contact/optimizer sensitivity mechanism has not been independently isolated."
+  ],
+  "next_gate": "Specify the policy command contract and replace logged joint/control references with robot-state-derived runtime execution, then validate an expert-derived stream before model training.",
+  "limits": [
+    "One exposed episode and seed; not a success rate or a held-out generalization result.",
+    "No DynamicVLA inference was used, and logged expert command content and shadow bookkeeping/safety remain.",
+    "Exact reproduction does not establish tolerance to policy errors, disturbances or changed conditions."
+  ]
+}

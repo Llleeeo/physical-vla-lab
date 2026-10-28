@@ -209,3 +209,14 @@ data/derived/hf_pilot_render_repo/.venv/bin/python \
 ```
 
 123 portable CPU checks pass, including three added extraction/geometry tests. The actual frozen geometry block was also executed against an independent CPU toy FK, and the real scene/control-log preflight passed. New physical execution is pending. This is a numerical-method component comparison, not a fix proven in simulation and not a VLA rollout. It retains logged q/qdot/twist/feedforward/constraints and the shadow FSM. If it reproduces success exactly, this will still not establish robustness to policy errors or disturbances.
+
+
+## Native live kinematics succeeds and reproduces the source
+
+The `native-pinch` physical run completes all 209 intervals / 627 physics updates and 582 OSC calls. Initial state and runtime safety pass. All 194 task Jacobians are recomputed from current robot state; the logged matrices are audit comparisons only. Every recomputed matrix is exactly equal to its reference, and all 15 core numeric trajectory datasets are again equal elementwise to the source. HDF5 run metadata differs, so file-byte equality is not claimed.
+
+Independent grasp evidence passes: 72 bilateral bins (1.2 s), final-window minimum retained lift 74.861 mm, and hand-relative position jitter 0.123 mm. There is no grasp attachment assistance or object-state overwrite. The [source-hashed result](../../results/summaries/2026-10-28-live-native-geometry-success.json) records the comparisons.
+
+This verifies the live geometry component for one exposed seed. The preceding metric-corrected shifted-tool calculation diverged after contact; replacing its numerical geometry construction with the native one recovers exact reproduction in this case. It does not isolate a general contact/optimizer sensitivity mechanism or establish robustness to small policy errors. Logged joint goals, paired velocities, task velocity/feedforward, constraints and gripper timing still provide the command content; the shadow FSM remains for bookkeeping and safety. No VLA has been evaluated in this experiment.
+
+The next gate is an explicit policy output/execution contract that removes the remaining logged motor-reference dependencies. Validate an expert-derived stream through that interface before converting the ball cohort or training a model. A live Jacobian alone does not certify the complete learned-policy executor.
