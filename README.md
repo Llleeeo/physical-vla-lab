@@ -17,7 +17,7 @@ This is an independent research integration, not the upstream RoboPhys benchmark
 | Physical generalization | Evaluation questions and failure-analysis workflow defined | Independent held-out physical conditions and systematic experiments |
 | UR10e | Later-stage research direction | Embodiment adaptation, simulation validation and supervised hardware experiments |
 
-The 40 ball episodes are **expert development data, not 40 VLA successes**. No disturbance-robustness improvement or sim-to-real transfer is claimed. The [effort-control probes](docs/project/HGWIND_EFFORT_PROBE.md) exposed an action-reference mismatch: recorded-motion joint tracking runs safely but loses the ball during lift. A constructed task-space reference performed worse; endpoint semantics were audited and the native pose-servo adapter aborted after contact. The original expert and complete-control physical replay both reproduce one source episode exactly across all 15 core numeric arrays. A live policy action contract remains unverified. See [results and limitations](docs/project/RESULTS.md).
+The 40 ball episodes are **expert development data, not 40 VLA successes**. No disturbance-robustness improvement or sim-to-real transfer is claimed. The [effort-control probes](docs/project/HGWIND_EFFORT_PROBE.md) exposed an action-reference mismatch: recorded-motion joint tracking runs safely but loses the ball during lift. A constructed task-space reference performed worse; endpoint semantics were audited and the native pose-servo adapter aborted after contact. The original expert and complete-control physical replay both reproduce one source episode exactly across all 15 core numeric arrays. A current-robot-Jacobian component diagnostic is CPU-ready; its physical run is pending. A live policy action contract remains unverified. See [results and limitations](docs/project/RESULTS.md).
 
 ## Workflow
 
@@ -51,7 +51,7 @@ Use a separate Python 3.12 environment. This command does not launch simulation,
 ```bash
 python3.12 -m venv .venv_cpu
 .venv_cpu/bin/python -m pip install -r requirements-cpu.txt
-PYTHONPATH=src .venv_cpu/bin/python -m pytest -q   tests/test_hgwind_cohort.py tests/test_hgwind_render_delivery.py   tests/test_hf_archive.py tests/test_prediction_metrics.py tests/test_chunk_execution.py tests/test_publication.py tests/test_trajectory_quality.py tests/test_recorded_franka.py tests/test_hgwind_effort_probe.py tests/test_grasp_evidence.py
+PYTHONPATH=src .venv_cpu/bin/python -m pytest -q   tests/test_hgwind_cohort.py tests/test_hgwind_render_delivery.py   tests/test_hf_archive.py tests/test_prediction_metrics.py tests/test_chunk_execution.py tests/test_publication.py tests/test_trajectory_quality.py tests/test_recorded_franka.py tests/test_hgwind_effort_probe.py tests/test_grasp_evidence.py tests/test_live_kinematics.py
 ```
 
 These tests use synthetic fixtures. They verify software contracts, not grasp success. Other tests may require local data, USD assets or Isaac installations.

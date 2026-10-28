@@ -24,7 +24,7 @@ _STATE = {}
 def validate_source(plan, metadata, actions, times):
     require(plan['schema']=='physical-vla-lab.hgwind-effort-probe.v1','Unknown probe manifest')
     require(plan['mode'] in ('joint','cartesian'),'Unknown probe mode')
-    require(plan.get('tracking','joint') in ('joint','task-space','native-pose','native-expert','logged-command'),'Unknown tracking branch')
+    require(plan.get('tracking','joint') in ('joint','task-space','native-pose','native-expert','logged-command','live-jacobian'),'Unknown tracking branch')
     require(plan.get('tracking','joint') not in ('task-space','native-pose') or (plan.get('reference')=='recorded-motion' and plan['mode']=='joint'),'Task-space tracking requires recorded-motion joint goals')
     steps=metadata.get('task_plan',{}).get('steps',[])
     require(metadata.get('task',{}).get('id')==TASK_ID and len(steps)==1
@@ -92,7 +92,7 @@ def load_logged_commands(path,source_positions,source_velocities):
 
 
 def reference_policy_velocity_limit():
-    if _STATE['plan'].get('tracking')!='logged-command':return None
+    if _STATE['plan'].get('tracking') not in ('logged-command','live-jacobian'):return None
     value=_STATE['active_logged_row']['policy_joint_velocity_limit']
     return None if value is None else np.asarray(value,float).copy()
 
@@ -110,7 +110,7 @@ def load_action_reference(source, *, task_id, control_hz=None):
         actions=f['actions'][:];times=f['timestamp'][:];positions=f['obs/joint_pos'][:];velocities=f['obs/joint_vel'][:]
     validate_source(plan,meta,actions,times)
     logged_rows=None
-    if plan.get('tracking')=='logged-command':
+    if plan.get('tracking') in ('logged-command','live-jacobian'):
         require(sha256(plan['control_log'])==plan['control_log_sha256'] and sha256(plan['control_log_report'])==plan['control_log_report_sha256'],'Original control reference changed')
         actions,velocities,logged_rows=load_logged_commands(plan['control_log'],positions,velocities)
     else:
@@ -124,7 +124,7 @@ def load_action_reference(source, *, task_id, control_hz=None):
     require(adapter.urdf_sha256==plan['urdf_sha256'],'URDF changed')
     actions=actions[:count]
     poses=np.stack([adapter.contract.encode(*adapter.pose_jacobian(q[:7])[:2],1 if q[7]>.02 else -1) for q in actions])
-    _STATE.clear();_STATE.update(plan=plan,adapter=adapter,poses=poses,velocities=velocities[:count],requests=[],assistance=[],task_reference_checks=[],native_pose_calls=[],logged_rows=logged_rows)
+    _STATE.clear();_STATE.update(plan=plan,adapter=adapter,poses=poses,velocities=velocities[:count],requests=[],assistance=[],task_reference_checks=[],native_pose_calls=[],logged_rows=logged_rows,live_jacobian_records=[])
     return actions.astype(np.float32),meta,{'source_trajectory':str(source),'source_sha256':sha256(source),
         'source_joint_names':meta['joint_names'],'source_frames':count,'mode':'capstone_hgwind_effort_command_probe',
         'initialization':'same_scene_base_seed_and_attempt_index; physical first states must be compared',
@@ -148,7 +148,10 @@ def reference_frame(actions, index, source_names, runtime_names, *, measured_pos
         target[:7],finger=_STATE['adapter'].joint_target(measured[:7],_STATE['poses'][index])
         target[7:]=finger
     velocity=np.asarray(_STATE['velocities'][index]).copy() if 'velocities' in _STATE else np.full(target.shape,np.nan)
-    if _STATE['plan'].get('tracking')=='logged-command':_STATE['active_logged_row']=_STATE['logged_rows'][index]
+    if _STATE['plan'].get('tracking') in ('logged-command','live-jacobian'):
+        _STATE['active_logged_row']=_STATE['logged_rows'][index]
+        if _STATE['plan']['tracking']=='live-jacobian':
+            _STATE['active_live_reference']=live_reference(expert,_STATE['active_logged_row']['operational_space_reference'],index)
     if _STATE['plan'].get('tracking')=='native-pose':
         target,velocity=native_pose_frame(expert,target,velocity,measured[:7])
     _STATE['requests'].append({'requested_velocity':velocity.tolist(),'frame':int(index),'measured_joints':measured.tolist(),'requested_joints':target.tolist(),
@@ -159,6 +162,17 @@ def reference_frame(actions, index, source_names, runtime_names, *, measured_pos
     return target,velocity
 
 
+def live_reference(expert,reference,index):
+    if reference is None:return None  # Preserve original joint-only startup.
+    from .live_kinematics import live_pinch_jacobian
+    old=np.asarray(reference['jacobian'],float)
+    require(old.shape==(6,7) and 'secondary_jacobian' not in reference,'Live component check supports the logged coupled six-dimensional task only')
+    current=live_pinch_jacobian(expert)
+    result={k:np.asarray(v,float).copy() if isinstance(v,list) else v for k,v in reference.items() if k!='jacobian'}
+    result['jacobian']=current
+    # Saved J is compared for diagnosis only; it never selects a motor value.
+    _STATE['live_jacobian_records'].append({'frame':int(index),'current':current.copy(),'comparison_max_abs':float(np.max(np.abs(current-old)))})
+    return result
 
 
 def native_pose_frame(expert, target, source_velocity, measured_q):
@@ -236,6 +250,9 @@ def task_reference_terms(adapter, measured_q, measured_v, desired_q, desired_v, 
 def physics_task_reference(expert, measured_q, measured_v, desired_q, desired_v, desired_a):
     if _STATE['plan'].get('tracking','joint')=='joint':return None
     if _STATE['plan'].get('tracking')=='native-pose':return _STATE['native_operational_reference']
+    if _STATE['plan'].get('tracking')=='live-jacobian':
+        ref=_STATE['active_live_reference']
+        return None if ref is None else {k:v.copy() if isinstance(v,np.ndarray) else v for k,v in ref.items()}
     if _STATE['plan'].get('tracking')=='logged-command':
         ref=_STATE['active_logged_row']['operational_space_reference']
         return None if ref is None else {k:np.asarray(v,float).copy() if isinstance(v,list) else v for k,v in ref.items()}
@@ -269,6 +286,11 @@ def summary():
     data=_STATE['requests']
     arrays={key:np.asarray([x[key] for x in data]) for key in ['frame','measured_joints','requested_joints','requested_velocity','source_pose_action']}
     arrays['assistance']=np.asarray(_STATE['assistance'])
+    records=_STATE['live_jacobian_records']
+    issued_live_updates=sum(row['operational_space_reference'] is not None for row in (_STATE.get('logged_rows') or [])[:len(data)])
+    arrays['live_jacobian_frame']=np.asarray([x['frame'] for x in records],dtype=np.int64)
+    arrays['live_jacobian']=np.asarray([x['current'] for x in records]).reshape(-1,6,7)
+    arrays['live_jacobian_comparison_max_abs']=np.asarray([x['comparison_max_abs'] for x in records])
     arrays['task_reference_checks']=np.asarray(_STATE['task_reference_checks']).reshape(-1,4)
     for key in ['pinch_goal_m','quaternion_wxyz','target_linear_velocity_mps','target_angular_velocity_rad_s']:
         arrays['native_'+key]=np.asarray([x[key] for x in _STATE['native_pose_calls']])
@@ -279,11 +301,11 @@ def summary():
     return {'schema':plan['schema'],'mode':plan['mode'],'reference':plan.get('reference','saved-targets'),'tracking':plan.get('tracking','joint'),'task_reference_callback_count':len(_STATE['task_reference_checks']),'native_pose_command_count':len(_STATE['native_pose_calls']),'command_frames':len(data),'assistance_checks':len(_STATE['assistance']),
         'source_reference_sha256':sha256(plan['source']),'saved_commands_own_motors':True,
         'shadow_expert_operational_reference_used':False,'shadow_expert_velocity_limit_used':False,
-        'shadow_task_fsm_runs_for_evidence':True,'source_native_operational_reference_reconstructed':False,'primary_tracking_controller':'operational_space_inverse_dynamics' if plan.get('tracking') in ('task-space','native-pose','logged-command') else 'joint_inverse_dynamics',
+        'shadow_task_fsm_runs_for_evidence':True,'source_native_operational_reference_reconstructed':False,'primary_tracking_controller':'operational_space_inverse_dynamics' if plan.get('tracking') in ('task-space','native-pose','logged-command','live-jacobian') else 'joint_inverse_dynamics',
         'training_eligible':False,'vla_policy':False,'source_actuator_mode':'operational_space_inverse_dynamics_effort',
-        'control_log_sha256':plan.get('control_log_sha256'),'cached_original_jacobians_replayed':plan.get('tracking')=='logged-command','logged_control_command_count':len(data) if plan.get('tracking')=='logged-command' else 0,'expected_logged_osc_callbacks':3*sum(row['operational_space_reference'] is not None for row in _STATE['logged_rows']) if plan.get('tracking')=='logged-command' else None,
-        'velocity_reference':('matched logged original joint-goal velocity' if plan.get('tracking')=='logged-command' else 'matched native pose-servo output; recorded robot velocity supplies waypoint feed-forward' if plan.get('tracking')=='native-pose' else 'next observed joint velocity' if plan.get('reference')=='recorded-motion' else 'measured-state position-error fallback'),
-        'reference_path':('logged original q/qdot/OSC tuple -> original effort executor' if plan.get('tracking')=='logged-command' else 'robot-only waypoint -> native pose-servo q/qdot/OSC tuple -> shared physics-rate viability and effort executor' if plan.get('tracking')=='native-pose' else 'saved/converted joint goals -> shared physics-rate viability generator -> original certified model-effort executor')}
+        'control_log_sha256':plan.get('control_log_sha256'),'cached_original_jacobians_replayed':plan.get('tracking')=='logged-command','live_jacobian_control_updates':len(records),'expected_issued_live_jacobian_updates':issued_live_updates,'live_jacobian_comparison_max_abs':max((x['comparison_max_abs'] for x in records),default=None),'original_joint_goals_and_constraints_retained':plan.get('tracking') in ('logged-command','live-jacobian'),'standalone_policy_controller':False,'logged_control_command_count':len(data) if plan.get('tracking') in ('logged-command','live-jacobian') else 0,'expected_logged_osc_callbacks':3*sum(row['operational_space_reference'] is not None for row in _STATE['logged_rows']) if plan.get('tracking') in ('logged-command','live-jacobian') else None,
+        'velocity_reference':('matched logged original joint-goal velocity' if plan.get('tracking') in ('logged-command','live-jacobian') else 'matched native pose-servo output; recorded robot velocity supplies waypoint feed-forward' if plan.get('tracking')=='native-pose' else 'next observed joint velocity' if plan.get('reference')=='recorded-motion' else 'measured-state position-error fallback'),
+        'reference_path':('original goals/velocity/twist/constraints plus current robot pinch Jacobian -> original effort executor' if plan.get('tracking')=='live-jacobian' else 'logged original q/qdot/OSC tuple -> original effort executor' if plan.get('tracking')=='logged-command' else 'robot-only waypoint -> native pose-servo q/qdot/OSC tuple -> shared physics-rate viability and effort executor' if plan.get('tracking')=='native-pose' else 'saved/converted joint goals -> shared physics-rate viability generator -> original certified model-effort executor')}
 
 
 def patch_worker(source):
@@ -336,6 +358,6 @@ def controller_branch_verified(tracking,completed_callbacks,osc_attempts,command
     if tracking=='joint':return osc_attempts==0
     if tracking=='task-space':return osc_attempts in allowed and tag.get('task_reference_callback_count')==osc_attempts
     if tracking=='native-pose':return osc_attempts in allowed and tag.get('native_pose_command_count')==command_frames
-    if tracking=='logged-command':return bool(0<=osc_attempts<=max(allowed) and tag.get('logged_control_command_count')==command_frames)
+    if tracking in ('logged-command','live-jacobian'):return bool(0<=osc_attempts<=max(allowed) and tag.get('logged_control_command_count')==command_frames)
     if tracking=='native-expert':return bool(tag.get('original_expert_used') and tag.get('segment_trace_count')==command_frames and 0<=osc_attempts<=max(allowed))
     return False

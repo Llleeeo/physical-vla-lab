@@ -54,8 +54,10 @@ def analyze(output):
     n=int(meta['num_steps']);require(n>=2,'Probe saved fewer than two states; inspect simulation.log');callback_count=int(meta.get('arm_execution',{}).get('dynamic_drive',{}).get('physics_callback_count',-1));cadence_ok=callback_count==3*n;full=(n==plan['frames'] and plan['frames']==plan.get('reference_frames',plan['source_frames']))
     task_callbacks=int(meta.get('arm_execution',{}).get('dynamic_drive',{}).get('operational_space_callback_count',0))
     branch_verified=controller_branch_verified(plan.get('tracking','joint'),callback_count,task_callbacks,n,tag,not meta['runtime_safety']['passed'])
-    if plan.get('tracking')=='logged-command' and cadence_ok:
+    if plan.get('tracking') in ('logged-command','live-jacobian') and cadence_ok:
         branch_verified=branch_verified and task_callbacks==tag.get('expected_logged_osc_callbacks')
+    if plan.get('tracking')=='live-jacobian':
+        branch_verified=branch_verified and tag.get('cached_original_jacobians_replayed') is False and tag.get('live_jacobian_control_updates')==tag.get('expected_issued_live_jacobian_updates',-1)
     completed_segments=int(meta.get('arm_execution',{}).get('dynamic_drive',{}).get('completed_segment_count',0))
     full=full and completed_segments==n
     state_keys=['joint_pos','joint_vel','object_pos','object_quat','object_vel','object_ang_vel']
@@ -91,6 +93,7 @@ def analyze(output):
             'task_sha256':plan['task_sha256'],'execution_fingerprints':{k:plan.get(k) for k in ['worker_sha256','patch_sha256','controller_config_sha256','urdf_sha256','adapter_sha256']},'recorded_frames':n,'completed_frames':completed_segments,'requested_frames':plan['frames'],'full_source_length_completed':None if plan.get('tracking')=='native-expert' else full,'control_budget_exhausted':n>=plan['frames'],'expert_early_success':bool(plan.get('tracking')=='native-expert' and meta.get('success') is True and n<plan['frames']),'physics_callback_count':callback_count,'servo_cadence_passed':cadence_ok,'completed_intervals_cadence_passed':callback_count==3*completed_segments,'attempted_osc_commands':task_callbacks,'rejected_final_osc_command':task_callbacks==callback_count+1 and not meta['runtime_safety']['passed'],'incomplete_control_interval':completed_segments<n,
             'initial_state_differences':initial,'initial_state_match':initial_match,'runtime_safety_passed':meta['runtime_safety']['passed'],
             'independent_grasp_evidence':grasp,'source_state_comparison':tracking,'probe_episode':str(ep),'motor_reference_audit':tag,'control_context':motor_context,'worker_exit_code':json.loads((output/'worker_exit.json').read_text())['exit_code'] if (output/'worker_exit.json').exists() else None,
+            'live_kinematics_component_passed':None if plan.get('tracking')!='live-jacobian' else bool(full and branch_verified and cadence_ok and initial_match and meta['runtime_safety']['passed'] and grasp and grasp['status']=='pass'),
             'control_reference_replay_passed':None if plan.get('tracking')!='logged-command' else bool(plan.get('tracking')=='logged-command' and full and branch_verified and cadence_ok and initial_match and meta['runtime_safety']['passed'] and grasp and grasp['status']=='pass'),
             'native_expert_reference_passed':None if plan.get('tracking')!='native-expert' else bool(plan.get('tracking')=='native-expert' and branch_verified and cadence_ok and initial_match and meta['runtime_safety']['passed'] and meta.get('success') is True and meta.get('trajectory_validity',{}).get('passed') is True and grasp and grasp['status']=='pass'),
             'motion_tracking_passed':None if plan.get('reference')!='recorded-motion' else bool(plan.get('reference')=='recorded-motion' and full and branch_verified and cadence_ok and initial_match and meta['runtime_safety']['passed'] and grasp and grasp['status']=='pass'),
@@ -98,7 +101,7 @@ def analyze(output):
             'official_benchmark_success_verified':False,'vla_policy':False,'training_eligible':False,
             'limits':['This uses the original effort/limit chain with saved joint-goal references, not reconstructed original operational references.','Shadow task FSM outcomes are not the independent probe result.','A short smoke cannot establish grasp performance.']}
     (output/'report.json').write_text(json.dumps(report,indent=2)+'\n')
-    print('HGWIND_EFFORT_PROBE_COMPLETED '+json.dumps({k:report[k] for k in ['mode','reference','tracking','tracking_branch_verified','recorded_frames','completed_frames','full_source_length_completed','initial_state_match','motion_tracking_passed','native_expert_reference_passed','control_reference_replay_passed','expert_early_success','baseline_ready_for_cartesian']}))
+    print('HGWIND_EFFORT_PROBE_COMPLETED '+json.dumps({k:report[k] for k in ['mode','reference','tracking','tracking_branch_verified','recorded_frames','completed_frames','full_source_length_completed','initial_state_match','motion_tracking_passed','native_expert_reference_passed','control_reference_replay_passed','live_kinematics_component_passed','expert_early_success','baseline_ready_for_cartesian']}))
     print('INDEPENDENT_GRASP '+str(None if grasp is None else grasp['status']));print('REPORT '+str(output/'report.json'))
     return report
 

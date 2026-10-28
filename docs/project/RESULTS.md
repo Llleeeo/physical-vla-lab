@@ -24,6 +24,8 @@ A 40/619 collection ratio describes this adaptive development collection only. I
 
 A fresh run of the original frozen expert configuration reproduced all 15 core numeric arrays of local/traj_00000 exactly over 209 frames, with passing runtime safety and independent contact/lift/retention checks. It recorded 627 physics updates and 582 native OSC calls. This establishes reproducibility for one exposed case; it does not establish converted-action or VLA success. The raw control goals and exported actions differ by up to 0.046696 rad. Complete-control physical replay now also passes independent grasp checks and exactly matches all 15 core arrays. It uses original cached Jacobians/constraints; the live policy action contract is still unverified. See [the complete-control replay summary](../../results/summaries/2026-10-28-control-reference-replay.json). See [the probe protocol](HGWIND_EFFORT_PROBE.md) and [source-hashed summary](../../results/summaries/2026-10-28-native-expert-reproduction.json).
 
+A separate current-Jacobian component diagnostic is CPU-ready (113 portable checks and a 209-frame scene preflight); its physical result is pending. It retains the remaining logged expert references and must not be counted as a deployed policy. See [readiness and retained dependencies](../../results/summaries/2026-10-28-live-kinematics-readiness.json).
+
 ## Earlier DynamicVLA integration: irregular egg-object task
 
 Task: `grasp_sliding_motion_on_flat_surface_1s1p_g9wvkk1`. Earlier shorthand called the object a ball; the target is an egg. This task remains a difficult development case.

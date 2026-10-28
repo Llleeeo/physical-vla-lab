@@ -10,7 +10,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT/'src'))
 from capstone_vla import hgwind_expert_trace as trace
 plan=json.loads(Path(os.environ['HGWIND_EFFORT_PROBE_MANIFEST']).read_text())
-if plan['tracking'] not in ('native-expert','logged-command') or any(x in sys.argv for x in ['--replay_trajectories','--replay_state_exact']) or (plan['tracking']=='native-expert' and '--repair-action-reference' in sys.argv):
+if plan['tracking'] not in ('native-expert','logged-command','live-jacobian') or any(x in sys.argv for x in ['--replay_trajectories','--replay_state_exact']) or (plan['tracking']=='native-expert' and '--repair-action-reference' in sys.argv):
     raise RuntimeError('Original expert reference must not replace or replay its commands')
 for name,digest in plan['adapter_sha256'].items():
     path=ROOT/name if not Path(name).is_absolute() else Path(name)

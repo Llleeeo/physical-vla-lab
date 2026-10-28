@@ -146,7 +146,7 @@ data/derived/hf_pilot_render_repo/.venv/bin/python \
   --reference-run data/derived/hgwind_effort_probes/20261028_191242_476137_joint_online-expert_native-expert --run
 ```
 
-The 209-step physical replay is pending. It intentionally uses cached original Jacobians/constraints and is limited to diagnostic reproduction; it is not a VLA observation/action contract. Its independent result is `control_reference_replay_passed`. A deployable policy adapter must generate its references from current robot state and the policy's documented outputs, after this integrity check.
+The subsequent 209-step physical replay passed, as detailed below. It intentionally uses cached original Jacobians/constraints and is limited to diagnostic reproduction; it is not a VLA observation/action contract. Its independent result is `control_reference_replay_passed`. A deployable policy adapter must generate its references from current robot state and the policy's documented outputs, after this integrity check.
 
 ## Complete-control reference replay passes
 
@@ -155,3 +155,25 @@ The logged-command physical replay completed 209 intervals with 627 physics upda
 Robot/object states were not overwritten. The replay nevertheless used original cached Jacobians/constraints and retained the shadow task FSM for bookkeeping/safety. It does not certify a standalone live Cartesian policy adapter. Earlier failed variants differed in multiple respects, so this result does not isolate one missing signal as the sole cause of all earlier failures.
 
 The next gate is a documented policy action contract: define pose versus twist, frame, units, gripper semantics and timing; construct matching labels; derive runtime kinematics from current robot state; and validate an expert-derived Cartesian command stream through that live executor. Cached control matrices and source FSM timing must not become hidden policy inputs. Existing episodes/cameras are preserved; ball-task training and split assignment remain pending. Check a small set of additional episodes after the single-episode action gate before batch conversion.
+
+
+## Live robot kinematics component check prepared
+
+The next controlled change replaces only the cached task Jacobian at each 60 Hz control boundary. `live_kinematics.live_pinch_jacobian()` obtains the current robot tool pose and world-frame Jacobian from the existing RoboPhys robot API, then shifts its linear rows to the calibrated pinch center using `omega cross offset`. Angular rows are unchanged. It takes no trajectory or object-state input. The result is held for the original three 180 Hz physics ticks; this does not introduce a new servo cadence. The old Jacobian is retained only for comparison in the audit, never for command selection.
+
+Other command components remain frozen. The successful source contains 194 six-dimensional OSC references after 15 joint-only startup frames; 110 rows have nonzero task-acceleration feedforward, and 141 carry joint-velocity geometry constraints. Removing these together with the cached Jacobian would confound the diagnosis. Original q/qdot goals, twist, feedforward, constraints, velocity caps and gripper signals therefore remain in this component experiment, as does the shadow FSM for bookkeeping/safety. It is **not a standalone Cartesian policy controller**, even if the physical grasp succeeds.
+
+```bash
+data/derived/hf_pilot_render_repo/.venv/bin/python \
+  scripts/run_hgwind_effort_probe.py --tracking live-jacobian \
+  --reference-run data/derived/hgwind_effort_probes/20261028_191242_476137_joint_online-expert_native-expert \
+  --run
+```
+
+Simulation is pending. Acceptance requires all 209 intervals, matching initial state, original safety limits, 194 live kinematics updates / 582 OSC calls, and independent physical grasp evidence. The new result is `live_kinematics_component_passed`; no irrelevant motion/Cartesian gate is interpreted as a failed test. A numerical comparison with the successful logged-command run can identify divergence, while exact array equality is not assumed for a different Jacobian computation.
+
+113 portable CPU checks pass, including nine new checks for point-offset sign, input validation, no mutation, independence from the stored Jacobian and propagation to the physics boundary with unchanged velocity caps. Python 3.10 parsing and the 209-frame scene/control-log preflight also pass. Existing data and upstream code are unchanged. Rollback: use `--tracking logged-command` for the existing complete-control reference; the new branch is opt-in.
+
+### Policy-label decision remains open
+
+DynamicVLA's local dataset adapter can disable relative-pose conversion, but this does not validate a twist-action policy. The existing egg pipeline subtracts current pose, wraps Euler differences and adds predicted deltas back to pose. Those operations must not be reused for velocity labels. A proposed six-dimensional twist plus one gripper command would need matching frame/units/control point, normalization, startup behavior and a robot-only execution rule, with pose-delta conversion disabled in every relevant layer. The original acceleration feedforward and geometry constraints also need an explicit runtime treatment. No ball-task training or bulk label conversion has started.

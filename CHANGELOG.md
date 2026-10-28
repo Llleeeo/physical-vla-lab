@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Live kinematics component diagnostic prepared
+
+- Added an opt-in current robot/pinch Jacobian branch around the passing full-control reference. Other logged signals, physics cadence and safety limits stay fixed; physical execution is pending.
+- Added nine focused regressions; 113 portable CPU checks, simulator-source Python 3.10 parsing and a 209-frame scene preflight pass.
+- Audited nonzero acceleration feedforward and geometry constraints before choosing action labels. A standalone VLA contract and ball-task training remain unverified.
+
 ## 2026-10-28 — Complete-control physical replay verified
 
 - Logged q/qdot/OSC/limit replay completed 209 intervals / 627 physics updates and passed independent grasp checks. All 15 core datasets exactly match the original episode again.

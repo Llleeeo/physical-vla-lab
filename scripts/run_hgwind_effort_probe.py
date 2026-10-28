@@ -13,6 +13,7 @@ import sys
 from zoneinfo import ZoneInfo
 
 import h5py
+import numpy as np
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path[:0]=[str(ROOT/'src'),str(ROOT/'scripts')]
@@ -25,7 +26,7 @@ from capstone_vla.recorded_franka import RecordedFrankaAdapter
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--mode',choices=('joint','cartesian'),default='joint')
-    parser.add_argument('--tracking',choices=('joint','task-space','native-pose','native-expert','logged-command'),default='joint')
+    parser.add_argument('--tracking',choices=('joint','task-space','native-pose','native-expert','logged-command','live-jacobian'),default='joint')
     parser.add_argument('--reference',choices=('saved-targets','recorded-motion'),default='saved-targets')
     parser.add_argument('--host',choices=('local','hongtao'),default='local')
     parser.add_argument('--episode',default='traj_00000')
@@ -51,18 +52,18 @@ def main():
     require(args.reference!='recorded-motion' or args.mode=='joint','Recorded-motion is a separate joint-tracking diagnostic; Cartesian support is not implemented')
     n=len(reference_actions) if args.frames==0 else args.frames;require(n<=len(reference_actions),'Smoke length exceeds source')
     stamp=datetime.now(ZoneInfo('Asia/Hong_Kong')).strftime('%Y%m%d_%H%M%S_%f')
-    output=ROOT/'data/derived/hgwind_effort_probes'/(stamp+'_'+args.mode+'_'+({'native-expert':'online-expert','logged-command':'control-log'}.get(args.tracking,args.reference))+'_'+args.tracking)
+    output=ROOT/'data/derived/hgwind_effort_probes'/(stamp+'_'+args.mode+'_'+({'native-expert':'online-expert','logged-command':'control-log','live-jacobian':'control-log'}.get(args.tracking,args.reference))+'_'+args.tracking)
     plan={'schema':'physical-vla-lab.hgwind-effort-probe.v1','mode':args.mode,'host':args.host,'episode':args.episode,
           'tracking':args.tracking,'reference':args.reference,'reference_frames':len(reference_actions),'frames':n,'source_frames':len(actions),'source':str(source),'source_files':row['files'],'source_reference_sha256':sha256(source),
           'task':cohort['task_usd'],'task_sha256':cohort['task_sha256'],'physics_sha256':cohort['physics_sha256'],
           'worker':str(worker),'worker_sha256':sha256(worker),'patch_sha256':hashlib.sha256(patched.encode()).hexdigest(),
           'bundle_manifest':str(bundle_manifest),'bundle_manifest_sha256':cohort['bundle_manifest_sha256'],
-          'adapter_sha256':{name:sha256(ROOT/name) for name in ['src/capstone_vla/hgwind_effort_probe.py','src/capstone_vla/recorded_franka.py','src/capstone_vla/franka.py','scripts/sim/run_hgwind_effort_probe_worker.py','src/capstone_vla/task2_bridge.py']},
+          'adapter_sha256':{name:sha256(ROOT/name) for name in ['src/capstone_vla/hgwind_effort_probe.py','src/capstone_vla/recorded_franka.py','src/capstone_vla/franka.py','scripts/sim/run_hgwind_effort_probe_worker.py','src/capstone_vla/task2_bridge.py','src/capstone_vla/live_kinematics.py']},
           'controller_config':str(cfg_path),'controller_config_sha256':sha256(cfg_path),'urdf_sha256':adapter.urdf_sha256,
           'output':str(output),'worker_output':str(output/'worker_output'),'seed':meta['base_seed'],'attempt_offset':meta['attempt_index'],
           'reference_fidelity':args.tracking+' tracking through the existing effort feasibility/limit pipeline; original expert operational references are not reconstructed.',
           'baseline_run':str(args.baseline_run.resolve()) if args.baseline_run else None,'training_eligible':False}
-    if args.tracking in ('native-expert','logged-command'):
+    if args.tracking in ('native-expert','logged-command','live-jacobian'):
         require(args.mode=='joint' and args.reference=='saved-targets' and args.frames==0,'Native expert uses its online commands and full 12 s attempt budget')
         require(meta['capstone_expert_control']['profile']=='smooth_lift_v1','Original profile is not the frozen smooth-lift configuration')
         from capstone_vla.hgwind_expert_trace import patch_collector,patch_profile_wrapper
@@ -78,7 +79,7 @@ def main():
         require(0<=plan['original_depth_bias_m']<=.002,'Unexpected original depth profile')
         for path in [ROOT/'src/capstone_vla/hgwind_expert_trace.py',ROOT/'scripts/sim/run_hgwind_native_expert_worker.py',wrapper,ROOT/'scripts/run_hgwind_depth_worker.py',bundle/'src/capstone_vla/hgwind_control.py']:
             plan['adapter_sha256'][str(path)]=sha256(path)
-    if args.tracking=='logged-command':
+    if args.tracking in ('logged-command','live-jacobian'):
         require(args.reference_run is not None,'Provide the passing original-expert reference run')
         ref_root=args.reference_run.resolve();ref_report=ref_root/'report.json';ref=json.loads(ref_report.read_text())
         require(ref.get('native_expert_reference_passed') is True and ref['source_reference_sha256']==plan['source_reference_sha256'] and ref['task_sha256']==plan['task_sha256'] and ref['execution_fingerprints']['worker_sha256']==plan['worker_sha256'],'Native reference is not a passing matching source/scene/worker')
@@ -86,6 +87,9 @@ def main():
             require(ref['execution_fingerprints']['adapter_sha256'].get(str(dependency))==sha256(dependency),'Original profile/depth implementation differs from the logged run')
         control_log=ref_root/'original_expert_control_references.json';targets,_,_=load_logged_commands(control_log,positions,velocities)
         plan.update(reference='control-log',frames=len(targets),reference_frames=len(targets),control_log=str(control_log),control_log_sha256=sha256(control_log),control_log_report=str(ref_report),control_log_report_sha256=sha256(ref_report),reference_fidelity='Diagnostic replay of logged original q/qdot/OSC references, including cached original Jacobians; not a deployed policy controller.')
+    if args.tracking=='live-jacobian':
+        require(all(x['operational_space_reference'] is None or (np.asarray(x['operational_space_reference']['jacobian']).shape==(6,7) and 'secondary_jacobian' not in x['operational_space_reference']) for x in json.loads(Path(plan['control_log']).read_text())),'Live component check requires six-dimensional task references')
+        plan['reference_fidelity']='Current robot pinch Jacobian at each control boundary; original joint goals, twist, feed-forward and constraints retained for component diagnosis. Not a standalone policy controller.'
     validate_source(plan,meta,actions,times)
     if args.mode=='cartesian':
         require(args.baseline_run is not None,'First run/inspect the joint baseline; provide --baseline-run for Cartesian')
@@ -108,7 +112,7 @@ def main():
              '--keep_failed','--run_id','hgwind_effort_probe_'+stamp,'--device','cuda:0','--headless','--no-visualization','--fast_exit_after_save',
              '--experience','isaacsim.exp.base.python.kit',
              '--kit_args=--portable-root '+str(ROOT/'data/derived/.cache/isaacsim/linux')+' --/renderer/multiGpu/autoEnable=false --/renderer/multiGpu/enabled=false --/renderer/multiGpu/maxGpuCount=1 --/app/extensions/fsWatcherEnabled=false']
-    if args.tracking in ('native-expert','logged-command'):
+    if args.tracking in ('native-expert','logged-command','live-jacobian'):
         command[2]=str(ROOT/'scripts/sim/run_hgwind_native_expert_worker.py')
         if args.tracking=='native-expert':
             i=command.index('--repair-action-reference');del command[i:i+2]

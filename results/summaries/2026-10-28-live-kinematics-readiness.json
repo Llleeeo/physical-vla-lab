@@ -1,0 +1,40 @@
+{
+  "schema": "physical-vla-lab.hgwind-live-kinematics-readiness.v1",
+  "date": "2026-10-28",
+  "status": "CPU_READY_SIMULATION_PENDING",
+  "control_log_sha256": "78b6ea934b8266aa428f47b95d9eb3be94d3bf8bce723fd5de99e402c054e140",
+  "reference_rows": 209,
+  "six_dimensional_osc_rows": 194,
+  "joint_only_startup_rows": 0,
+  "rows_with_nonzero_task_acceleration_feedforward": 110,
+  "task_acceleration_feedforward_max_abs": [
+    0.6895840842283116,
+    0.3147952931264351,
+    9.810012410322564,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "rows_with_joint_velocity_geometry_constraints": 141,
+  "changed_component": "At each original 60 Hz control boundary, replace cached task Jacobian with live world-frame robot tool Jacobian shifted to current calibrated pinch center. Hold for the same three physics ticks.",
+  "retained_diagnostic_inputs": [
+    "original joint goals and paired velocities",
+    "original task velocity and acceleration feedforward",
+    "original task constraints and policy velocity caps",
+    "original gripper commands and joint-only startup",
+    "shadow task FSM for bookkeeping and safety"
+  ],
+  "portable_cpu_tests_passed": 113,
+  "python310_simulation_source_parse_passed": true,
+  "real_scene_cpu_preflight_frames": 209,
+  "gpu_run_started": false,
+  "live_kinematics_component_passed": null,
+  "standalone_policy_controller_verified": false,
+  "vla_evaluated": false,
+  "training_started": false,
+  "limits": [
+    "One exposed source case; future physical run is a component diagnostic, not policy evaluation.",
+    "Stored Jacobians are compared for audit only; remaining source references still own most command content.",
+    "Seven-dimensional pose/gripper and twist/gripper labels have different semantics and must not be interchanged."
+  ]
+}
