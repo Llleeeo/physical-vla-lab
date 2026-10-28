@@ -12,6 +12,13 @@ def _require(value,message):
 
 def configure(plan):
     _STATE.clear();_STATE.update(plan=plan,rows=[],assistance=[])
+    if plan.get('trace_cartesian_targets'):
+        from .cartesian_target_trace import CartesianTargetRecorder
+        _STATE['cartesian_recorder']=CartesianTargetRecorder()
+
+
+def begin_cartesian_frame(expert,index):
+    _STATE['cartesian_recorder'].begin_frame(expert,index)
 
 
 def plain(value):
@@ -31,7 +38,8 @@ def record_segment(index,segment,target,q,qd,stage,robot_path,objects,attach_sta
     _require(not any(assistance),'Original expert reference probe detected grasp assistance')
     _STATE['assistance'].append(assistance)
     # Copy at the command boundary; later physics mutates segment bookkeeping.
-    _STATE['rows'].append(plain({'frame':int(index),'joint_positions':q,'joint_velocities':qd,'target':target,
+    links=_STATE['cartesian_recorder'].segment_links(index,segment) if 'cartesian_recorder' in _STATE else {}
+    _STATE['rows'].append(plain({**links,'frame':int(index),'joint_positions':q,'joint_velocities':qd,'target':target,
         **{k:segment[k] for k in ['goal_position','goal_velocity','operational_space_reference','policy_joint_velocity_limit','duration_s','episode_time_s']}}))
 
 
@@ -39,13 +47,16 @@ def summary(policy):
     plan=_STATE['plan'];root=Path(plan['output']);rows=_STATE['rows']
     out=root/'original_expert_control_references.json';_require(not out.exists(),'Original expert trace already exists')
     out.write_text(json.dumps(rows,indent=2)+'\n')
+    if 'cartesian_recorder' in _STATE:
+        capture=root/'cartesian_target_inputs.json';_require(not capture.exists(),'Cartesian capture already exists')
+        capture.write_text(json.dumps(_STATE['cartesian_recorder'].payload(),indent=2,allow_nan=False)+'\n')
     np.savez(root/'command_diagnostics.npz',requested_joints=np.asarray([x['target'] for x in rows]),assistance=np.asarray(_STATE['assistance']))
     return {'schema':plan['schema'],'tracking':'native-expert','mode':'joint','reference':'online-expert',
         'original_expert_used':True,'source_success_reused':False,'saved_commands_own_motors':False,
         'shadow_expert_operational_reference_used':False,'shadow_expert_velocity_limit_used':False,
         'source_native_operational_reference_reconstructed':False,'original_control_configuration_used':True,
         'command_frames':len(rows),'segment_trace_count':len(rows),'source_reference_sha256':plan['source_reference_sha256'],
-        'depth_bias_m':plan['original_depth_bias_m'],'control_reference_file':out.name,'training_eligible':False,'vla_policy':False}
+        'depth_bias_m':plan['original_depth_bias_m'],'control_reference_file':out.name,'cartesian_target_capture_enabled':'cartesian_recorder' in _STATE,'training_eligible':False,'vla_policy':False}
 
 
 def patch_collector(source):
@@ -62,7 +73,7 @@ def patch_collector(source):
 
 def patch_profile_wrapper(source):
     replacements=[('exec(compile(source,str(worker),\'exec\'),',"source=CAPSTONE_TRACE_PATCH(source)\nexec(compile(source,str(worker),'exec'),"),
-        ("'CAPSTONE_PROFILE_SUMMARY':profile_summary}","'CAPSTONE_PROFILE_SUMMARY':CAPSTONE_DEPTH_PROFILE_SUMMARY, 'CAPSTONE_RECORD_NATIVE_SEGMENT':CAPSTONE_TRACE_RECORD, 'CAPSTONE_NATIVE_TRACE_SUMMARY':CAPSTONE_TRACE_SUMMARY}")]
+        ("'CAPSTONE_PROFILE_SUMMARY':profile_summary}","'CAPSTONE_PROFILE_SUMMARY':CAPSTONE_DEPTH_PROFILE_SUMMARY, 'CAPSTONE_RECORD_NATIVE_SEGMENT':CAPSTONE_TRACE_RECORD, 'CAPSTONE_NATIVE_TRACE_SUMMARY':CAPSTONE_TRACE_SUMMARY, 'CAPSTONE_BEGIN_CARTESIAN_FRAME':CAPSTONE_BEGIN_CARTESIAN_FRAME}")]
     for old,new in replacements:
         _require(source.count(old)==1,'Frozen profile wrapper changed')
         source=source.replace(old,new)

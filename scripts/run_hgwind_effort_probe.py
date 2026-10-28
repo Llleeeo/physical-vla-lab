@@ -30,6 +30,7 @@ def main():
     parser.add_argument('--jacobian-method',choices=('shifted-tool','native-pinch'),default='shifted-tool',help='Live-Jacobian geometry calculation only')
     parser.add_argument('--task-feedforward',choices=('logged','zero'),default='logged',help='One-factor task-acceleration diagnostic; gravity compensation stays unchanged')
     parser.add_argument('--kinematics-run',type=Path,help='Passing native live-kinematics baseline required for zero task feedforward')
+    parser.add_argument('--trace-cartesian-targets',action='store_true',help='Read-only original upper Cartesian requests; native-expert only')
     parser.add_argument('--reference',choices=('saved-targets','recorded-motion'),default='saved-targets')
     parser.add_argument('--host',choices=('local','hongtao'),default='local')
     parser.add_argument('--episode',default='traj_00000')
@@ -40,6 +41,7 @@ def main():
     args=parser.parse_args();require(args.frames==0 or args.frames>=2,'frames must be 0 or >=2')
     require(args.jacobian_method=='shifted-tool' or args.tracking=='live-jacobian','Native pinch calculation is only a live-Jacobian component diagnostic')
     require(args.task_feedforward!='zero' or (args.tracking=='live-jacobian' and args.jacobian_method=='native-pinch' and args.kinematics_run is not None),'First provide a passing native-pinch --kinematics-run for zero task feedforward')
+    require(not args.trace_cartesian_targets or args.tracking=='native-expert','Upper target capture requires the unchanged original expert')
     manifest_path=ROOT/'data/derived/hgwind_40_camera_v2_20261028/render_manifest.json'
     cohort=json.loads(manifest_path.read_text());matches=[r for r in cohort['rows'] if r['host']==args.host and r['episode']==args.episode]
     require(len(matches)==1,'Unknown source episode');row=matches[0];source=Path(row['source'])/'replay.hdf5';meta=json.loads((source.parent/'meta.json').read_text())
@@ -59,7 +61,8 @@ def main():
     stamp=datetime.now(ZoneInfo('Asia/Hong_Kong')).strftime('%Y%m%d_%H%M%S_%f')
     output=ROOT/'data/derived/hgwind_effort_probes'/(stamp+'_'+args.mode+'_'+({'native-expert':'online-expert','logged-command':'control-log','live-jacobian':'control-log'}.get(args.tracking,args.reference))+'_'+args.tracking)
     if args.task_feedforward=='zero':output=output.with_name(output.name+'_ff-zero')
-    plan={'task_feedforward':args.task_feedforward,'schema':'physical-vla-lab.hgwind-effort-probe.v1','mode':args.mode,'host':args.host,'episode':args.episode,
+    if args.trace_cartesian_targets:output=output.with_name(output.name+'_target-capture')
+    plan={'trace_cartesian_targets':args.trace_cartesian_targets,'task_feedforward':args.task_feedforward,'schema':'physical-vla-lab.hgwind-effort-probe.v1','mode':args.mode,'host':args.host,'episode':args.episode,
           'tracking':args.tracking,'reference':args.reference,'reference_frames':len(reference_actions),'frames':n,'source_frames':len(actions),'source':str(source),'source_files':row['files'],'source_reference_sha256':sha256(source),
           'task':cohort['task_usd'],'task_sha256':cohort['task_sha256'],'physics_sha256':cohort['physics_sha256'],
           'worker':str(worker),'worker_sha256':sha256(worker),'patch_sha256':hashlib.sha256(patched.encode()).hexdigest(),
@@ -79,6 +82,10 @@ def main():
         require(original_text.count(anchor)==1,'Original profile metadata insertion changed')
         original_text=original_text.replace(anchor,anchor+'\n            "capstone_expert_control": CAPSTONE_PROFILE_SUMMARY(pol),')
         patched=patch_collector(original_text) if args.tracking=='native-expert' else patch_worker(original_text)
+        if args.trace_cartesian_targets:
+            from capstone_vla.cartesian_target_trace import patch_capture_collector
+            patched=patch_capture_collector(patched)
+            path=ROOT/'src/capstone_vla/cartesian_target_trace.py';plan['adapter_sha256'][str(path)]=sha256(path)
         plan.update(reference='online-expert',reference_frames=720,frames=720,patch_sha256=hashlib.sha256(patched.encode()).hexdigest(),
             original_profile_wrapper=str(wrapper),original_depth_helper=str(ROOT/'scripts/run_hgwind_depth_worker.py'),original_depth_bias_m=meta['capstone_expert_control']['depth_bias']['requested_downward_goal_bias_m'],
             reference_fidelity='Fresh frozen online expert with source smooth-lift/depth profile; saved source actions are not executed.')
@@ -154,6 +161,7 @@ def main():
     print(f'CPU_PREFLIGHT_OK mode={args.mode} reference={plan['reference']} source={args.host}/{args.episode} frames={n} effort_pipeline=true primary_tracking={args.tracking} exact_state_replay=false',flush=True)
     if args.tracking=='live-jacobian':print(f"TASK_METRIC_OK orientation_length_scale_m={plan['operational_orientation_length_scale_m']} coupled_rows={plan['source_coupled_task_metric_rows_verified']} jacobian_method={args.jacobian_method}",flush=True)
     if args.task_feedforward=='zero':print(f"TASK_FEEDFORWARD_ABLATION mode=zero nonzero_source_commands={plan['expected_removed_feedforward_commands']} gravity_compensation=unchanged",flush=True)
+    if args.trace_cartesian_targets:print('CARTESIAN_TARGET_CAPTURE enabled=true motor_overrides=false callable_descriptors_only=true',flush=True)
     print('REFERENCE_LIMIT '+plan['reference_fidelity'],flush=True);print('OUTPUT '+str(output),flush=True);print('COMMAND '+shlex.join(command),flush=True)
     if not args.run:print('DRY_RUN_ONLY: add --run');return 0
     output.mkdir(parents=True,exist_ok=False);(output/'plan.json').write_text(json.dumps(plan,indent=2)+'\n')

@@ -101,8 +101,19 @@ def analyze(output):
             'baseline_ready_for_cartesian':None if plan.get('reference')!='saved-targets' else bool(plan.get('reference','saved-targets')=='saved-targets' and plan['mode']=='joint' and full and branch_verified and cadence_ok and initial_match and meta['runtime_safety']['passed'] and grasp and grasp['status']=='pass'),
             'official_benchmark_success_verified':False,'vla_policy':False,'training_eligible':False,
             'limits':['This uses the original effort/limit chain with saved joint-goal references, not reconstructed original operational references.','Shadow task FSM outcomes are not the independent probe result.','A short smoke cannot establish grasp performance.']}
+    report['cartesian_target_capture_verified']=None
+    if plan.get('trace_cartesian_targets'):
+        from capstone_vla.cartesian_target_trace import audit_capture
+        capture=json.loads((output/'cartesian_target_inputs.json').read_text())
+        segments=json.loads((output/'original_expert_control_references.json').read_text())
+        report['cartesian_target_capture_audit']=audit_capture(capture,segments,n)
+        with h5py.File(source,'r') as original,h5py.File(ep/'replay.hdf5','r') as captured:
+            keys=['actions','timestamp','is_first','is_last','is_terminal']+['obs/'+key for key in original['obs']]
+            equality={key:bool(np.array_equal(original[key][:],captured[key][:])) for key in keys}
+        report['cartesian_target_capture_audit']['core_array_exact_equality']=equality
+        report['cartesian_target_capture_verified']=bool(report['native_expert_reference_passed'] and report['cartesian_target_capture_audit']['capture_alignment_passed'] and all(equality.values()))
     (output/'report.json').write_text(json.dumps(report,indent=2)+'\n')
-    print('HGWIND_EFFORT_PROBE_COMPLETED '+json.dumps({k:report[k] for k in ['mode','reference','tracking','tracking_branch_verified','recorded_frames','completed_frames','full_source_length_completed','initial_state_match','motion_tracking_passed','native_expert_reference_passed','control_reference_replay_passed','live_kinematics_component_passed','task_feedforward_ablation_passed','expert_early_success','baseline_ready_for_cartesian']}))
+    print('HGWIND_EFFORT_PROBE_COMPLETED '+json.dumps({k:report[k] for k in ['mode','reference','tracking','tracking_branch_verified','recorded_frames','completed_frames','full_source_length_completed','initial_state_match','motion_tracking_passed','native_expert_reference_passed','control_reference_replay_passed','live_kinematics_component_passed','task_feedforward_ablation_passed','cartesian_target_capture_verified','expert_early_success','baseline_ready_for_cartesian']}))
     print('INDEPENDENT_GRASP '+str(None if grasp is None else grasp['status']));print('REPORT '+str(output/'report.json'))
     return report
 

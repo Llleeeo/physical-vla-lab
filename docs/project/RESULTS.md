@@ -30,6 +30,8 @@ The subsequent native-geometry live-Jacobian run passes all 209 intervals, safet
 
 The task-acceleration feedforward ablation completed 209 intervals safely but produced no finger/object contact; EE difference reached 50.122 mm by frame 15. The audit confirms 110 changed nonzero commands and otherwise unchanged requested joint references and control/scene fingerprints. Direct velocity differencing does not recover the original acceleration. Retain the passing reference while defining the complete Cartesian feedback contract; the result does not independently establish a required VLA action dimension. See [the dependency audit](../../results/summaries/2026-10-28-task-feedforward-result.json). Latest runtime CPU regression suite: 129 passes.
 
+A read-only [upper Cartesian target capture](CARTESIAN_TARGET_CAPTURE.md) is CPU-ready (137 checks and real frozen scene/patch preflight). It will observe original target/feedback arguments and associate them with actual motor segments; physical capture and standalone feedback execution are pending.
+
 ## Earlier DynamicVLA integration: irregular egg-object task
 
 Task: `grasp_sliding_motion_on_flat_surface_1s1p_g9wvkk1`. Earlier shorthand called the object a ball; the target is an egg. This task remains a difficult development case.

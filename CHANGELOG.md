@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Original upper Cartesian target capture prepared
+
+- Added an opt-in read-only observer of actual native pose-servo arguments and outputs, without changing original method arguments, return objects or exceptions.
+- Link calls to executed OSC segments using returned arm references and the consumed reference object, retain callable descriptors and fallback frames, and require exact core-array reproduction before pairing with existing images.
+- Eight new regressions bring the portable suite to 137 passes; actual scene and frozen patch preflight pass. One physical capture is pending; full Cartesian feedback execution remains unimplemented.
+
 ## 2026-10-28 — Task feedforward ablation outcome and dependency audit
 
 - Zero-task-acceleration experiment completes all 209 intervals safely but makes no finger/object contact. Verified 110 altered commands, zero applied task acceleration and otherwise matching requested joint references/control fingerprints.

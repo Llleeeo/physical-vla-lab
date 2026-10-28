@@ -1,0 +1,45 @@
+{
+  "schema": "physical-vla-lab.hgwind-cartesian-target-capture-readiness.v1",
+  "date": "2026-10-28",
+  "status": "READ_ONLY_CAPTURE_CPU_READY_PHYSICAL_RUN_PENDING",
+  "source_sha256": "e1b54faae644b64f8148b0fe0397d74287f06d7c48fa97ee34a054339a72e3d3",
+  "task_sha256": "83330198e8a5a70758eda7b8ead447f61b3289c4206d738507ab6c77a806a6c7",
+  "frozen_worker_sha256": "a0c1a9431fb679cb7b2b5f3416243b86557ca8890edcc45053a5fbbcdb084989",
+  "capture_boundary": "Original operational_space_pinch_action call inputs before binding/servo processing, plus original returned arm action and pending operational reference snapshot.",
+  "captured_fields": [
+    "world pinch target position and quaternion wxyz",
+    "target linear/angular velocity and linear acceleration",
+    "defaulted pose gains, speed/limit settings and coupled task metric",
+    "posture/joint-velocity references when provided",
+    "callable projector names as descriptors only",
+    "control frame and selected-call linkage"
+  ],
+  "motor_commands_overridden": false,
+  "input_objects_copied_for_original_call": false,
+  "grasp_or_safety_configuration_changed": false,
+  "association_rule": "Candidate calls must match returned arm position/velocity. Select the call whose original pending-reference object was consumed into the executed OSC segment; verify IDs and arm outputs after serialization.",
+  "acceptance": [
+    "independent native expert grasp and safety pass",
+    "complete frame coverage and valid call order",
+    "unique selected call for each OSC segment",
+    "exact numerical equality of core source and captured trajectory arrays"
+  ],
+  "scoped_result_field": "cartesian_target_capture_verified",
+  "normal_early_success_allowed": true,
+  "maximum_control_budget": 720,
+  "portable_cpu_tests_passed": 137,
+  "python310_source_parsing_passed": true,
+  "frozen_worker_and_profile_patch_compile_passed": true,
+  "real_scene_preflight_passed": true,
+  "physical_capture_started": false,
+  "original_upper_targets_available": false,
+  "standalone_cartesian_replay_verified": false,
+  "vla_evaluated": false,
+  "limits": [
+    "Callable descriptors are not executable or serializable policy inputs.",
+    "Multiple calls, failed calls and non-Cartesian fallback frames are preserved; no missing pose targets are invented.",
+    "Full controller feedback/state dependencies remain to be audited after actual capture.",
+    "Recorded expert targets may be privileged labels; no claim that they are permissible VLA observations.",
+    "No ball training or bulk data conversion has started."
+  ]
+}
