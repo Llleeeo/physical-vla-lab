@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-28 — Saved probe visualization helper
+
+- Added a small wrapper around the existing frozen renderer for saved successful or failed HGwind probes, with a separate work copy, recorded camera scene and original-evidence hash checks.
+- Real CPU preflight selects the requested zero-feedforward failure: one task / one trajectory at 30 Hz preview. No new simulation or GPU rendering was launched by the agent.
+
 ## 2026-10-28 — Original upper Cartesian target capture prepared
 
 - Added an opt-in read-only observer of actual native pose-servo arguments and outputs, without changing original method arguments, return objects or exceptions.
