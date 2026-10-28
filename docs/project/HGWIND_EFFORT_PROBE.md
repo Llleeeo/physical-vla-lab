@@ -129,3 +129,21 @@ data/derived/hf_pilot_render_repo/.venv/bin/python \
 The time budget is the original 12 simulated seconds (720 control steps maximum), with normal early completion after verified success. The old source episode's 208-transition replay budget does not truncate this online attempt. No new target, speed, friction, contact-recovery or limit parameter is introduced. Native target q/qdot, pending OSC reference and policy limits are copied at each actual command segment into `original_expert_control_references.json`; tracing does not modify them. Physical assistance is separately checked.
 
 `scripts/sim/run_hgwind_native_expert_worker.py` assembles the original wrappers in memory. `src/capstone_vla/hgwind_expert_trace.py` only copies logs and adds metadata. The report separates `native_expert_reference_passed` from all converted-action and learned-policy gates. A successful original expert reference would support the original execution setup and provide the missing command log; it would not validate the conversion or DynamicVLA. A failed reference requires investigating original-expert/environment reproducibility before further adapter tuning. Original code and the 40 development episodes remain unchanged.
+
+## Original expert reproduces the recorded episode exactly
+
+The fresh native-expert reference succeeded after 209 control intervals / 627 physics callbacks, including 582 OSC calls. All 15 core datasets (actions, robot/object observations, timestamps and episode flags) are exactly equal elementwise to the source episode. This is numerical array equality; the HDF5 files contain different run metadata. Independent evidence passes: 72 bilateral control bins (1.2 s), final-window minimum lift 74.861 mm and tool-frame jitter 0.123 mm. This verifies one exposed seeded expert case, not VLA performance or generalization.
+
+The 720-step setting was a maximum budget; success triggered normal early completion at 209. The analyzer now marks source replay length and irrelevant motion/Cartesian gates as null for online-expert runs, and reports `expert_early_success=true`. It must not imply those unrelated tests failed.
+
+The captured raw arm goals differ from exported `actions` by up to 0.046696 rad. The existing export stores processed drive references, so identical field names do not make the two interfaces interchangeable. The successful run now supplies the previously missing original q goal, paired qdot, OSC reference and policy speed-limit tuple.
+
+A separate `logged-command` diagnostic replays that tuple through the same frozen smooth-lift/depth configuration. It requires a passing native-expert report with matching source/scene/worker, exact logged measured q/qdot agreement, sequential frame/timing checks, finite matching task vectors, and pinned control-log/report hashes. Frames without an OSC reference retain the original joint-controller fallback. Policy speed limits are replayed together with the reference. Full-run acceptance additionally checks the expected OSC callback count.
+
+```bash
+data/derived/hf_pilot_render_repo/.venv/bin/python \
+  scripts/run_hgwind_effort_probe.py --tracking logged-command \
+  --reference-run data/derived/hgwind_effort_probes/20261028_191242_476137_joint_online-expert_native-expert --run
+```
+
+The 209-step physical replay is pending. It intentionally uses cached original Jacobians/constraints and is limited to diagnostic reproduction; it is not a VLA observation/action contract. Its independent result is `control_reference_replay_passed`. A deployable policy adapter must generate its references from current robot state and the policy's documented outputs, after this integrity check.

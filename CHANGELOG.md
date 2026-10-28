@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Native expert episode reproduced exactly
+
+- Original expert completed 209 intervals and independent grasp checks passed. All 15 core numeric datasets exactly match the source; this is one exposed expert case, not a VLA result.
+- Recorded actual raw goals/paired velocities/OSC/policy limits; raw arm goals differ from exported actions by up to 0.046696 rad.
+- Added a pinned complete-control-log replay diagnostic under the same original profile, and clarified untested/early-completion report fields. Six regressions added; 104 portable CPU checks pass. New physical replay pending.
+
 ## 2026-10-28 — Native-pose contact abort; original expert reference prepared
 
 - Recorded a joint-5 overspeed/contact sequence and an empty acceleration/jerk/braking intersection. Constraints remain unchanged; full failure causality is not established.

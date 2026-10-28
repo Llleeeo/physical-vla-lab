@@ -24,7 +24,7 @@ _STATE = {}
 def validate_source(plan, metadata, actions, times):
     require(plan['schema']=='physical-vla-lab.hgwind-effort-probe.v1','Unknown probe manifest')
     require(plan['mode'] in ('joint','cartesian'),'Unknown probe mode')
-    require(plan.get('tracking','joint') in ('joint','task-space','native-pose','native-expert'),'Unknown tracking branch')
+    require(plan.get('tracking','joint') in ('joint','task-space','native-pose','native-expert','logged-command'),'Unknown tracking branch')
     require(plan.get('tracking','joint') not in ('task-space','native-pose') or (plan.get('reference')=='recorded-motion' and plan['mode']=='joint'),'Task-space tracking requires recorded-motion joint goals')
     steps=metadata.get('task_plan',{}).get('steps',[])
     require(metadata.get('task',{}).get('id')==TASK_ID and len(steps)==1
@@ -66,6 +66,37 @@ def build_reference(actions, joint_positions, joint_velocities, reference):
     return goals,velocities
 
 
+
+def load_logged_commands(path,source_positions,source_velocities):
+    rows=json.loads(Path(path).read_text());n=len(source_positions)
+    require(isinstance(rows,list) and len(rows)==n and n>=2,'Control log length differs from source')
+    targets=np.asarray([r['target'] for r in rows],np.float32)
+    velocities=np.full((n,9),np.nan);source_q=np.asarray([r['joint_positions'] for r in rows]);source_v=np.asarray([r['joint_velocities'] for r in rows])
+    require(np.array_equal(source_q,source_positions) and np.array_equal(source_v,source_velocities),'Control log is not the matching reproduced robot motion')
+    require(targets.shape==(n,9) and np.isfinite(targets).all(),'Invalid logged targets')
+    for k,row in enumerate(rows):
+        require(row['frame']==k and abs(row['duration_s']-1/60)<1e-9 and abs(row['episode_time_s']-k/60)<1e-7,'Control log clock/frame order differs')
+        q=np.asarray(row['goal_position']);v=np.asarray(row['goal_velocity'])
+        require(q.shape==(7,) and v.shape==(7,) and np.isfinite(v).all()
+                and np.array_equal(q,targets[k,:7]),'Invalid logged position/velocity pair')
+        velocities[k,:7]=v
+        limit=row['policy_joint_velocity_limit']
+        require(limit is None or (np.asarray(limit).shape==(7,) and np.isfinite(limit).all() and np.all(np.asarray(limit)>0)),'Invalid logged policy velocity limit')
+        ref=row['operational_space_reference']
+        if ref is not None:
+            require(isinstance(ref,dict),'Invalid logged OSC reference')
+            jac=np.asarray(ref.get('jacobian'),float);require(jac.shape in ((3,7),(6,7)) and np.isfinite(jac).all(),'Invalid logged task Jacobian')
+            for key in ['task_position_error','commanded_task_velocity','feedforward_task_acceleration']:
+                x=np.asarray(ref.get(key),float);require(x.shape==(len(jac),) and np.isfinite(x).all(),'Invalid logged OSC vector: '+key)
+    return targets,velocities,rows
+
+
+def reference_policy_velocity_limit():
+    if _STATE['plan'].get('tracking')!='logged-command':return None
+    value=_STATE['active_logged_row']['policy_joint_velocity_limit']
+    return None if value is None else np.asarray(value,float).copy()
+
+
 def _plan():
     return json.loads(Path(os.environ['HGWIND_EFFORT_PROBE_MANIFEST']).read_text())
 
@@ -78,7 +109,12 @@ def load_action_reference(source, *, task_id, control_hz=None):
     with h5py.File(source,'r') as f:
         actions=f['actions'][:];times=f['timestamp'][:];positions=f['obs/joint_pos'][:];velocities=f['obs/joint_vel'][:]
     validate_source(plan,meta,actions,times)
-    actions,velocities=build_reference(actions,positions,velocities,plan.get('reference','saved-targets'))
+    logged_rows=None
+    if plan.get('tracking')=='logged-command':
+        require(sha256(plan['control_log'])==plan['control_log_sha256'] and sha256(plan['control_log_report'])==plan['control_log_report_sha256'],'Original control reference changed')
+        actions,velocities,logged_rows=load_logged_commands(plan['control_log'],positions,velocities)
+    else:
+        actions,velocities=build_reference(actions,positions,velocities,plan.get('reference','saved-targets'))
     count=int(plan['frames']);require(2<=count<=len(actions),'Invalid probe length')
     require(plan.get('reference','saved-targets')!='recorded-motion' or plan['mode']=='joint','Recorded-motion diagnostic currently supports joint tracking only')
     keys=('ee_offset_m','damping','max_joint_target_delta_rad','finger_open_m')
@@ -88,7 +124,7 @@ def load_action_reference(source, *, task_id, control_hz=None):
     require(adapter.urdf_sha256==plan['urdf_sha256'],'URDF changed')
     actions=actions[:count]
     poses=np.stack([adapter.contract.encode(*adapter.pose_jacobian(q[:7])[:2],1 if q[7]>.02 else -1) for q in actions])
-    _STATE.clear();_STATE.update(plan=plan,adapter=adapter,poses=poses,velocities=velocities[:count],requests=[],assistance=[],task_reference_checks=[],native_pose_calls=[])
+    _STATE.clear();_STATE.update(plan=plan,adapter=adapter,poses=poses,velocities=velocities[:count],requests=[],assistance=[],task_reference_checks=[],native_pose_calls=[],logged_rows=logged_rows)
     return actions.astype(np.float32),meta,{'source_trajectory':str(source),'source_sha256':sha256(source),
         'source_joint_names':meta['joint_names'],'source_frames':count,'mode':'capstone_hgwind_effort_command_probe',
         'initialization':'same_scene_base_seed_and_attempt_index; physical first states must be compared',
@@ -112,6 +148,7 @@ def reference_frame(actions, index, source_names, runtime_names, *, measured_pos
         target[:7],finger=_STATE['adapter'].joint_target(measured[:7],_STATE['poses'][index])
         target[7:]=finger
     velocity=np.asarray(_STATE['velocities'][index]).copy() if 'velocities' in _STATE else np.full(target.shape,np.nan)
+    if _STATE['plan'].get('tracking')=='logged-command':_STATE['active_logged_row']=_STATE['logged_rows'][index]
     if _STATE['plan'].get('tracking')=='native-pose':
         target,velocity=native_pose_frame(expert,target,velocity,measured[:7])
     _STATE['requests'].append({'requested_velocity':velocity.tolist(),'frame':int(index),'measured_joints':measured.tolist(),'requested_joints':target.tolist(),
@@ -199,6 +236,9 @@ def task_reference_terms(adapter, measured_q, measured_v, desired_q, desired_v, 
 def physics_task_reference(expert, measured_q, measured_v, desired_q, desired_v, desired_a):
     if _STATE['plan'].get('tracking','joint')=='joint':return None
     if _STATE['plan'].get('tracking')=='native-pose':return _STATE['native_operational_reference']
+    if _STATE['plan'].get('tracking')=='logged-command':
+        ref=_STATE['active_logged_row']['operational_space_reference']
+        return None if ref is None else {k:np.asarray(v,float).copy() if isinstance(v,list) else v for k,v in ref.items()}
     adapter=_STATE['adapter'];base_p,base_wxyz=expert._base_pose()
     base=Rotation.from_quat(np.asarray(base_wxyz)[[1,2,3,0]])
     reference=task_reference_terms(adapter,measured_q,measured_v,desired_q,desired_v,desired_a,base.as_matrix())
@@ -239,10 +279,11 @@ def summary():
     return {'schema':plan['schema'],'mode':plan['mode'],'reference':plan.get('reference','saved-targets'),'tracking':plan.get('tracking','joint'),'task_reference_callback_count':len(_STATE['task_reference_checks']),'native_pose_command_count':len(_STATE['native_pose_calls']),'command_frames':len(data),'assistance_checks':len(_STATE['assistance']),
         'source_reference_sha256':sha256(plan['source']),'saved_commands_own_motors':True,
         'shadow_expert_operational_reference_used':False,'shadow_expert_velocity_limit_used':False,
-        'shadow_task_fsm_runs_for_evidence':True,'source_native_operational_reference_reconstructed':False,'primary_tracking_controller':'operational_space_inverse_dynamics' if plan.get('tracking') in ('task-space','native-pose') else 'joint_inverse_dynamics',
+        'shadow_task_fsm_runs_for_evidence':True,'source_native_operational_reference_reconstructed':False,'primary_tracking_controller':'operational_space_inverse_dynamics' if plan.get('tracking') in ('task-space','native-pose','logged-command') else 'joint_inverse_dynamics',
         'training_eligible':False,'vla_policy':False,'source_actuator_mode':'operational_space_inverse_dynamics_effort',
-        'velocity_reference':('matched native pose-servo output; recorded robot velocity supplies waypoint feed-forward' if plan.get('tracking')=='native-pose' else 'next observed joint velocity' if plan.get('reference')=='recorded-motion' else 'measured-state position-error fallback'),
-        'reference_path':('robot-only waypoint -> native pose-servo q/qdot/OSC tuple -> shared physics-rate viability and effort executor' if plan.get('tracking')=='native-pose' else 'saved/converted joint goals -> shared physics-rate viability generator -> original certified model-effort executor')}
+        'control_log_sha256':plan.get('control_log_sha256'),'cached_original_jacobians_replayed':plan.get('tracking')=='logged-command','logged_control_command_count':len(data) if plan.get('tracking')=='logged-command' else 0,'expected_logged_osc_callbacks':3*sum(row['operational_space_reference'] is not None for row in _STATE['logged_rows']) if plan.get('tracking')=='logged-command' else None,
+        'velocity_reference':('matched logged original joint-goal velocity' if plan.get('tracking')=='logged-command' else 'matched native pose-servo output; recorded robot velocity supplies waypoint feed-forward' if plan.get('tracking')=='native-pose' else 'next observed joint velocity' if plan.get('reference')=='recorded-motion' else 'measured-state position-error fallback'),
+        'reference_path':('logged original q/qdot/OSC tuple -> original effort executor' if plan.get('tracking')=='logged-command' else 'robot-only waypoint -> native pose-servo q/qdot/OSC tuple -> shared physics-rate viability and effort executor' if plan.get('tracking')=='native-pose' else 'saved/converted joint goals -> shared physics-rate viability generator -> original certified model-effort executor')}
 
 
 def patch_worker(source):
@@ -252,7 +293,7 @@ def patch_worker(source):
         ('from expert_data.action_repair import reference_frame',
          'from capstone_vla.hgwind_effort_probe import reference_frame'),
         ('                        robot_dof_names,\n                    )\n                # A preflight reference',
-         '                        robot_dof_names, measured_positions=jp, expert=pol.expert,\n                    )\n                    policy_joint_velocity_limit = None\n                # A preflight reference'),
+         '                        robot_dof_names, measured_positions=jp, expert=pol.expert,\n                    )\n                    from capstone_vla.hgwind_effort_probe import reference_policy_velocity_limit\n                    policy_joint_velocity_limit = reference_policy_velocity_limit()\n                # A preflight reference'),
         ('            rec["ee_pos"].append(ee_p); rec["ee_quat"].append(np.asarray(ee_q, np.float32))',
          '            rec["ee_pos"].append(ee_p); rec["ee_quat"].append(np.asarray(ee_q, np.float32))\n            from capstone_vla.hgwind_effort_probe import check_assistance\n            check_assistance(stage, robot_path, objects, attach_state)'),
         ('"skill_terminations": _jsonify(skill_terminations),',
@@ -295,5 +336,6 @@ def controller_branch_verified(tracking,completed_callbacks,osc_attempts,command
     if tracking=='joint':return osc_attempts==0
     if tracking=='task-space':return osc_attempts in allowed and tag.get('task_reference_callback_count')==osc_attempts
     if tracking=='native-pose':return osc_attempts in allowed and tag.get('native_pose_command_count')==command_frames
+    if tracking=='logged-command':return bool(0<=osc_attempts<=max(allowed) and tag.get('logged_control_command_count')==command_frames)
     if tracking=='native-expert':return bool(tag.get('original_expert_used') and tag.get('segment_trace_count')==command_frames and 0<=osc_attempts<=max(allowed))
     return False

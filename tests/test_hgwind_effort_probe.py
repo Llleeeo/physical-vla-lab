@@ -294,3 +294,44 @@ def test_original_trace_rejects_unknown_frozen_source():
 def test_original_expert_source_validation_does_not_require_saved_action_execution():
     p,m,a,t=source();p.update(tracking='native-expert',reference='online-expert')
     probe.validate_source(p,m,a,t)
+
+
+def logged_fixture(tmp_path):
+    import json
+    q=np.zeros((3,9));v=np.zeros((3,9));rows=[]
+    for i in range(3):
+        target=np.r_[np.full(7,.05),.04,.04].astype(np.float32)
+        rows.append({'frame':i,'duration_s':1/60,'episode_time_s':i/60,'joint_positions':q[i].tolist(),'joint_velocities':v[i].tolist(),
+            'target':target.tolist(),'goal_position':target[:7].tolist(),'goal_velocity':np.full(7,.1).tolist(),
+            'policy_joint_velocity_limit':None if i==0 else np.full(7,1.8).tolist(),
+            'operational_space_reference':None if i==0 else {'jacobian':np.eye(6,7).tolist(),'task_position_error':np.zeros(6).tolist(),'commanded_task_velocity':np.ones(6).tolist(),'feedforward_task_acceleration':np.zeros(6).tolist()}})
+    p=tmp_path/'controls.json';p.write_text(json.dumps(rows));return p,q,v,rows
+
+
+def test_logged_control_keeps_original_endpoint_velocity_and_first_joint_fallback(tmp_path):
+    p,q,v,rows=logged_fixture(tmp_path);targets,vel,loaded=probe.load_logged_commands(p,q,v)
+    np.testing.assert_array_equal(targets,np.asarray([r['target'] for r in rows],np.float32))
+    np.testing.assert_allclose(vel[:,:7],.1);assert np.isnan(vel[:,7:]).all()
+    assert loaded[0]['operational_space_reference'] is None and loaded[1]['operational_space_reference']['task_position_error']==[0]*6
+
+
+@pytest.mark.parametrize('fault',['frame','velocity_shape','source_state','osc_velocity'])
+def test_logged_control_rejects_mismatched_time_motion_or_command_tuple(tmp_path,fault):
+    import json
+    p,q,v,rows=logged_fixture(tmp_path)
+    if fault=='frame':rows[1]['frame']=2
+    elif fault=='velocity_shape':rows[1]['goal_velocity']=[0]*6
+    elif fault=='source_state':q[1,0]=1
+    else:rows[1]['operational_space_reference']['commanded_task_velocity'][0]=float('nan')
+    p.write_text(json.dumps(rows))
+    with pytest.raises(ValueError):probe.load_logged_commands(p,q,v)
+
+
+def test_logged_control_reference_and_policy_limit_reach_physics_boundary(monkeypatch,tmp_path):
+    p,q,v,rows=logged_fixture(tmp_path)
+    monkeypatch.setattr(probe,'_STATE',{'plan':{'tracking':'logged-command'},'active_logged_row':rows[1]})
+    np.testing.assert_allclose(probe.reference_policy_velocity_limit(),1.8)
+    ref=probe.physics_task_reference(None,None,None,None,None,None)
+    np.testing.assert_allclose(ref['jacobian'],np.eye(6,7));assert 'physics_rate_reference' not in ref
+    monkeypatch.setitem(probe._STATE,'active_logged_row',rows[0])
+    assert probe.reference_policy_velocity_limit() is None and probe.physics_task_reference(None,None,None,None,None,None) is None
