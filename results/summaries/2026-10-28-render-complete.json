@@ -1,0 +1,330 @@
+{
+  "schema": "physical-vla-lab.render-completion.v1",
+  "date": "2026-10-28",
+  "timezone": "Asia/Hong_Kong",
+  "task_id": "grasp_wind_driven_motion_1s1p_hgprgew",
+  "camera_revision": "v2",
+  "episodes": 40,
+  "frames": 12154,
+  "camera_fps": 60,
+  "views": [
+    "opst_cam",
+    "side_left_cam",
+    "side_right_cam",
+    "overhead_cam",
+    "wrist_cam"
+  ],
+  "episodes_by_source": {
+    "main": 21,
+    "remote": 19
+  },
+  "remote_episodes_delivered_and_verified": 19,
+  "all_source_indices_and_timestamps_match": true,
+  "sampled_images": 600,
+  "suspicious_blank_samples": 0,
+  "task_sha256": "83330198e8a5a70758eda7b8ead447f61b3289c4206d738507ab6c77a806a6c7",
+  "physics_sha256": "6d147dbf49e5132c459cad3cf9cd9aa9b8e12160721f42b761ccecec56ad1a19",
+  "manual_visual_review_complete": false,
+  "training_ready": false,
+  "source_reports": [
+    {
+      "relative_path": "data/derived/hgwind_40_camera_v2_20261028/visual_audit.json",
+      "sha256": "e390a6b4111d4e8f94ba3e70cf5df61977f6a92d28a2e8c739b36503d7f6395d"
+    },
+    {
+      "relative_path": "data/derived/hgwind_40_camera_v2_20261028/cloud_delivery.json",
+      "sha256": "8424ff8a5f457af53ccc182164ec98292fa7c8a086e2e9715b9896e0614f4486"
+    },
+    {
+      "relative_path": "data/derived/hgwind_40_camera_v2_20261028/render_manifest.json",
+      "sha256": "637c59426bea9700d1d8a60fee405f9c9fbb0f67838520cc1298df4bda151feb"
+    }
+  ],
+  "episodes_detail": [
+    {
+      "source_group": "main",
+      "episode": "traj_00000",
+      "frames": 209,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00001",
+      "frames": 319,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00002",
+      "frames": 288,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00003",
+      "frames": 322,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00004",
+      "frames": 254,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00005",
+      "frames": 334,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00006",
+      "frames": 289,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00007",
+      "frames": 293,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00008",
+      "frames": 523,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00009",
+      "frames": 356,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00010",
+      "frames": 432,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00011",
+      "frames": 274,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00012",
+      "frames": 315,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00013",
+      "frames": 274,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00014",
+      "frames": 259,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00015",
+      "frames": 267,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00016",
+      "frames": 293,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00017",
+      "frames": 288,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00018",
+      "frames": 269,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00019",
+      "frames": 270,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "main",
+      "episode": "traj_00020",
+      "frames": 428,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "remote",
+      "episode": "traj_00000",
+      "frames": 335,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "remote",
+      "episode": "traj_00001",
+      "frames": 296,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "remote",
+      "episode": "traj_00002",
+      "frames": 287,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "remote",
+      "episode": "traj_00003",
+      "frames": 285,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "remote",
+      "episode": "traj_00004",
+      "frames": 343,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "remote",
+      "episode": "traj_00005",
+      "frames": 260,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "remote",
+      "episode": "traj_00006",
+      "frames": 271,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "remote",
+      "episode": "traj_00007",
+      "frames": 268,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "remote",
+      "episode": "traj_00008",
+      "frames": 310,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "remote",
+      "episode": "traj_00009",
+      "frames": 382,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "remote",
+      "episode": "traj_00010",
+      "frames": 298,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "remote",
+      "episode": "traj_00011",
+      "frames": 298,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "remote",
+      "episode": "traj_00012",
+      "frames": 277,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "remote",
+      "episode": "traj_00013",
+      "frames": 283,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "remote",
+      "episode": "traj_00014",
+      "frames": 262,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "remote",
+      "episode": "traj_00015",
+      "frames": 289,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "remote",
+      "episode": "traj_00016",
+      "frames": 292,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "remote",
+      "episode": "traj_00017",
+      "frames": 303,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    },
+    {
+      "source_group": "remote",
+      "episode": "traj_00018",
+      "frames": 259,
+      "source_alignment_passed": true,
+      "manual_reviewed": false
+    }
+  ],
+  "limits": [
+    "Automatic completeness checks are not human visibility/quality review.",
+    "No new learned-policy success or generalization result is established.",
+    "This is development data; training conversion and independent evaluation remain pending."
+  ]
+}

@@ -11,8 +11,10 @@ Task: `grasp_wind_driven_motion_1s1p_hgprgew`.
 - 12,154 control frames, recorded at 60 Hz; 40 distinct numeric trajectory fingerprints.
 - Raw/core HDF5 consistency, finite actions/states, timing, scene identity and contact indexing checks passed.
 - Independent recording analysis found positive impulses on both fingers and no attachment assistance in these 40 episodes. These checks complement, rather than replace, task verification and visual review.
-- Two revised-camera sample episodes (209 and 335 frames) passed all frame-index/timestamp checks. Five RGB views were sampled for blank frames; none were flagged. The remote sample completed upload, pinned-revision download and local verification.
-- Remaining 38 revised-camera renders were started. This document does not assume their completion. No ball-cohort VLA training or held-out split is claimed yet.
+- All 40 revised-camera episodes are now on the main machine and passed canonical render-completeness and frame-index/timestamp checks at 60 Hz, totaling 12,154 frames. All 19 remote episodes completed pinned-revision Hub download and installation with file-checksum verification.
+- Across five RGB views and three sampled frames per episode/view (600 samples), none were flagged as blank. Source raw-file hashes and the physical scene signature remained unchanged. Sampling does not certify target visibility or grasp quality throughout every video.
+- A temporary TLS interruption delayed cloud downloads after upload had succeeded; sync-only resumption completed delivery without rerendering.
+- Manual quality/visibility review, ball-task action conversion and training remain pending; no held-out split is claimed yet. See the [render-completion evidence](../../results/summaries/2026-10-28-render-complete.json).
 
 A 40/619 collection ratio describes this adaptive development collection only. It is neither a policy success rate nor an unbiased estimate of a frozen expert's generalization.
 

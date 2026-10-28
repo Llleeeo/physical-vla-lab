@@ -13,7 +13,7 @@ This is an independent research integration, not the upstream RoboPhys benchmark
 | Franka action interface | Cartesian/joint adapters, timing and action-convention checks, simulation diagnostics | Reliable end-to-end learned dynamic grasping |
 | DynamicVLA baseline | Pretrained-model loading, fine-tuning and offline evaluation on an earlier egg-object task | Offline prediction improvements have not established robust closed-loop success |
 | Wind-driven ball demonstrations | 40 collector-accepted physical grasps; recording and contact checks completed | Full visual review and downstream training conversion |
-| Visual data pipeline | Two revised-camera samples verified at 60 Hz; remote render → private Hub archive → local verified download completed | Rendering the remaining 38 episodes is in progress at this snapshot |
+| Visual data pipeline | All 40 revised-camera episodes verified at 60 Hz (12,154 frames); all 19 remote episodes delivered through the private Hub to the main machine | Trajectory quality/visibility review and downstream action conversion |
 | Physical generalization | Evaluation questions and failure-analysis workflow defined | Independent held-out physical conditions and systematic experiments |
 | UR10e | Later-stage research direction | Embodiment adaptation, simulation validation and supervised hardware experiments |
 
