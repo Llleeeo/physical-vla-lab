@@ -2,6 +2,16 @@
 
 Snapshot: **2026-10-29, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Startup force measurement: reproduced failure, observed setup calls
+
+User run `20261029_225526_640181` reaches simulation under GDB, records169frames/168completed intervals, and renders five30Hz views of85frames each. The15 compared action/observation/native arrays match the prior uninstrumented fresh teacher1 failure exactly. This establishes observed noninterference for those arrays in this run, not a general claim about logging/debugger timing.
+
+The joint-offset4 speed is2.6393rad/s versus the2.61 bound; required braking conflicts with acceleration/jerk bounds. Bilateral contact lasts0.4667s, but sustained lift fails. The diagnostic completing means that a measurement exists; grasp still fails. No learned policy ran.
+
+Ten force API calls are observed: four before control-frame recording at the same0.033333334s clock reading, followed by six marked control frames. Setup force x-components are0.670589983,0.670589983,1.668164968,1.668164968N. All calls return normally and report configured dt1/60s. This configured value is not the native integration-step record. No zero-dt call was observed in coverage, so the earlier zero-dt hypothesis remains unsupported. Equal clock readings do not prove force accumulation or absence of internal stepping; original force-call histories are unavailable.
+
+The two earlier C++ scene-load crashes do not recur in this launch. No native crash stack was saved and no crash fix is established. Proposed next step: compare original worker history58/59/60 with the already recorded fresh attempt60, preserving settings and every outcome. This experiment is not implemented/run yet; even a history effect would not isolate a unique fan/cache/solver cause. [Source hashes and measured values](../../results/summaries/2026-10-29-startup-force-measurement.json).
+
 ## Repeated scene-load abort: native stack capture prepared
 
 The bounded retry `20261029_224044_493811` reproduces the earlier C++ `std::system_error: Invalid argument` at the same stage. Both runs stop before completed script inspection, save zero episodes and record zero force calls. No wind, grasp or learned-policy conclusion follows. Keep the two failures as execution evidence; the original native crash cause is still unknown.

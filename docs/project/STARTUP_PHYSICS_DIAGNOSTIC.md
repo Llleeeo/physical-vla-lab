@@ -1,5 +1,15 @@
 # Startup physics mismatch: bounded passive diagnostic
 
+## Startup force measurement: reproduced failure, observed setup calls
+
+User run `20261029_225526_640181` reaches simulation under GDB, records169frames/168completed intervals, and renders five30Hz views of85frames each. The15 compared action/observation/native arrays match the prior uninstrumented fresh teacher1 failure exactly. This establishes observed noninterference for those arrays in this run, not a general claim about logging/debugger timing.
+
+The joint-offset4 speed is2.6393rad/s versus the2.61 bound; required braking conflicts with acceleration/jerk bounds. Bilateral contact lasts0.4667s, but sustained lift fails. The diagnostic completing means that a measurement exists; grasp still fails. No learned policy ran.
+
+Ten force API calls are observed: four before control-frame recording at the same0.033333334s clock reading, followed by six marked control frames. Setup force x-components are0.670589983,0.670589983,1.668164968,1.668164968N. All calls return normally and report configured dt1/60s. This configured value is not the native integration-step record. No zero-dt call was observed in coverage, so the earlier zero-dt hypothesis remains unsupported. Equal clock readings do not prove force accumulation or absence of internal stepping; original force-call histories are unavailable.
+
+The two earlier C++ scene-load crashes do not recur in this launch. No native crash stack was saved and no crash fix is established. Proposed next step: compare original worker history58/59/60 with the already recorded fresh attempt60, preserving settings and every outcome. This experiment is not implemented/run yet; even a history effect would not isolate a unique fan/cache/solver cause. [Source hashes and measured values](../../results/summaries/2026-10-29-startup-force-measurement.json).
+
 ## Verified evidence
 
 The completed three-case batch is documented in [results](RESULTS.md). The two aborted native teachers do not first diverge at grasp: the ball's native velocity differs immediately after the first 180 Hz physics step (about 5.56 ms). Their first motor actions are identical to the originals, and EE positions still match at the next 60 Hz observation. Initial native ball mass, inertia, COM and transform match; control-frame initial position, orientation and velocities also match.
@@ -35,7 +45,7 @@ data/derived/hf_pilot_render_repo/.venv/bin/python \
 
 This launches only its own SDK Python child under GDB. It does not attach to another process, update the SDK, replace the entry or change simulator/control parameters. The system debugger starts without SDK LD_PRELOAD/LD_LIBRARY_PATH/PYTHONPATH/PYTHONHOME; its child receives the exact SDK values via the inferior environment. All other established worker environment/arguments remain in place. The plan pins the debugger helper hash and generated wrapper/command hashes. No debugger download or installation is performed.
 
-A native stop writes `<run>/native_backtrace.log` (40 current-thread frames and four frames per thread), also copied into `simulation.log`; the coordinator includes the path in `diagnostic.json`. If the child exits normally and has saved a trajectory, ordinary analysis/rendering proceeds. No automatic retry loop is added. GDB can change timing or stop on a different signal; examine the actual captured stop before connecting it to the original C++ abort. Debugger execution has not yet been tested with Isaac.
+A native stop writes `<run>/native_backtrace.log` (40 current-thread frames and four frames per thread), also copied into `simulation.log`; the coordinator includes the path in `diagnostic.json`. If the child exits normally and has saved a trajectory, ordinary analysis/rendering proceeds. No automatic retry loop is added. GDB can change timing or stop on a different signal; examine the actual captured stop before connecting it to the original C++ abort. The user subsequently ran this under Isaac; it reached the same saved physical failure without a native stop, as documented above.
 
 243 portable CPU checks pass. Separate CPU-only integration runs verify exact success/nonzero child statuses (0/7), preserved child library environment and saved stack on a controlled abort (255). Actual scene preflight passes, without GPU launch. Two further CPU-only tests through the actual SDK python.sh/Python3.10 chain preserve a normal exit and capture a deliberately triggered abort (python.sh reports1); SDK library/Python paths reach the child. No SimulationApp or GPU workload is started. These tests verify the diagnostic tool, not recovery of the simulator or physical task.
 
@@ -45,7 +55,7 @@ Run `20261029_223230_505509` aborted natively during scene loading (`std::system
 
 The coordinator now labels missing episodes `STARTUP_DIAGNOSTIC_FAILED status=no_evaluable_episode`. A recorded force measurement is distinct from physical grasp success, and saved physical failures are still rendered. Native fatal lines are printed in the launching terminal. This status fix passes240CPU checks; the retry has not been launched by the agent.
 
-## One prepared measurement
+## Original measurement command (completed)
 
 ```bash
 cd /home/robophys/Capstone_Project_Yuan_Haoming
@@ -54,7 +64,7 @@ data/derived/hf_pilot_render_repo/.venv/bin/python \
   scripts/run_hgwind_startup_diagnostic.py --run
 ```
 
-Default case: traj_00001, one native expert attempt with the unchanged 12 s maximum simulated budget. No parameter sweep, training or repeat-until-success behavior. The diagnostic is GPU pending; default without `--run` is CPU preflight.
+Default case: traj_00001, one native expert attempt with the unchanged 12 s maximum simulated budget. No parameter sweep, training or repeat-until-success behavior. The user-run measurement is complete as documented above; default without `--run` remains CPU preflight. The command below is retained for provenance, not a request for another identical retry.
 
 The optional `--trace-startup-forces` flag on `run_hgwind_effort_probe.py` selects a separate worker wrapper. It installs a fan-module-local proxy around the native PhysX getter. Every call is forwarded with unchanged arguments/return/exception; no force clearing, skipped application, additional native script update or robot command is introduced. Capture records body, force, application point, mode, control-frame marker, simulation clock and configured physics_dt.
 

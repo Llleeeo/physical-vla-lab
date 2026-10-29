@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Passive force measurement reproduces the saved failure
+
+- User's GDB launch passes scene loading; the earlier native crash does not recur and remains unexplained. The native teacher again aborts at169 recorded/168completed intervals;15 compared action/observation/native arrays match the earlier uninstrumented failure exactly.
+- Observe10 fan calls, including4 before recording at one unchanged clock reading;0 zero-configured-dt calls within coverage. Original force histories and accumulation behavior are unknown; no force/root-cause attribution or physics/controller fix is claimed.
+- Verify all five30Hz videos with85 decoded frames, source indices and timestamps. Save hashed evidence and propose one original worker-history comparison; no additional GPU job, runtime edit or learned-policy evaluation.
+
 ## 2026-10-29 — Repeated native abort requires a backtrace
 
 - Preserve the second identical scene-load C++ abort with no episode/force observations; avoid further unchanged retries or unsupported root-cause attribution.

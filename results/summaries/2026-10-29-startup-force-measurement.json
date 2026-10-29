@@ -1,0 +1,236 @@
+{
+  "schema": "physical-vla-lab.startup-force-measurement.v1",
+  "run": "20261029_225526_640181_joint_online-expert_native-expert_target-capture",
+  "diagnostic_status": "measurement_recorded",
+  "native_crash_reproduced": false,
+  "native_crash_cause_identified": false,
+  "learned_policy_evaluated": false,
+  "recorded_frames": 169,
+  "completed_frames": 168,
+  "physical_grasp": {
+    "schema": "capstone_grasp_evidence_v1",
+    "status": "fail",
+    "official_benchmark_success": null,
+    "criteria": {
+      "minimum_bilateral_duration_s": 0.25,
+      "final_hold_duration_s": 0.25,
+      "minimum_lift_m": 0.05,
+      "maximum_relative_position_jitter_m": 0.02,
+      "minimum_precontact_speed_m_s": 0.05,
+      "motion_requirement": "linear",
+      "minimum_precontact_angular_speed_rad_s": 0.1,
+      "maximum_final_relative_spin_rad_s": 0.5,
+      "require_lift": true
+    },
+    "checks": {
+      "continuous_bilateral_contact": true,
+      "final_bilateral_hold": true,
+      "sustained_lift": false,
+      "relative_position_retention": true,
+      "bilateral_nonzero_impulses": true,
+      "object_moving_before_first_contact": true,
+      "no_grasp_assistance": true
+    },
+    "measurements": {
+      "frames": 169,
+      "sample_hz": 60.00000000000021,
+      "bilateral_frames": 28,
+      "longest_bilateral_duration_s": 0.466666666666665,
+      "first_contact_frame": 139,
+      "first_bilateral_frame": 141,
+      "minimum_final_lift_from_first_bilateral_m": 2.304650843143463e-05,
+      "final_relative_position_jitter_m": 0.0011852262694033845,
+      "object_speed_before_first_contact_m_s": 0.23241561651229858,
+      "object_angular_speed_before_first_contact_rad_s": null,
+      "final_relative_spin_p95_rad_s": null
+    },
+    "scope": "independent engineering check on recorded states; not full geometry/physics-generalization certification"
+  },
+  "comparison_to_previous_uninstrumented_failure": {
+    "run": "20261029_215347_386336_joint_online-expert_native-expert_target-capture",
+    "arrays": {
+      "timestamp": {
+        "shape": [
+          169
+        ],
+        "exact_values_including_nan": true
+      },
+      "actions": {
+        "shape": [
+          169,
+          9
+        ],
+        "exact_values_including_nan": true
+      },
+      "obs/ee_pos": {
+        "shape": [
+          169,
+          3
+        ],
+        "exact_values_including_nan": true
+      },
+      "obs/ee_quat": {
+        "shape": [
+          169,
+          4
+        ],
+        "exact_values_including_nan": true
+      },
+      "obs/ee_vel": {
+        "shape": [
+          169,
+          3
+        ],
+        "exact_values_including_nan": true
+      },
+      "obs/finger_segment_world": {
+        "shape": [
+          169,
+          2,
+          3
+        ],
+        "exact_values_including_nan": true
+      },
+      "obs/joint_pos": {
+        "shape": [
+          169,
+          9
+        ],
+        "exact_values_including_nan": true
+      },
+      "obs/joint_vel": {
+        "shape": [
+          169,
+          9
+        ],
+        "exact_values_including_nan": true
+      },
+      "obs/object_ang_vel": {
+        "shape": [
+          169,
+          2,
+          3
+        ],
+        "exact_values_including_nan": true
+      },
+      "obs/object_pos": {
+        "shape": [
+          169,
+          2,
+          3
+        ],
+        "exact_values_including_nan": true
+      },
+      "obs/object_quat": {
+        "shape": [
+          169,
+          2,
+          4
+        ],
+        "exact_values_including_nan": true
+      },
+      "obs/object_vel": {
+        "shape": [
+          169,
+          2,
+          3
+        ],
+        "exact_values_including_nan": true
+      },
+      "evidence/native/rigid_body/get_velocities/values": {
+        "shape": [
+          508,
+          74,
+          6
+        ],
+        "exact_values_including_nan": true
+      },
+      "evidence/native/rigid_body/get_transforms/values": {
+        "shape": [
+          508,
+          74,
+          7
+        ],
+        "exact_values_including_nan": true
+      },
+      "evidence/native/rigid_body/get_accelerations/values": {
+        "shape": [
+          507,
+          74,
+          6
+        ],
+        "exact_values_including_nan": true
+      }
+    },
+    "all_compared_values_exact": true
+  },
+  "force_observation": {
+    "calls": 10,
+    "pre_recording_calls": 4,
+    "zero_configured_physics_dt_calls": 0,
+    "setup_simulation_clock_s": [
+      0.033333334140479565,
+      0.033333334140479565,
+      0.033333334140479565,
+      0.033333334140479565
+    ],
+    "setup_forces_N": [
+      [
+        0.6705899834632874,
+        -2.8071902136161953e-08,
+        -5.2531696295678575e-17
+      ],
+      [
+        0.6705899834632874,
+        -2.8071902136161953e-08,
+        -5.2531696295678575e-17
+      ],
+      [
+        1.6681649684906006,
+        -6.983189138054513e-08,
+        -1.3067827110381313e-16
+      ],
+      [
+        1.6681649684906006,
+        -6.983189138054513e-08,
+        -1.3067827110381313e-16
+      ]
+    ],
+    "configured_dt_s": [
+      0.016666666666666666
+    ],
+    "force_calls_all_returned": true
+  },
+  "video_review": {
+    "views": 5,
+    "frames_per_view": 85,
+    "fps": 30,
+    "source_frame_alignment_verified": true,
+    "decoded_frame_counts_verified": true,
+    "manual_reviewed": false
+  },
+  "interpretation": [
+    "Native C++ scene-load crash did not recur under this debugger launch. No native crash stack was produced; no crash fix or root cause is established.",
+    "The recorded robot/action/object arrays and listed native arrays exactly reproduce the earlier uninstrumented fresh-worker failure for this run.",
+    "Four observed pre-recording force calls share the same simulation clock reading. This does not prove that no internal physics step occurred or that force accumulators retained these calls.",
+    "The proxy reports configured sim.get_physics_dt(), not each integrated native step. Zero such readings were observed within coverage; earlier unobserved calls remain unknown.",
+    "Original collection force-call history is unavailable. Observed startup calls alone cannot explain fresh-versus-original first-step velocity differences.",
+    "Physical abort remains joint offset4 velocity2.6393rad/s above2.61 bound, with incompatible braking acceleration/jerk limits; bilateral contact0.4667s but no sustained lift."
+  ],
+  "next_experiment_proposal": {
+    "status": "not_implemented_or_run",
+    "question": "Does original within-worker attempt history restore startup physics for attempt60?",
+    "comparison": "Use existing fresh attempt60 as control; regenerate original58,59,60 in one worker with frozen scene/seed/controller and matching reset boundaries. Trace each startup; compare attempt60 first180Hz steps and full episode to original.",
+    "acceptance": "Preserve all outcomes and render each saved episode. Stop on missing episode or changed settings. Any conclusion is restricted to this development sequence; a history effect does not identify a unique fan/cache/solver mechanism."
+  },
+  "source_sha256": {
+    "data/derived/hgwind_startup_diagnostics/20261029_225526_307328/diagnostic.json": "907a84fd65ed49c7352339aa0779baadc784c7b1580def2ca81dea1c1c9f478d",
+    "data/derived/hgwind_effort_probes/20261029_225526_640181_joint_online-expert_native-expert_target-capture/report.json": "0009c1de83e4f292792de5db2c1f4261bffba48f574cf947b6e60ab8ace94155",
+    "data/derived/hgwind_effort_probes/20261029_215347_386336_joint_online-expert_native-expert_target-capture/report.json": "0f2b31919aa681034c3dce77ce6d77cef4831d0235eae0b58b408adbcfdfdbe7",
+    "data/derived/hgwind_effort_probes/20261029_225526_640181_joint_online-expert_native-expert_target-capture/worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/replay.hdf5": "1292e4799a0b4f6c86ca783db468f64fe7389e02e9a6e376a47f1f706a3721b4",
+    "data/derived/hgwind_effort_probes/20261029_215347_386336_joint_online-expert_native-expert_target-capture/worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/replay.hdf5": "e3ab9e4c1ffd7a5042f38e9ab7a8ab0a7a860c13fabcb131ea739f91cb86ef39",
+    "data/derived/hgwind_effort_probes/20261029_225526_640181_joint_online-expert_native-expert_target-capture/startup_force_calls.jsonl": "5ea4a27b06f6392eaee67c520edc6e6b28c14b39005907f712a900ec7efe402b",
+    "data/derived/hgwind_effort_probes/20261029_225526_640181_joint_online-expert_native-expert_target-capture/simulation.log": "609bdb7ac93a08e61c31f98f03aebe2c887e4daacfd50154562e632728c080f7",
+    "src/capstone_vla/hgwind_startup_trace.py": "f86e48116d4c13580cdbc3bc2e69208f4948baafafa13f6f07654903b701470f"
+  }
+}
