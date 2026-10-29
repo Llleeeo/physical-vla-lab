@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Measured-posture ablation fails grasp retention
+
+- User-run ablation completes 209 intervals / 627 physics and OSC updates safely. Request isolation and measured-posture audits pass, including exact correspondence to recorded robot q, but independent grasp retention fails.
+- Bilateral contact spans frames 137–162 (0.433 s), final retained lift is approximately zero and relative-position jitter is 55.677 mm. The previous fixed-gain/recorded-posture run remains the passing baseline.
+- Traced the original episode-latched posture to initial measured q plus sampled IK/homotopy variation; ordered native arithmetic reconstructs it exactly for this case without per-frame target truth. Test a robot-side posture configuration rather than assuming the restoring term can be deleted or must be learned. No runtime changes; prior 186 CPU passes apply.
+
 ## 2026-10-29 — Native measured-posture diagnostic prepared
 
 - Add an opt-in posture probe based on the passing fixed-9/8 packet run: remove only the recorded seven-joint posture endpoint, using the existing native current-state redundancy branch. Exactly 173 input frames change; other requests and limits remain identical.

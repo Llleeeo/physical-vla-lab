@@ -1,0 +1,129 @@
+{
+  "schema": "physical-vla-lab.packet-measured-posture-result.v1",
+  "date": "2026-10-29",
+  "status": "EXECUTION_VERIFIED_GRASP_RETENTION_FAILED",
+  "implementation_commit": "cc21a94409b6ef3c9814e0ec46fdad9f9493fe53",
+  "source_reference_sha256": "e1b54faae644b64f8148b0fe0397d74287f06d7c48fa97ee34a054339a72e3d3",
+  "task_sha256": "83330198e8a5a70758eda7b8ead447f61b3289c4206d738507ab6c77a806a6c7",
+  "fixed_gain_baseline_report_sha256": "78b9b025d986e17620f115da7b7b6f92a65b0f77351718ba8df4610eefd274af",
+  "artifact_sha256": {
+    "plan.json": "5239366876d3697320057e14d71f53e27a1f97bc8d61671551033fc5923806ee",
+    "report.json": "de14e2ef89f368cbdc5bcf1aad5f49f5a150cb8fde5f7a7333ee3e95190c1a28",
+    "packet_requests.json": "d8739f715e4b15f1c3c7ad153ad4d803b7839a9a74ed6c1dc7469b73cb2ab335",
+    "cartesian_packet_execution.json": "fa1717fca8e50af287c9b4e7cb2b3b2d1de3f6f028f8a5abe1c9ca49f97464d5",
+    "original_expert_control_references.json": "0b618cc26bfcb0e0cc92dce310ebc7ba8d1fb3081caf9415a18eb4c3734d2033",
+    "command_diagnostics.npz": "ed3d64ed2e1c9e8c54d7a6f3f34168e7447e4f8940723c4595d4a5c07a4d13cc",
+    "worker_output/replay.hdf5": "cfc796c587493d2d1d054dcaef86e96fd5a57ff9cb1b4db88dd763349e321ab4",
+    "worker_output/meta.json": "c56200f6265387165e68fb95c7cd33ae2c1030437b8ed7fb281d66c3110e05ee"
+  },
+  "frames": 209,
+  "completed_intervals": 209,
+  "physics_callbacks": 627,
+  "osc_callbacks": 627,
+  "initial_state_match": true,
+  "runtime_safety_passed": true,
+  "only_posture_target_changed": true,
+  "changed_request_frames": 173,
+  "all_other_request_fields_exact": true,
+  "packet_audit": {
+    "exact_requests_and_gripper": true,
+    "safety_jaw_context_matches": true,
+    "causal_robot_safety_motion_verified": true,
+    "full_stream_completed": true,
+    "no_online_skill_decisions_verified": true,
+    "packet_execution_verified": true,
+    "terminal_cartesian_hold_frames": 15,
+    "source_controller_setting_schedule_retained": false,
+    "packet_gain_profile": "fixed-9-8",
+    "gain_profile_verified": true,
+    "packet_posture_profile": "measured",
+    "posture_profile_verified": true,
+    "learned_policy_evaluated": false
+  },
+  "packet_controller_probe_passed": false,
+  "packet_measured_posture_probe_passed": false,
+  "independent_grasp_evidence": {
+    "schema": "capstone_grasp_evidence_v1",
+    "status": "fail",
+    "official_benchmark_success": null,
+    "criteria": {
+      "minimum_bilateral_duration_s": 0.25,
+      "final_hold_duration_s": 0.25,
+      "minimum_lift_m": 0.05,
+      "maximum_relative_position_jitter_m": 0.02,
+      "minimum_precontact_speed_m_s": 0.05,
+      "motion_requirement": "linear",
+      "minimum_precontact_angular_speed_rad_s": 0.1,
+      "maximum_final_relative_spin_rad_s": 0.5,
+      "require_lift": true
+    },
+    "checks": {
+      "continuous_bilateral_contact": true,
+      "final_bilateral_hold": false,
+      "sustained_lift": false,
+      "relative_position_retention": false,
+      "bilateral_nonzero_impulses": true,
+      "object_moving_before_first_contact": true,
+      "no_grasp_assistance": true
+    },
+    "measurements": {
+      "frames": 209,
+      "sample_hz": 60.00000000000021,
+      "bilateral_frames": 26,
+      "longest_bilateral_duration_s": 0.4333333333333318,
+      "first_contact_frame": 135,
+      "first_bilateral_frame": 137,
+      "minimum_final_lift_from_first_bilateral_m": -7.450580596923828e-09,
+      "final_relative_position_jitter_m": 0.05567714015759502,
+      "object_speed_before_first_contact_m_s": 0.22630296647548676,
+      "object_angular_speed_before_first_contact_rad_s": null,
+      "final_relative_spin_p95_rad_s": null
+    },
+    "scope": "independent engineering check on recorded states; not full geometry/physics-generalization certification"
+  },
+  "baseline_grasp_measurements": {
+    "frames": 209,
+    "sample_hz": 60.00000000000021,
+    "bilateral_frames": 72,
+    "longest_bilateral_duration_s": 1.1999999999999957,
+    "first_contact_frame": 135,
+    "first_bilateral_frame": 137,
+    "minimum_final_lift_from_first_bilateral_m": 0.07257737219333649,
+    "final_relative_position_jitter_m": 0.0001600185685475559,
+    "object_speed_before_first_contact_m_s": 0.22630296647548676,
+    "object_angular_speed_before_first_contact_rad_s": null,
+    "final_relative_spin_p95_rad_s": null
+  },
+  "bilateral_contact_frame_range_inclusive": [
+    137,
+    162
+  ],
+  "first_frame_without_bilateral_contact_after_that_run": 163,
+  "native_posture_sources": {
+    "measured_state": 207,
+    "collision_projection": 2
+  },
+  "raw_contact_recomputation_matched": true,
+  "measured_posture_matches_raw_robot_q": true,
+  "read_only_verification_checks_passed": 38,
+  "source_files_unchanged": true,
+  "native_limit_profile_unchanged": true,
+  "anchor_origin": {
+    "scope": "This exposed case only",
+    "classification": "Episode-latched initial robot posture plus sampled robot trajectory-variation offsets",
+    "formula": "q_initial + (ik_seed_offset + 0.12 * clipped_strength * homotopy_pattern(rank))",
+    "exact_native_arithmetic_reconstruction": true,
+    "maximum_reconstruction_error_rad": 0.0,
+    "per_frame_target_object_truth_required_for_this_reconstruction": false,
+    "generic_support_case_not_established": true
+  },
+  "interpretation": [
+    "Removing the source posture bias changes redundant arm motion and fails retention despite correct execution; it is not a failed runtime audit.",
+    "Contact acquisition timing remains 135/137, but bilateral contact ends after frame 162.",
+    "The successful recorded posture anchor is configuration/variation-derived in this case; its retention need does not establish a required seven-dimensional learned action output."
+  ],
+  "next_step": "Keep the passing fixed-gain/recorded-posture baseline. Test a robot-side latched posture configuration rather than deleting the restoring posture term; remaining orientation/motion schedules still need validation.",
+  "vla_evaluated": false,
+  "official_benchmark_success_verified": false,
+  "new_gpu_run_launched_by_agent": false
+}

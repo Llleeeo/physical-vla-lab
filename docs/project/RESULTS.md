@@ -133,6 +133,23 @@ All 186 portable CPU checks, actual scene preflight, old fixed-gain preflight,
 saved baseline re-audit and 209 native-branch CPU fixtures pass. No new physical
 or learned-policy result is available. See [preparation evidence](../../results/summaries/2026-10-29-measured-posture-probe-preparation.json).
 
+## Measured-posture result: failed final retention
+
+The comparison completes 209 intervals with safe, correctly audited native
+current-state posture handling. Raw measured q matches every logged resolved
+posture, and only the posture-reference field differs from the passing fixed-gain
+baseline. Thirty-eight read-only checks and raw contact recomputation pass.
+Bilateral contact lasts 0.433 s (frames 137–162), but final retention/lift fails;
+relative-position jitter is 55.677 mm. Both the independent grasp and combined
+measured-posture gates fail. The fixed-gain/recorded-posture baseline remains valid.
+
+For this exposed case, original native code reconstructs the source posture anchor
+exactly from initial robot q and logged sampled IK/homotopy offsets. This supports
+testing posture as explicit robot-side initialization/configuration; it does not
+justify removing the term, adding a required seven-dimensional model output or
+claiming universal cross-task compatibility. No runtime code changes in this
+update; prior 186 CPU checks apply. See [hashed result](../../results/summaries/2026-10-29-measured-posture-probe-result.json).
+
 ## Earlier DynamicVLA integration: irregular egg-object task
 
 Task: `grasp_sliding_motion_on_flat_surface_1s1p_g9wvkk1`. Earlier shorthand called the object a ball; the target is an egg. This task remains a difficult development case.

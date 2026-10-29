@@ -331,3 +331,37 @@ branch also passes a 209-recorded-state CPU fixture. This checks native branch
 semantics, not physical grasp performance. No new GPU run was launched; the
 posture probe's physical result is pending. Other orientation/settings and
 motion-reference dependencies remain. See [preparation evidence](../../results/summaries/2026-10-29-measured-posture-probe-preparation.json).
+
+
+## Measured-posture result: execution passes, retention fails — 2026-10-29
+
+The user-run comparison completes all 209 intervals / 627 physics and OSC updates
+with initial-state identity and runtime safety. Exact request, jaw, causal motion
+and native posture audits pass. Only `posture_target` changes; the logged native
+posture matches the raw measured robot q at every frame (207 `measured_state`,
+two `collision_projection` calls). Independent raw contact recomputation confirms
+failure: bilateral contact lasts frames 137–162, or 0.433 s, but the final hold,
+lift and relative-retention checks fail. Final retained lift is approximately zero
+and relative-position jitter is 55.677 mm. The previous fixed-gain/recorded-posture
+baseline passes with 1.20 s contact, 72.577 mm retained lift and 0.160 mm jitter.
+
+Removing the posture restoring objective changes redundant arm motion even when
+requested EE goals are unchanged. Contact acquisition remains at frames 135/137;
+the loss occurs during retention. Exact contact-force/geometric mechanism is not
+yet isolated. This is a physical failure of the candidate configuration, not a
+failed software audit or evidence that pose-only learning is impossible.
+
+A source audit of `Catch._variation_posture_target` adds a useful distinction.
+For this exposed episode, the passing constant anchor equals initial measured
+joint positions plus the logged sampled IK offset and homotopy-sector offset.
+Native arithmetic order reconstructs all 173 non-None posture targets exactly.
+That case-specific reconstruction requires robot state and declared trajectory
+variation, without per-frame target-object truth. Other support-geometry branches
+can differ; no universal reconstruction has been established.
+
+Keep the passing fixed-gain/recorded-posture reference. Next test a robot-side
+latched posture configuration, with its source and lifetime explicit, rather than
+blindly deleting the restoring term or adding seven learned action dimensions.
+Remaining orientation/motion dependencies still require validation. All original
+records and limits remain unchanged; 38 read-only checks pass, and the prior 186
+CPU suite applies because no runtime code changed. See [source-hashed result](../../results/summaries/2026-10-29-measured-posture-probe-result.json).
