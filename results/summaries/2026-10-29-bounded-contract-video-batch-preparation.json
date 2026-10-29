@@ -189,7 +189,7 @@
     "No renderable file can be promised if a crash saves no states; the review index records that explicitly."
   ],
   "implementation_sha256": {
-    "src/capstone_vla/contract_batch.py": "684f2b7c6a7df6b1353a070332d10c43d5b62d15e6129b02b690f5c14c79afe8",
+    "src/capstone_vla/contract_batch.py": "f87afdb958adf3d26edaeefc95e7d0dae3806f7579dd14475b8683b1c7d1f81f",
     "scripts/run_hgwind_contract_batch.py": "885ddc2baca963088491ea4235f65aa07491461abe7b24b738ae4d07c26266e1",
     "scripts/prepare_hgwind_teacher_contract.py": "8dd6b0ce31a4150768654b2203f409fdb9c9d3d47b0008ea17d8d11cd1026770",
     "scripts/run_hgwind_action_contract.py": "068a7198e2ce35aa432b5b4f3bb6f34ce2805d23637ad2e9256dbeaba5c0f9ef",

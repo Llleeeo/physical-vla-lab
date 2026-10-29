@@ -63,6 +63,7 @@ def test_video_index_lists_failure_and_never_overwrites_manual_notes(tmp_path):
     text=(tmp_path/'VIDEO_REVIEW.md').read_text()
     assert 'failed_case' in text and 'traj_00001/contract' in text and 'fail' in text
     assert all(c+'.mp4' in text for c in CAMERAS)
+    assert text.index('- failed_case:')>text.index('| traj_00001/contract |')
     (tmp_path/'MANUAL_REVIEW.md').write_text('human annotations')
     write_review_index(tmp_path,state)
     assert (tmp_path/'MANUAL_REVIEW.md').read_text()=='human annotations'

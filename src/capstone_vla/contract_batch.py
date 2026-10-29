@@ -95,13 +95,15 @@ def write_review_index(output,state):
         'Independent grasp result and collector filename are separate; pending/failed rendering is listed explicitly.','',
         '| Run | Independent grasp | Video status | Front | Left | Right | Overhead | Wrist |',
         '|---|---|---|---|---|---|---|---|']
+    errors=[]
     for label,record in rows:
         videos=record.get('video_check',{}).get('videos',{})
         links=['['+name+']('+videos[name]['path']+')' if name in videos else '—' for name in CAMERAS]
         lines.append('| '+label+' | '+str(record.get('grasp','not_evaluated'))+' | '+
             record.get('render_state',record.get('state','pending'))+' | '+' | '.join(links)+' |')
         if record.get('error'):
-            lines.extend(['','- '+label+': '+str(record['error']).replace('\n',' ')])
+            errors.append('- '+label+': '+str(record['error']).replace('\n',' '))
+    if errors:lines.extend(['']+errors)
     lines.extend(['','Inspect approach, moving-ball interception, closure depth, lift/retention, jitter, and ball visibility.',
         'Record human judgements in MANUAL_REVIEW.md; this index is regenerated on resume.',''])
     (output/'VIDEO_REVIEW.md').write_text('\n'.join(lines))
