@@ -161,6 +161,22 @@ initializer fixture, baseline re-audit and Python 3.10 parsing pass. No physical
 gripping result or universal controller compatibility is claimed. See
 [preparation evidence](../../results/summaries/2026-10-29-latched-posture-probe-preparation.json).
 
+## Live-initialized posture: two same-condition successful repeats
+
+The user ran the latched-posture probe twice with the same seed and initial
+condition. Both complete 209 intervals / 627 physics and OSC updates safely and
+pass independent grasping. Forty read-only checks per run verify requests,
+initialization/raw robot state and contact evidence. All 15 core arrays and
+request/execution payloads are exactly equal across the two repeats.
+
+Each retains 1.20 s bilateral contact, about 72.595 mm final lift and 0.160 mm
+relative-position jitter. Live initialization replaces per-frame saved posture
+execution and remains in effect through lift/hold. This supports a passing
+exposed-case controller baseline, not cross-trajectory reliability, a success-rate
+estimate or learned VLA success. Other recorded target motion/settings inputs
+remain explicit dependencies. Raw reports/limits are unchanged; prior 193 CPU
+checks apply. See [hashed evidence](../../results/summaries/2026-10-29-latched-posture-probe-result.json).
+
 ## Earlier DynamicVLA integration: irregular egg-object task
 
 Task: `grasp_sliding_motion_on_flat_surface_1s1p_g9wvkk1`. Earlier shorthand called the object a ball; the target is an egg. This task remains a difficult development case.

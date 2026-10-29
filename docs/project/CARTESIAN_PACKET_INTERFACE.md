@@ -410,3 +410,29 @@ All 193 portable CPU checks, actual scene/old fixed-gain preflight, baseline raw
 audit and Python 3.10 parsing pass. A CPU initializer fixture using the recorded
 initial state also reproduces the exact anchor. No GPU rollout was launched;
 physical result is pending. See [preparation evidence](../../results/summaries/2026-10-29-latched-posture-probe-preparation.json).
+
+
+## Live-initialized latched posture passes — 2026-10-29
+
+Both user-run repeats pass the latched-posture and independent grasp gates. Each
+completes 209 intervals / 627 physics and OSC updates with matching initial state
+and passing runtime safety. Forty read-only checks per run verify provenance,
+actual requests, live initialization, native resolved posture, per-call raw robot
+q and raw contact evidence. First 173 core frames match the passing fixed-gain
+baseline; only the later 36 posture-request fields change. No source files,
+original reports, labels or manufacturer limits are changed.
+
+Both runs measure 1.20 s continuous bilateral contact, about 72.595 mm final
+retained lift and 0.160 mm relative-position jitter. All 15 core arrays and both
+request/execution payloads are exactly equal across the repeats. They share seed,
+attempt offset and initial state: this is repeatability on one exposed condition,
+not two independent tests or a generalization success-rate estimate.
+
+The posture objective can therefore be initialized on the robot side and held
+through this case, without executing saved per-frame posture targets. Keep this
+as a passing development baseline together with the earlier recorded-posture
+reference. The sampled robot-variation recipe still remains explicit, alongside
+recorded target motion, orientation/settings schedules and gripper requests.
+No universal nominal profile or learned-policy action contract is established.
+No runtime changes in this result update; the prior 193 CPU checks apply. See
+[source-hashed evidence](../../results/summaries/2026-10-29-latched-posture-probe-result.json).

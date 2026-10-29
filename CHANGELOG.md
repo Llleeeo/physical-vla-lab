@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Live-initialized latched posture grasps successfully
+
+- Both user runs complete 209 intervals / 627 physics and OSC updates with safe, independently verified grasping. Runtime anchor generation, raw robot-state correspondence and isolated input-change audits pass; 40 read-only checks pass per run.
+- Both use the same seed/initial condition and reproduce all 15 core arrays exactly. Each retains 1.2 s bilateral contact, about 72.595 mm final lift and 0.160 mm relative-position jitter. This is exposed-case repeatability, not an independent success-rate estimate.
+- Adopt the live-initialized posture configuration as a passing development baseline. Recorded target motion and other settings remain; no learned-policy success is claimed. Runtime unchanged in this result update; prior 193 CPU checks apply.
+
 ## 2026-10-29 — Robot-side latched-posture comparison prepared
 
 - Add an opt-in posture anchor generated once from live initial joints and declared sampled robot variation, retained throughout the stream. Configuration excludes saved q/anchor and object state; native bounds and collision projection remain.
