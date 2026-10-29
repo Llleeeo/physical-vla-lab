@@ -1,12 +1,12 @@
 # Results and limitations
 
-Snapshot: **2026-10-29, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
+Snapshot: **2026-10-30, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
 ## Matched fresh control unavailable; startup resource shortage measured
 
 Fresh60 run `20261030_000853_155886_fresh60` repeats the same Omniverse Client mutex abort during the first guarded update, before any attempt. The loading barrier has not reliably fixed startup. No new grasp result exists; the earlier exact three-episode history reproduction stands.
 
-A separate no-physics/no-renderer CPU USD loader reports30 inotify ENOSPC watch-creation failures; direct resource probing allocates only26/512 watches. Host limit is65536 and VS Code holds approximately64927 watch references. Disk availability is357G. Watch exhaustion is confirmed, while its causal relationship to the Client abort remains unknown. Local watch exclusions await window reload; an admission probe now prevents simulator launch when insufficient.267 CPU checks pass; no GPU was launched by agent. [Evidence and next action](NATIVE_STARTUP_RESOURCES.md).
+A separate no-physics/no-renderer CPU USD loader reports30 inotify ENOSPC watch-creation failures; direct resource probing allocates only26/512 watches. Host limit is65536 and VS Code holds approximately64927 watch references. Disk availability is357G. Watch exhaustion is confirmed, while its causal relationship to the Client abort remains unknown. An admission probe prevents simulator launch when insufficient. After VS Code reload, summed watch references fall to 581, the allocation probe passes 512/512, and the same CPU-only USD loader opens the scene with zero watch errors. Matched fresh60 CPU preflight and exact collector/history checks pass. Resource recovery is verified; native simulator stability and crash causation remain unestablished. The next step is one matched fresh60 run without rendering. No GPU was launched by the agent. [Evidence and next action](NATIVE_STARTUP_RESOURCES.md).
 
 ## Original worker history reproduced; matched-startup fresh control pending
 

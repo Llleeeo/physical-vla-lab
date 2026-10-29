@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-30 — Watch resources recover after editor reload
+
+- Verify the old large watcher exits, summed watch references fall to 581, and the independent allocation probe passes 512/512. CPU-only USD load opens the task normally with zero watch errors.
+- Matched fresh60 CPU preflight and exact collector/history checks pass. Prepare one user-run simulator retest without rendering; no controller, physics or SDK changes. Native-crash causation remains unproven.
+
 ## 2026-10-30 — Fresh control blocked; inotify exhaustion measured
 
 - Same native Client mutex stack recurs on the first stage-load-barrier update; no attempt starts. The barrier does not reliably avoid the crash.

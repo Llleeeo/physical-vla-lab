@@ -4,7 +4,7 @@ The original attempts58,59,60 occurred in one worker. Their saved lengths are720
 
 ## Current environment blocker
 
-The matched fresh60 launch aborts before any attempt with the same Client stack. The stage-load barrier does not reliably avoid startup failure. Inotify resource exhaustion has now been independently measured; see [startup resources](NATIVE_STARTUP_RESOURCES.md) before another simulation. Local VS Code exclusions await window reload and the coordinator now checks watcher headroom before SDK startup.
+The matched fresh60 launch aborts before any attempt with the same Client stack. The stage-load barrier does not reliably avoid startup failure. Inotify resource exhaustion has now been independently measured; see [startup resources](NATIVE_STARTUP_RESOURCES.md) before another simulation. After VS Code reload, watch allocation and CPU scene loading pass with zero watch errors; the coordinator checks watcher headroom before SDK startup. A matched fresh60 simulator retest is now ready, with native-crash causation still unproven.
 
 ## Observed reproduction and one matched-startup control (30 October)
 

@@ -10,7 +10,7 @@ This is an independent research integration, not the upstream RoboPhys benchmark
 
 The guarded worker-history launch now reproduces all three selected original episodes: failed58, failed59 and successful60, with all15 full-length action/observation arrays per episode matching exactly. The target retains at least60.349mm lift. A [single matched-startup fresh60 control](docs/project/WORKER_HISTORY_DIAGNOSTIC.md#observed-reproduction-and-one-matched-startup-control-30-october) is prepared to distinguish process history from changed startup scheduling (263 CPU checks). This is expert reproducibility evidence; learned ball-policy success remains unestablished.
 
-The matched fresh60 control is currently blocked by another pre-episode Client abort. A [verified Linux watch-resource shortage](docs/project/NATIVE_STARTUP_RESOURCES.md) is being addressed: local VS Code exclusions await window reload, and a new admission probe rejects insufficient resources before simulator launch. Crash causation and the fresh-control result remain unestablished.267 CPU checks pass.
+The [Linux watch-resource shortage](docs/project/NATIVE_STARTUP_RESOURCES.md) has recovered after VS Code reload: 512/512 allocation and CPU scene-loading checks pass with zero watch errors. One matched fresh60 simulator retest is pending; native-crash causation and the fresh-control result remain unestablished. 267 portable CPU checks previously passed; runtime code is unchanged in this evidence update.
 
 | Workstream | Verified progress | Remaining work |
 |---|---|---|

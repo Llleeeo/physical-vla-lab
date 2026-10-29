@@ -62,14 +62,13 @@
       "__pycache__"
     ],
     "scope": "VS Code recursive watch notifications only; no data or simulator source changed",
-    "activation": "Pending VS Code window reload; current watcher occupancy unchanged after file creation",
+    "activation": "User reloaded VS Code; old large watcher exited, 512/512 allocation passed, and CPU USD load has zero watch errors.",
     "admission_check": "Request512 temporary IN_ATTRIB watches; always close descriptor and remove files; abort before simulator launch if unavailable",
     "rollback": "Remove new local workspace settings and revert the preflight addition; no kernel parameter changed"
   },
   "pending": [
-    "User reloads VS Code window",
-    "Recheck watch allocation and minimal USD warning count",
-    "Only after resources recover, run the matched-startup fresh60 control"
+    "User runs one matched-startup fresh60 simulation; no rendering",
+    "Inspect native startup and physical outcome before attributing the earlier native abort to watch exhaustion"
   ],
   "validation": {
     "portable_cpu_tests": 267,
@@ -99,5 +98,35 @@
   "references": [
     "https://man7.org/linux/man-pages/man2/inotify_add_watch.2.html",
     "https://code.visualstudio.com/docs/setup/linux"
-  ]
+  ],
+  "after_reload": {
+    "resource_observation": {
+      "probe": {
+        "allocated": 512,
+        "errno": null,
+        "max_user_instances": 128,
+        "max_user_watches": 65536,
+        "passed": true,
+        "phase": "complete",
+        "requested": 512,
+        "schema": "physical-vla-lab.inotify-preflight.v1",
+        "scope": "Admission probe only; not an Isaac stability guarantee"
+      },
+      "summed_watch_fd_references": 581,
+      "old_large_watcher_exited": true,
+      "snapshot_caveat": "References can change and shared descriptors may be counted twice."
+    },
+    "cpu_usd_loader_stage_open_passed": true,
+    "cpu_usd_loader_exit_code": 0,
+    "watch_creation_errors": 0,
+    "physics_or_renderer_started": false,
+    "matched_fresh60_cpu_preflight_passed": true,
+    "native_collector_hash_matches_history": true,
+    "native_simulation_retest": "pending user run",
+    "evidence_sha256": {
+      "capstone_cpu_usd_after_reload.log": "a22a02eeca14929a458e5010b9b55599877061db041b566243a78bca99c66e0a",
+      "after_reload_resources.json": "328efc9fc06a6fefc3f8d06ca09cc304a76043de168708868aad95a4d0304393",
+      "capstone_after_reload_cpu_preflight.log": "fbb38537b717bc301ccd38b3e43393f94d4fc98d7aabe84057a3301b33e0b6f5"
+    }
+  }
 }
