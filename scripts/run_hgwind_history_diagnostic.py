@@ -25,7 +25,7 @@ FRESH = ROOT / 'data/derived/hgwind_effort_probes/20261029_225526_640181_joint_o
 ATTEMPTS = [58, 59, 60]
 
 
-def prepare(native_backtrace=False):
+def prepare(native_backtrace=False, stage_load_barrier=False):
     plan = json.loads((FRESH / 'plan.json').read_text())
     require(plan['attempt_offset'] == 60 and plan['seed'] == 202610280, 'Fresh reference differs')
     require(json.loads((FRESH / 'report.json').read_text())['recorded_frames'] == 169, 'Fresh reference changed')
@@ -44,11 +44,14 @@ def prepare(native_backtrace=False):
     out = ROOT / 'data/derived/hgwind_history_diagnostics' / stamp
     plan.pop('native_debugger', None)
     plan.update(output=str(out), worker_output=str(out / 'worker_output'), attempt_offset=58,
-        history_attempts=ATTEMPTS, native_debugger_requested=native_backtrace,
+        history_attempts=ATTEMPTS, native_debugger_requested=native_backtrace, stage_load_barrier=stage_load_barrier,
         fresh_reference=str(FRESH), fresh_plan_sha256=sha256(FRESH/'plan.json'), fresh_report_sha256=sha256(FRESH/'report.json'),
         original_worker_context=context, original_log_sha256=sha256(LOG),
         reference_fidelity='One frozen native worker, original attempts58/59/60, normal reset and safety exits; no source actions execute.')
     for name in ['src/capstone_vla/hgwind_history.py','scripts/sim/run_hgwind_history_worker.py','scripts/run_hgwind_history_diagnostic.py']:
+        plan['adapter_sha256'][str(ROOT/name)] = sha256(ROOT/name)
+    if stage_load_barrier:
+        name = 'src/capstone_vla/scene_load_barrier.py'
         plan['adapter_sha256'][str(ROOT/name)] = sha256(ROOT/name)
     import hashlib
     patched = assemble(plan)
@@ -109,7 +112,7 @@ def finish(out, code, render=False):
     episodes = index_saved_episodes(plan['worker_output'], TASK_ID)
     result = dict(schema='physical-vla-lab.hgwind-history.v1', worker_exit=code,
         requested_attempts=ATTEMPTS, saved_attempts=sorted(episodes), cases=[], learned_policy_evaluated=False,
-        complete=False, physical_success=False, render_requested=render, native_backtrace=str(out/'native_backtrace.log') if (out/'native_backtrace.log').exists() else None, interpretation='Incomplete history cannot answer the attempt60 history hypothesis.')
+        complete=False, physical_success=False, render_requested=render, stage_load_barrier_requested=bool(plan.get('stage_load_barrier')), stage_load_barrier_evidence=json.loads((out/'stage_load_barrier.json').read_text()) if (out/'stage_load_barrier.json').exists() else None, native_backtrace=str(out/'native_backtrace.log') if (out/'native_backtrace.log').exists() else None, interpretation='Incomplete history cannot answer the attempt60 history hypothesis.')
     for index, episode in sorted(episodes.items()):
         case = plan['history_cases'][str(index)]; location = Path(case['output'])
         row = dict(attempt_index=index, original_episode=case['episode'], run=str(location), analysis_complete=False,render_complete=False)
@@ -155,12 +158,15 @@ def finish(out, code, render=False):
     order_path=out/'attempt_order.jsonl'
     order=[json.loads(line)['attempt_index'] for line in order_path.read_text().splitlines()] if order_path.exists() else []
     result['observed_attempt_order']=order
-    result['complete'] = code == 0 and sorted(episodes)==ATTEMPTS and order==ATTEMPTS and all(x['analysis_complete'] and (not render or x['render_complete']) for x in result['cases'])
+    stage_evidence = result['stage_load_barrier_evidence'] or {}
+    result['stage_load_barrier_verified'] = bool(stage_evidence.get('ready') is True and stage_evidence.get('held_script_instances') == 0 and stage_evidence.get('initial_timeline_time') == stage_evidence.get('final_timeline_time')) if plan.get('stage_load_barrier') else None
+    startup_ok = not plan.get('stage_load_barrier') or result['stage_load_barrier_verified'] is True
+    result['complete'] = startup_ok and code == 0 and sorted(episodes)==ATTEMPTS and order==ATTEMPTS and all(x['analysis_complete'] and (not render or x['render_complete']) for x in result['cases'])
     target = next((x for x in result['cases'] if x['attempt_index']==60),{})
     result['target_grasp_status'] = target.get('grasp', 'not_evaluated')
-    result['physical_success'] = bool(target.get('analysis_complete') and target.get('grasp')=='pass' and target.get('runtime_safety') and target.get('initial_state_match'))
+    result['physical_success'] = bool(startup_ok and target.get('analysis_complete') and target.get('grasp')=='pass' and target.get('runtime_safety') and target.get('initial_state_match'))
     if result['complete']:
-        result['interpretation']='Compare original and fresh startup/native arrays before attributing any result to history; this remains a development expert experiment.'
+        result['interpretation']=('Startup attach sequencing changed under an opt-in workaround; this is a modified-startup history experiment. ' if plan.get('stage_load_barrier') else '')+'Compare original and fresh startup/native arrays before attributing any result to history; this remains a development expert experiment.'
     (out/'report.json').write_text(json.dumps(result,indent=2)+'\n')
     lines=['# Worker-history video review','','Raw trajectories retained. Rendering is optional; skipped views have not been visually reviewed.','']
     for row in result['cases']:
@@ -179,6 +185,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--run',action='store_true')
     parser.add_argument('--native-backtrace',action='store_true')
+    parser.add_argument('--stage-load-barrier',action='store_true',help='Experimental stopped-timeline stage attach barrier before robot USD edits')
     parser.add_argument('--render',action='store_true',help='Opt in to five-view review videos; default analyzes only')
     parser.add_argument('--finish',type=Path,help='Analyze/render a completed run without launching physics again')
     args=parser.parse_args()
@@ -186,8 +193,9 @@ def main():
         require(not args.run,'--finish never launches collection')
         out=args.finish.resolve();out.relative_to(ROOT/'data/derived/hgwind_history_diagnostics')
         return finish(out,json.loads((out/'worker_exit.json').read_text())['exit_code'],render=args.render)
-    plan,command,lab=prepare(args.native_backtrace)
+    plan,command,lab=prepare(args.native_backtrace,args.stage_load_barrier)
     plan['render_requested'] = args.render
+    if args.stage_load_barrier:print('STARTUP_WORKAROUND stage_load_barrier=true efficacy=unverified physics_parameters_unchanged=true',flush=True)
     print('RENDER_MODE '+('enabled' if args.render else 'skipped; raw trajectories retained'),flush=True)
     print('COMMAND '+shlex.join(command),flush=True)
     if not args.run:return 0

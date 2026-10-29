@@ -8,6 +8,8 @@ This is an independent research integration, not the upstream RoboPhys benchmark
 
 ## Current status — 29 October 2026
 
+The latest worker-history launch aborts during scene loading in the Omniverse Client library, before any grasp attempt. A guarded, opt-in [startup wait workaround](docs/project/WORKER_HISTORY_DIAGNOSTIC.md#current-blocker-and-optional-startup-workaround) is prepared and CPU validated (260 checks); simulator efficacy and the history comparison remain pending.
+
 | Workstream | Verified progress | Remaining work |
 |---|---|---|
 | Franka action interface | Recorded-tool FK verified across all 40 ball episodes; explicit Cartesian request execution grasps successfully on one exposed seed without online task/skill decisions | Live policy action contract and learned dynamic grasping |

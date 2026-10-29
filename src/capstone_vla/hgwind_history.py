@@ -40,9 +40,14 @@ def begin_attempt(index):
     print('HISTORY_ATTEMPT index=%d ordinal=%d/3' % (index, len(_SEEN)), flush=True)
 
 
-def patch_history_collector(source):
+def patch_history_collector(source, stage_load_barrier=None):
     from .hgwind_startup_trace import patch_startup_collector
     source = patch_startup_collector(source)
+    if stage_load_barrier is None:
+        stage_load_barrier = bool(_PLAN and _PLAN.get('stage_load_barrier'))
+    if stage_load_barrier:
+        from .scene_load_barrier import patch_scene_load_barrier
+        source = patch_scene_load_barrier(source)
     anchor = '        attempt_index = int(args.attempt_offset) + int(ep)'
     if source.count(anchor) != 1:
         raise ValueError('History attempt boundary changed')
@@ -64,7 +69,7 @@ def assemble(plan):
     if source.count(anchor) != 1:
         raise ValueError('Frozen profile insertion changed')
     source = source.replace(anchor, anchor + '\n            "capstone_expert_control": CAPSTONE_PROFILE_SUMMARY(pol),')
-    return patch_capture_collector(patch_history_collector(patch_collector(source)))
+    return patch_capture_collector(patch_history_collector(patch_collector(source), bool(plan.get('stage_load_barrier'))))
 
 
 def index_saved_episodes(worker_output, task_id):

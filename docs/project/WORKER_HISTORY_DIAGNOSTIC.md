@@ -2,6 +2,26 @@
 
 The original attempts58,59,60 occurred in one worker. Their saved lengths are720,363,319 control frames; the first two failed grasping without a safety abort and the third succeeded. A fresh-worker attempt60 instead differs in ball velocity after the first physical step and eventually aborts on motion feasibility. This experiment tests whether reproducing the original within-worker history changes that mismatch. It does not identify a unique reset/cache/force mechanism or evaluate a learned policy.
 
+## Current blocker and optional startup workaround
+
+The user run `20261029_232920_958901` aborts after `open_stage()` returns, before attempt58 starts. GDB locates the exception in `libomniclient.so`, on its `OC Tick` thread. Disassembly of the matching installed library places the throw after a failed `pthread_mutex_lock`, on an internal callback path. The mutex/request ownership and triggering file remain unknown; this does not establish a disk, network, physics or controller cause. No history or grasp outcome was evaluated.
+
+A CPU-only check of the same installed client2.55.0 succeeds for100 local stat/subscription/callback/stop cycles, with Hub disabled for that isolation check. It starts no SimulationApp and cannot validate Kit attachment. [Hashed observations and limitations](../../results/summaries/2026-10-29-startup-client-abort.json).
+
+The frozen collector immediately prepares robot USD after `open_stage()` returns. Other code in that same collector acknowledges that Kit attachment may still be pending. An **opt-in, unproven workaround** waits for attach completion before these robot edits. It holds both the existing script-load barrier and pending script-application calls, requires a stopped and unchanged timeline and no script instances, and restores the native method on success/error/timeout. It never calls Play or a physics-step method. The wait is bounded by1200 Kit updates and a60s wall budget checked between updates; one blocked native update can still exceed that budget. Intermediate evidence is written atomically to `stage_load_barrier.json`.
+
+```bash
+cd /home/robophys/Capstone_Project_Yuan_Haoming
+
+data/derived/hf_pilot_render_repo/.venv/bin/python \
+  scripts/run_hgwind_history_diagnostic.py \
+  --stage-load-barrier --native-backtrace --run
+```
+
+This changes startup scheduling and must be identified as a modified-startup comparison. Reaching `STAGE_LOAD_BARRIER ready` only confirms its guards; it does not prove the intermittent crash is fixed. A complete history still requires all three original attempts, source/initial-state comparisons and independent physical evidence. Missing/failed barrier evidence blocks diagnostic completion. Existing source files, physics values and control profile are preserved. Rendering remains off by default. Omit the option to recover the original collector assembly, whose SHA256 is verified identical to the previous run.
+
+260 portable CPU checks, including17 focused history checks, actual scene/source preflight, Python3.10 parsing and actual native-entry assembly checks pass. No new simulator execution was launched by the agent. Proposed GPU execution is pending.
+
 ## Run once
 
 ```bash

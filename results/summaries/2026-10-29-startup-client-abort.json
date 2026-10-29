@@ -1,0 +1,65 @@
+{
+  "schema": "physical-vla-lab.startup-client-abort.v1",
+  "date": "2026-10-29",
+  "experiment": "hgwind history58/59/60",
+  "execution_status": "native_abort_before_first_attempt",
+  "observed_attempts": [],
+  "saved_episodes": 0,
+  "target_grasp": "not_evaluated",
+  "learned_policy_evaluated": false,
+  "signal": "SIGABRT",
+  "throw": "std::system_error: Invalid argument",
+  "thread": "OC Tick",
+  "library": "libomniclient.so",
+  "client_version": "2.55.0-release.5430+gl.8c72f64b",
+  "stack_observation": "pthread_mutex_lock error path to std::__throw_system_error, called from an internal Omniverse Client callback path and Core::singleTick",
+  "root_cause": "unknown; specific resource, request ownership, network, hardware and controller causes are not established",
+  "source_hashes": {
+    "plan.json": "2811549f19372d16a250f5c34bca3a7e9864959748645d4d1bfb4f48bae9d63a",
+    "report.json": "3478e031ca0674a4478a3947256d5a77bc6787f6dbc06d3fa17c832881f7c22f",
+    "simulation.log": "2b941f7f2c44b888ce4fc69220e2f1a941e86c3b69f3996b5e9cec92e4d4085b",
+    "native_backtrace.log": "657375a6dbf551a58e7d744465c8c837bfacd185bb596eb66ca136fb7ea1ee79"
+  },
+  "cpu_client_probe": {
+    "iterations": 100,
+    "operations": [
+      "local stat",
+      "stat subscribe",
+      "callback completion",
+      "request stop"
+    ],
+    "passed": true,
+    "simulation_app_started": false,
+    "hub_mode": "disabled for this CPU-only isolation",
+    "limitation": "Does not exercise Kit stage attachment or reproduce the intermittent crash",
+    "script_sha256": "96490b6d84e582da2a10b24027307c1a1647108ce054bce1cb494a758e390b0f"
+  },
+  "proposed_workaround": {
+    "flag": "--stage-load-barrier",
+    "scope": "history diagnostic process only",
+    "operation": "Defer script loading/application, pump bounded Kit attach updates with stopped timeline, then resume native robot USD preparation",
+    "update_cap": 1200,
+    "wall_budget_s": 60,
+    "physics_parameters_changed": false,
+    "implementation": "CPU validated; no simulator efficacy result",
+    "limitation": "Adds startup updates and changes startup ordering; cannot be called an exact original-startup reproduction or a proven crash fix"
+  },
+  "validation": {
+    "portable_cpu_tests": 260,
+    "focused_history_tests": 17,
+    "actual_scene_preflight": true,
+    "native_entry_hash_match": true,
+    "python310_parse": true,
+    "default_patched_collector_sha256_unchanged": true,
+    "new_simulator_run_by_agent": false,
+    "render_requested": false
+  },
+  "adapter_hashes": {
+    "src/capstone_vla/scene_load_barrier.py": "72ff7f0337bd77dce286e6f1fb3676f02116586d562eb198affc7f3e149d5ea5",
+    "src/capstone_vla/hgwind_history.py": "9c31297a268b9aae3173e8f0933677db057ffd7c22fba18860e86ca6a22fb937",
+    "scripts/run_hgwind_history_diagnostic.py": "cad4a860c7d235609f69406c88d7f97c304f878e844af1252ef4919729e97e15",
+    "tests/test_hgwind_history.py": "34f579c2ee53f456949d149d61c2a86428ba29cd940b40dc496a9630bf648f4c"
+  },
+  "library_sha256": "5e6099c765af7959367ccc2fbd844c55482f40ed77ae95320f1ed259c84a0707",
+  "lock_error_callsite_offset": "0x5aaff3"
+}

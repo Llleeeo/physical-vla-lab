@@ -128,3 +128,65 @@ def test_partial_history_optional_render_without_relaunching_physics(tmp_path,mo
     if render:assert commands[0][1].endswith('render_hgwind_effort_probe.py')
     else:assert report['cases'][0]['render_status']=='skipped_by_request'
     assert (episode/'replay.hdf5').read_bytes()==b'fixture'
+
+
+@pytest.mark.parametrize('failure', [None, 'pending', 'update', 'clock', 'playing'])
+def test_stage_load_wait_defers_scripts_and_restores_native_apply(tmp_path, failure):
+    from capstone_vla.scene_load_barrier import wait_for_stage
+    timeline = SimpleNamespace(is_stopped=lambda:True,get_current_time=lambda:0.)
+    manager = SimpleNamespace(_prim_to_scripts={})
+    calls=[]
+    def native_apply(prim):calls.append(prim)
+    manager._apply_scripts=native_apply
+    class Barrier:
+        _released=False
+        _manager=manager
+        def hold(self):pass
+    barrier=Barrier();manager._load_all_scripts=barrier.hold
+    updates=[]
+    def update():
+        manager._apply_scripts('must-stay-deferred')
+        updates.append(1)
+        if failure=='update':raise ValueError('attach failed')
+        if failure=='clock':timeline.get_current_time=lambda:.01
+        if failure=='playing':timeline.is_stopped=lambda:False
+    context=SimpleNamespace(get_stage_loading_status=lambda:('',1,1 if failure=='pending' else 0))
+    app=SimpleNamespace(update=update)
+    path=tmp_path/'stage.json'
+    if failure:
+        with pytest.raises((RuntimeError,ValueError,TimeoutError)):
+            wait_for_stage(context,app,manager,barrier,timeline,path,max_updates=3)
+    else:
+        report=wait_for_stage(context,app,manager,barrier,timeline,path,max_updates=3)
+        assert report['ready'] is True and report['updates']==2
+        assert report['initial_timeline_time']==report['final_timeline_time']==0
+    assert manager._apply_scripts is native_apply and calls==[]
+    result=json.loads(path.read_text())
+    assert result['ready'] is (failure is None)
+    assert result['deferred_apply_calls']==len(updates)
+    if failure:assert 'error' in result
+    manager._apply_scripts('restored');assert calls==['restored']
+
+
+def test_stage_load_wait_rejects_started_scripts_before_any_update(tmp_path):
+    from capstone_vla.scene_load_barrier import wait_for_stage
+    manager=SimpleNamespace(_prim_to_scripts={'/fan':{'script':object()}})
+    barrier=SimpleNamespace(_released=False,_manager=manager)
+    with pytest.raises(RuntimeError,match='precede'):
+        wait_for_stage(None,None,manager,barrier,SimpleNamespace(is_stopped=lambda:True),tmp_path/'unused')
+    assert list(tmp_path.iterdir())==[]
+
+
+def test_stage_wait_patch_precedes_robot_mutation_and_rejects_missing_anchor():
+    from capstone_vla.scene_load_barrier import patch_scene_load_barrier
+    source="""def load():
+    _st0 = omni.usd.get_context().get_stage()
+    if _st0 is None:
+        raise RuntimeError()
+    _strip_robot_script(_st0, '/robot')
+def _inspect_loaded_scripts(_st0, robot_script_removed, allow_no_scripts):
+    pass
+"""
+    patched=patch_scene_load_barrier(source)
+    assert patched.index('    CAPSTONE_WAIT_STAGE_LOAD(')<patched.index('    _strip_robot_script(')
+    with pytest.raises(ValueError,match='boundary'):patch_scene_load_barrier('pass')

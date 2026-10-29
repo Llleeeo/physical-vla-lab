@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Scene-load crash localized; bounded workaround prepared
+
+- Capture the history launch abort before any attempt: Omniverse Client `OC Tick`, failed mutex-lock throw in its internal callback path. Specific cause remains unknown; no grasp or history result exists. A100-cycle CPU-only local client check passes but does not exercise Kit.
+- Add opt-in `--stage-load-barrier`: finish Kit attachment with scripts deferred and timeline stopped before native robot USD edits. Preserve original default assembly, source/controller/physics and no-render default; record guards and require valid evidence. The startup sequence changes, and simulator efficacy is unverified.
+- 260 portable CPU checks, actual scene/source preflight and exact native-entry assembly checks pass. No simulator run by agent.
+
 ## 2026-10-29 — Worker-history rendering becomes optional
 
 - At the user’s request, default history runs now collect/analyze only and retain raw trajectories. Explicit `--render` opts into videos, including later `--finish --render`.

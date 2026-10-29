@@ -2,6 +2,12 @@
 
 Snapshot: **2026-10-29, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## History launch blocked by native client abort
+
+The user’s history launch `20261029_232920_958901` aborts during scene loading with no observed/saved attempt. GDB locates `std::system_error/Invalid argument` in `libomniclient.so` on `OC Tick`; matching-binary inspection identifies the failed mutex-lock path. The underlying resource/ownership failure is unknown. This is unavailable history evidence, not zero successful grasps out of three.
+
+The optional [stage-load barrier](WORKER_HISTORY_DIAGNOSTIC.md#current-blocker-and-optional-startup-workaround) now defers script application and waits for stopped-timeline attachment before native robot USD edits. It is CPU validated, with260 portable checks and actual scene/native-entry preflight; its ability to avoid the native crash is untested. It changes startup scheduling, so any future result must state that condition. The default patched collector is hash-identical to the previous launch, and rendering remains optional. [Source hashes and scope](../../results/summaries/2026-10-29-startup-client-abort.json).
+
 ## Worker-history experiment prepared; physical result pending
 
 The [new bounded command](WORKER_HISTORY_DIAGNOSTIC.md) executes original attempts58/59/60 in one native worker, then analyzes every saved result. Rendering is now optional at the user’s request (`--render`); skipped video generation does not imply a failed diagnostic. Original outcomes were failed720frames, failed363frames and successful319frames. An unchanged safety exit can truncate this sequence; no automatic worker restart is allowed. Compare startup physics and full arrays with originals and the previously measured fresh attempt60 before interpreting a grasp outcome.
