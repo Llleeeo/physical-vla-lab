@@ -4,8 +4,8 @@
 
 The exposed upper-target feedback run already succeeds. Its native expert still
 selects when to call the pose API, commands jaws, refreshes safety context and
-switches to a joint-only tail. The next isolated probe removes those online
-decisions. `cartesian_packets.py` provides an explicit numeric request boundary
+switches to a joint-only tail. The explicit packet probe now removes those online
+decisions and passes independent physical-grasp checks on one exposed case. `cartesian_packets.py` provides an explicit numeric request boundary
 around the existing native robot servo; it does not select the final DynamicVLA
 action dimension or certify a learned controller.
 
@@ -183,3 +183,36 @@ portable suite to 170 passes, including update ordering, history advancement,
 stale-context detection and invalid-pose rejection. Python 3.10 parsing and scene
 preflight pass. Original reports and limits remain unchanged; the same physical
 command above must still be rerun to determine final grasp performance.
+
+
+## Physical packet gate passed — 2026-10-29
+
+After restoring robot-motion safety context, the same packet command completes
+209/209 intervals with 627 physics updates and 627 native OSC callbacks. Packet
+alignment, commanded-jaw context, causal robot-motion context, initial-state
+identity and runtime safety all pass. Read-only recomputation of the packet audit
+and raw 180 Hz contact evidence matches the saved report; 30 source/execution
+hash checks pass. Original reports and source files remain unchanged.
+
+The first 194 control-reference rows and all 15 core HDF5 arrays for those frames
+exactly match the passing source. The first changed action is frame 194 and first
+changed measured robot/object position is 195, when the explicit Cartesian hold
+replaces the source joint tail. Full-episode exact equality is not claimed.
+Independent checks measure 72 consecutive bilateral-contact bins (1.2 s), at
+least 74.861 mm final retained lift and 0.131 mm relative-position jitter. The
+object moves at 0.2263 m/s immediately before first contact. No grasp assistance
+or manufacturer-limit changes are present.
+
+The original collector still saves `failed_00000` with FSM success false: this
+probe bypasses the online decision loop that would update that FSM. Those files
+and labels remain unchanged. `packet_controller_probe_passed=true` and the
+independent contact/lift/retention report are this engineering experiment's
+result; official benchmark certification is not asserted.
+
+This removes online expert decisions, explicit jaw ownership and joint-tail
+dependencies. Recorded upper motion, numeric settings/posture schedule, native
+servo state and non-target geometry safety remain. It does not establish a
+pose-only DynamicVLA action contract. Next, define and test a fixed policy-facing
+controller profile and a compatible motion-reference construction against this
+passing baseline before batch conversion/training. See the [source-hashed
+result](../../results/summaries/2026-10-29-cartesian-packet-success.json).

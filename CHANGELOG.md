@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Explicit Cartesian packet execution grasps successfully
+
+- The corrected user-run packet controller completes 209 intervals / 627 physics and OSC updates safely, with no online task/skill decisions or expert joint-only terminal tail. Raw audit and contact recomputation match the saved report.
+- First 194 references and all 15 core arrays match the exposed source exactly. The 15-frame Cartesian terminal hold retains the ball: 1.2 s bilateral contact, at least 74.861 mm retained lift and 0.131 mm relative-position jitter. No assistance or limit changes.
+- Source numeric motion/settings remain explicit dependencies; this is one engineering gate, not VLA or generalization success. The unchanged collector FSM label remains false and is not relabeled. Runtime code is unchanged; the prior 170 CPU checks apply.
+
 ## 2026-10-29 — Restore measured robot motion in packet safety context
 
 - Jaw-context correction allows the full safe 209-frame packet rollout, but retention fails. First arm-command divergence is frame 156; recorded robot/object states remain exact through that frame.

@@ -1,0 +1,111 @@
+{
+  "schema": "physical-vla-lab.cartesian-packet-result.v1",
+  "date": "2026-10-29",
+  "status": "EXPOSED_EXPLICIT_PACKET_EXECUTION_AND_GRASP_PASSED",
+  "implementation_commit": "995a79b4f940055b6221412ed583da228b26d0ed",
+  "source_reference_sha256": "e1b54faae644b64f8148b0fe0397d74287f06d7c48fa97ee34a054339a72e3d3",
+  "task_sha256": "83330198e8a5a70758eda7b8ead447f61b3289c4206d738507ab6c77a806a6c7",
+  "artifact_sha256": {
+    "plan.json": "8b31344bebcb46a51dadd48b9950d5ca9e0d0ad5bf39860e6818ed6688e6480b",
+    "report.json": "f7dc1640841d5e39ef587146f9ef592e9adf9dad1fc2f625d0ec1385ca11818f",
+    "cartesian_packet_execution.json": "63dc33361fbf4a2d3bb053216734a6a901560ea9d167003a9edc0f6a983668f0",
+    "packet_requests.json": "537cbcc680c085f542f37efcd8037094fb2430bae57666c9323ae081ec291228",
+    "original_expert_control_references.json": "605cd3482925ca222c7bdb4b0b5a388a0f8bf857a96cfcf6bac76a7d91386c44",
+    "command_diagnostics.npz": "996bbbf1550a29d5ea3d0a9518398ba0ed030b7093ab994c6e876dbad219748d",
+    "worker_output/meta.json": "3cfaec7351950f9e0569ade86473344ae2862fbff2c6a2dca8647474c2f91173",
+    "worker_output/replay.hdf5": "bd84d3b85b9be0e9f9b2c06701e4542e254408f3d767195506f0a02c64fc4ecd"
+  },
+  "frames": 209,
+  "completed_intervals": 209,
+  "physics_callbacks": 627,
+  "osc_callbacks": 627,
+  "initial_state_match": true,
+  "runtime_safety_passed": true,
+  "packet_controller_probe_passed": true,
+  "packet_audit": {
+    "exact_requests_and_gripper": true,
+    "safety_jaw_context_matches": true,
+    "causal_robot_safety_motion_verified": true,
+    "full_stream_completed": true,
+    "no_online_skill_decisions_verified": true,
+    "packet_execution_verified": true,
+    "terminal_cartesian_hold_frames": 15,
+    "source_controller_setting_schedule_retained": true,
+    "learned_policy_evaluated": false
+  },
+  "exact_reference_segment_prefix_frames": 194,
+  "all_15_core_arrays_exact_for_first_194_frames": true,
+  "first_changed_action_frame": 194,
+  "first_changed_measured_robot_and_object_position_frame": 195,
+  "source_state_comparison": {
+    "ee_position_mean_mm": 0.10371702164411545,
+    "ee_position_p95_mm": 0.3311905264854431,
+    "ee_orientation_p95_deg": 0.19158985152919078,
+    "first_position_discrepancy_above_0_01mm_frame": 195,
+    "position_error_at_frame_90_mm": 0.0
+  },
+  "independent_grasp_evidence": {
+    "schema": "capstone_grasp_evidence_v1",
+    "status": "pass",
+    "official_benchmark_success": null,
+    "criteria": {
+      "minimum_bilateral_duration_s": 0.25,
+      "final_hold_duration_s": 0.25,
+      "minimum_lift_m": 0.05,
+      "maximum_relative_position_jitter_m": 0.02,
+      "minimum_precontact_speed_m_s": 0.05,
+      "motion_requirement": "linear",
+      "minimum_precontact_angular_speed_rad_s": 0.1,
+      "maximum_final_relative_spin_rad_s": 0.5,
+      "require_lift": true
+    },
+    "checks": {
+      "continuous_bilateral_contact": true,
+      "final_bilateral_hold": true,
+      "sustained_lift": true,
+      "relative_position_retention": true,
+      "bilateral_nonzero_impulses": true,
+      "object_moving_before_first_contact": true,
+      "no_grasp_assistance": true
+    },
+    "measurements": {
+      "frames": 209,
+      "sample_hz": 60.00000000000021,
+      "bilateral_frames": 72,
+      "longest_bilateral_duration_s": 1.1999999999999957,
+      "first_contact_frame": 135,
+      "first_bilateral_frame": 137,
+      "minimum_final_lift_from_first_bilateral_m": 0.07486140727996826,
+      "final_relative_position_jitter_m": 0.0001305347940813571,
+      "object_speed_before_first_contact_m_s": 0.22630296647548676,
+      "object_angular_speed_before_first_contact_rad_s": null,
+      "final_relative_spin_p95_rad_s": null
+    },
+    "scope": "independent engineering check on recorded states; not full geometry/physics-generalization certification"
+  },
+  "raw_contact_evidence_recomputed_and_matched": true,
+  "source_and_execution_hash_checks_passed": 30,
+  "source_files_unchanged": true,
+  "manufacturer_limit_profile_unchanged": true,
+  "collector_fsm_success": false,
+  "collector_label_interpretation": "Online task/skill step is bypassed; its unchanged FSM does not certify packet execution. Independent contact/lift/retention checks pass; no original metadata is relabeled.",
+  "online_task_or_skill_step_executed": false,
+  "expert_joint_fallback_executed": false,
+  "saved_inner_control_outputs_executed": false,
+  "retained_dependencies": [
+    "Recorded upper pose and motion references, including task acceleration",
+    "Recorded numeric gain/posture/orientation/settings and callback-mode schedule",
+    "Native robot servo memory, effort feasibility/limits and fixed jaw-drive initialization",
+    "Initialized geometry helper with current robot motion and explicit jaw state; non-target scene geometry"
+  ],
+  "standalone_learned_policy_contract_verified": false,
+  "vla_evaluated": false,
+  "training_eligible": false,
+  "official_benchmark_success_verified": false,
+  "limits": [
+    "One exposed development episode; not a success-rate, generalization or learned-policy result.",
+    "Target truth is blocked in the request/safety adapter, but the recorded expert request stream was generated from privileged simulation observations.",
+    "The terminal Cartesian hold changes the last 15 intervals; full-episode exact reproduction is not claimed."
+  ],
+  "next_step": "Define and test a policy-facing fixed controller profile and motion-reference construction against this passing packet baseline before batch ball-task conversion or fine-tuning."
+}

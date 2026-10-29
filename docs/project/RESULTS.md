@@ -74,6 +74,28 @@ normally provided by the skipped skill tick. That robot-only context is now
 refreshed, logged and causally audited; 170 CPU checks and scene preflight pass.
 The corrected physical grasp result is pending. See [the motion-context diagnosis](../../results/summaries/2026-10-29-packet-robot-motion-context-diagnosis.json).
 
+## Explicit Cartesian packet grasp: one exposed case
+
+The corrected packet executor passes 209 complete intervals / 627 physics and
+OSC updates, with initial-state identity, runtime safety, explicit jaw mode and
+causal measured-robot-motion context verified. The online task/skill decision
+loop is bypassed and the final 15 intervals use Cartesian hold rather than an
+expert joint tail. First 194 references and all 15 core arrays exactly match
+the source; the remaining hold intervals are intentionally different.
+
+Raw contact-evidence recomputation confirms 1.2 s continuous bilateral contact,
+at least 74.861 mm final retained lift and 0.131 mm relative-position jitter,
+without assistance or limit changes. Thirty source/execution hash checks pass.
+The collector's unchanged FSM success remains false because its decision loop
+is bypassed; no saved labels are relabeled. The separate packet/grasp gates pass.
+
+This validates a recorded numeric request boundary, not a learned VLA. Recorded
+motion and settings remain dependencies; this single exposed case provides no
+success-rate or held-out physical-generalization estimate. The next gate is the
+policy-facing settings/motion contract before ball-task training. No runtime
+code changes in this result update; the prior 170 CPU passes remain applicable.
+See [protocol](CARTESIAN_PACKET_INTERFACE.md) and [hashed evidence](../../results/summaries/2026-10-29-cartesian-packet-success.json).
+
 ## Earlier DynamicVLA integration: irregular egg-object task
 
 Task: `grasp_sliding_motion_on_flat_surface_1s1p_g9wvkk1`. Earlier shorthand called the object a ball; the target is an egg. This task remains a difficult development case.
