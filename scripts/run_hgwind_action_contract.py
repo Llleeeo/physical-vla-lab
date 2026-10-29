@@ -150,19 +150,14 @@ def command(plan,lab):
         '--episode_s',str(plan['frames']/60),'--no-expert-config']
 
 
-def main():
-    parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--baseline-run',type=Path,default=DEFAULT_BASELINE)
-    parser.add_argument('--run',action='store_true')
-    args=parser.parse_args()
-    plan,actions,model_cfg,diagnostics,lab=prepare(args.baseline_run)
+def run_prepared(plan,actions,model_cfg,diagnostics,lab,run=False):
     cmd=command(plan,lab);out=Path(plan['output'])
     print('CPU_PREFLIGHT_OK '+json.dumps(diagnostics),flush=True)
     print('CONTRACT absolute_world_pose=true motion_feedforward=explicit safety_callbacks=always_on hidden_expert_schedule=false',flush=True)
     print('PURPOSE expert_command_interface_validation; learned_policy=false',flush=True)
     print('OUTPUT '+str(out),flush=True)
     print('COMMAND '+shlex.join(cmd),flush=True)
-    if not args.run:
+    if not run:
         print('DRY_RUN_ONLY: add --run');return 0
     out.mkdir(parents=True,exist_ok=False)
     np.save(out/'actions.npy',actions,allow_pickle=False)
@@ -202,6 +197,21 @@ def main():
     report=analyze(out)
     print('NEXT stop_after_integrated_gate; inspect_result_then_validate_3_to_5_distinct_episodes',flush=True)
     return code or (0 if report['ball_action_contract_passed'] else 1)
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    sources=parser.add_mutually_exclusive_group()
+    sources.add_argument('--baseline-run',type=Path)
+    sources.add_argument('--teacher-run',type=Path,help='Fresh verified native expert capture; bounded cohort diagnostic only')
+    parser.add_argument('--run',action='store_true')
+    args=parser.parse_args()
+    if args.teacher_run:
+        from prepare_hgwind_teacher_contract import prepare_teacher
+        prepared=prepare_teacher(args.teacher_run)
+    else:
+        prepared=prepare(args.baseline_run or DEFAULT_BASELINE)
+    return run_prepared(*prepared,run=args.run)
 
 
 if __name__=='__main__':raise SystemExit(main())

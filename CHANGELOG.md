@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-29 — Bounded paired batch with all-outcome videos prepared
+
+- Add a serial three-case teacher/29D-surrogate coordinator, automatic rendering of every saved success/failure and existing passing/failed references, unified five-view video index and protected human notes. Resume does not repeat completed failed physics; missing renderings can retry.
+- Declare binary-jaw schema eligibility before outcomes: 9/20 new local sources supported, 11 intermediate-width sources unsupported, not failed/low-quality labels. Select attempts 60/144/345 (traj_00001/00007/00018); no replacement after teacher failure.
+- Prepare directly from verified aligned native teacher labels without repeating historical component probes. Existing teacher fixture recreates the exact previous 209×29 action array; fixed runtime settings and action contract remain unchanged.
+- Extend rendering to saved episodes without analysis reports or successful filenames, preserve source hashes, and verify every RGB MP4 plus source timing. 13 new regressions bring portable CPU checks to 223; actual three-case/two-render preflights and simulator parsing pass. GPU batch/results/videos remain pending.
+
 ## 2026-10-29 — Integrated interface verified; grasp retention fails
 
 - User run completes 209 intervals / 627 physics and OSC updates with matching initial state, native safety and verified 29D command/live-posture boundary. Independent grasp retention fails: 0.433 s bilateral contact, no final retained lift, 55.786 mm relative-position jitter. Preserve the earlier passing baseline.

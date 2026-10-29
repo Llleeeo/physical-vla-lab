@@ -1,0 +1,198 @@
+{
+  "schema": "physical-vla-lab.bounded-contract-video-batch-preparation.v1",
+  "date": "2026-10-29",
+  "status": "prepared_cpu_verified_gpu_execution_pending",
+  "selection_rule": "schema support before new outcomes; first/middle/last by local attempt index",
+  "selection_scope": {
+    "new_local_sources": 20,
+    "binary_schema_supported": 9,
+    "unsupported_intermediate_jaw_targets": 11
+  },
+  "selected": [
+    {
+      "episode": "traj_00001",
+      "attempt_index": 60,
+      "episode_seed": 3502756008,
+      "frames": 319,
+      "numeric_fingerprint": "7b6afcf4b44b35bdd7e6d71e8e7fe7cab41a28ac4904bea256712b42b604eb52"
+    },
+    {
+      "episode": "traj_00007",
+      "attempt_index": 144,
+      "episode_seed": 1517065935,
+      "frames": 293,
+      "numeric_fingerprint": "847bcd2bd7a7304859765c97625d2e5442b3f0ac882f592425a67becd36b84ec"
+    },
+    {
+      "episode": "traj_00018",
+      "attempt_index": 345,
+      "episode_seed": 1023469613,
+      "frames": 269,
+      "numeric_fingerprint": "38ec099ddc5189192758c96189b10c26f80a830c6545d443bd90377c9c4db249"
+    }
+  ],
+  "schema_screen": [
+    {
+      "episode": "traj_00001",
+      "attempt_index": 60,
+      "gripper_schema_supported": true,
+      "schema_reason": "binary_0_or_0.04m"
+    },
+    {
+      "episode": "traj_00002",
+      "attempt_index": 61,
+      "gripper_schema_supported": true,
+      "schema_reason": "binary_0_or_0.04m"
+    },
+    {
+      "episode": "traj_00003",
+      "attempt_index": 71,
+      "gripper_schema_supported": true,
+      "schema_reason": "binary_0_or_0.04m"
+    },
+    {
+      "episode": "traj_00004",
+      "attempt_index": 95,
+      "gripper_schema_supported": false,
+      "schema_reason": "nonbinary_or_asymmetric_actuator_targets_not_silently_converted"
+    },
+    {
+      "episode": "traj_00005",
+      "attempt_index": 118,
+      "gripper_schema_supported": false,
+      "schema_reason": "nonbinary_or_asymmetric_actuator_targets_not_silently_converted"
+    },
+    {
+      "episode": "traj_00006",
+      "attempt_index": 119,
+      "gripper_schema_supported": true,
+      "schema_reason": "binary_0_or_0.04m"
+    },
+    {
+      "episode": "traj_00007",
+      "attempt_index": 144,
+      "gripper_schema_supported": true,
+      "schema_reason": "binary_0_or_0.04m"
+    },
+    {
+      "episode": "traj_00008",
+      "attempt_index": 146,
+      "gripper_schema_supported": false,
+      "schema_reason": "nonbinary_or_asymmetric_actuator_targets_not_silently_converted"
+    },
+    {
+      "episode": "traj_00009",
+      "attempt_index": 147,
+      "gripper_schema_supported": false,
+      "schema_reason": "nonbinary_or_asymmetric_actuator_targets_not_silently_converted"
+    },
+    {
+      "episode": "traj_00010",
+      "attempt_index": 156,
+      "gripper_schema_supported": false,
+      "schema_reason": "nonbinary_or_asymmetric_actuator_targets_not_silently_converted"
+    },
+    {
+      "episode": "traj_00011",
+      "attempt_index": 157,
+      "gripper_schema_supported": false,
+      "schema_reason": "nonbinary_or_asymmetric_actuator_targets_not_silently_converted"
+    },
+    {
+      "episode": "traj_00012",
+      "attempt_index": 172,
+      "gripper_schema_supported": false,
+      "schema_reason": "nonbinary_or_asymmetric_actuator_targets_not_silently_converted"
+    },
+    {
+      "episode": "traj_00013",
+      "attempt_index": 256,
+      "gripper_schema_supported": true,
+      "schema_reason": "binary_0_or_0.04m"
+    },
+    {
+      "episode": "traj_00014",
+      "attempt_index": 262,
+      "gripper_schema_supported": false,
+      "schema_reason": "nonbinary_or_asymmetric_actuator_targets_not_silently_converted"
+    },
+    {
+      "episode": "traj_00015",
+      "attempt_index": 263,
+      "gripper_schema_supported": true,
+      "schema_reason": "binary_0_or_0.04m"
+    },
+    {
+      "episode": "traj_00016",
+      "attempt_index": 273,
+      "gripper_schema_supported": false,
+      "schema_reason": "nonbinary_or_asymmetric_actuator_targets_not_silently_converted"
+    },
+    {
+      "episode": "traj_00017",
+      "attempt_index": 295,
+      "gripper_schema_supported": true,
+      "schema_reason": "binary_0_or_0.04m"
+    },
+    {
+      "episode": "traj_00018",
+      "attempt_index": 345,
+      "gripper_schema_supported": true,
+      "schema_reason": "binary_0_or_0.04m"
+    },
+    {
+      "episode": "traj_00019",
+      "attempt_index": 346,
+      "gripper_schema_supported": false,
+      "schema_reason": "nonbinary_or_asymmetric_actuator_targets_not_silently_converted"
+    },
+    {
+      "episode": "traj_00020",
+      "attempt_index": 356,
+      "gripper_schema_supported": false,
+      "schema_reason": "nonbinary_or_asymmetric_actuator_targets_not_silently_converted"
+    }
+  ],
+  "maximum_new_physics_runs": 6,
+  "existing_physics_runs_to_render": 2,
+  "maximum_reviewable_runs": 8,
+  "cameras": [
+    "opst_cam",
+    "side_left_cam",
+    "side_right_cam",
+    "overhead_cam",
+    "wrist_cam"
+  ],
+  "review_fps": 30,
+  "control_hz": 60,
+  "physics_hz": 180,
+  "teacher_unsupported_or_failed": "retain_and_render_actual_saved_episode; skip_surrogate_without_replacement",
+  "resume": "do_not_repeat_finished_physics_even_if_failed; retry_missing_or_failed_renders",
+  "human_review": [
+    "VIDEO_REVIEW.md",
+    "MANUAL_REVIEW.md"
+  ],
+  "cpu_tests_passed": 223,
+  "actual_case_preflights_passed": 3,
+  "actual_existing_render_preflights_passed": 2,
+  "direct_teacher_preparation_verified": true,
+  "direct_teacher_action_array_matches_previous_surrogate": true,
+  "teacher_fixture_action_array_sha256": "0881a61858fc023569f6e6ee5bf843f4990857a87a19ee676943f94b85aa7315",
+  "runtime_contract_parameters_changed": false,
+  "gpu_started": false,
+  "training": false,
+  "held_out_evaluation": false,
+  "limitations": [
+    "Preparation and CPU checks only; the three new paired outcomes and all new review videos are pending execution.",
+    "Schema-supported local subset, not the complete 40-episode cohort or a benchmark success-rate estimate.",
+    "30 Hz saved-state videos are for human inspection, not 60 Hz training pixels.",
+    "No renderable file can be promised if a crash saves no states; the review index records that explicitly."
+  ],
+  "implementation_sha256": {
+    "src/capstone_vla/contract_batch.py": "684f2b7c6a7df6b1353a070332d10c43d5b62d15e6129b02b690f5c14c79afe8",
+    "scripts/run_hgwind_contract_batch.py": "885ddc2baca963088491ea4235f65aa07491461abe7b24b738ae4d07c26266e1",
+    "scripts/prepare_hgwind_teacher_contract.py": "8dd6b0ce31a4150768654b2203f409fdb9c9d3d47b0008ea17d8d11cd1026770",
+    "scripts/run_hgwind_action_contract.py": "068a7198e2ce35aa432b5b4f3bb6f34ce2805d23637ad2e9256dbeaba5c0f9ef",
+    "scripts/render_hgwind_effort_probe.py": "10b0381279e17f2978403b7d1dd3e9039056252b77ee502e6e7e2b59c274d906"
+  }
+}

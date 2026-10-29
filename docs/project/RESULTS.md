@@ -12,6 +12,10 @@ Before first contact at 135, EE difference from the passing reference is at most
 
 21 runtime dependency hashes and unchanged runtime encoder/decoder functions verify. 210 portable CPU checks pass; no additional simulation, model training or inference was launched for this analysis. Recorded expert upper commands replay without fresh target-conditioned decisions, so this exposed replay failure does not demonstrate that a learned reactive policy cannot succeed. Freeze the controller and run a bounded 3–5 distinct development-episode diagnostic before deciding label generation/training. Existing 40 processed 9D recordings still lack the complete upper labels.
 
+## Prepared paired diagnostic and video review
+
+Three schema-supported local cases (attempts 60/144/345) are now fixed before new outcomes. The [coordinator](CONTRACT_VIDEO_BATCH.md) will run native teachers and eligible fixed-contract surrogates once each, render every saved success/failure plus both prior references, and produce a five-view manual-review index. 223 CPU checks and real case/render preflights pass; no GPU runs or new video completeness are claimed yet. The complete binary-schema support screen is retained; 11 intermediate-jaw cases are unsupported by this contract, not labelled poor demonstrations.
+
 ## Wind-driven spherical-object cohort
 
 Task: `grasp_wind_driven_motion_1s1p_hgprgew`.

@@ -13,6 +13,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'src'))
 from capstone_vla.hgwind_cohort import TASK_ID,require
 from capstone_vla.hf_archive import sha256
+from capstone_vla.contract_batch import saved_episode
 
 
 def load(path,name):
@@ -24,10 +25,8 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--probe-run',type=Path,required=True)
     parser.add_argument('--run',action='store_true')
-    args=parser.parse_args();run=args.probe_run.resolve();run.relative_to(ROOT/'data/derived/hgwind_effort_probes')
-    plan=json.loads((run/'plan.json').read_text());report=json.loads((run/'report.json').read_text())
-    episode=Path(report['probe_episode']);episode.relative_to(run/'worker_output')
-    meta=json.loads((episode/'meta.json').read_text());require(meta['task']['id']==TASK_ID,'Unexpected task')
+    args=parser.parse_args();run=args.probe_run.resolve()
+    plan,episode,meta=saved_episode(ROOT,run)
     task=Path(plan['task']);require(sha256(task)==plan['task_sha256'],'Recorded task scene changed')
     manifest=json.loads((ROOT/'data/derived/hgwind_40_camera_v2_20261028/render_manifest.json').read_text())
     require(manifest['task_sha256']==plan['task_sha256'],'Render camera scene differs from probe')
@@ -41,7 +40,11 @@ def main():
     for source in protected:
         if source==task:continue
         destination=staged/source.name
-        if destination.exists():require(sha256(destination)==protected[source],'Staged source differs: '+source.name)
+        if destination.exists():
+            if source.name=='meta.json':
+                from capstone_vla.hgwind_cohort import assert_metadata_enrichment
+                assert_metadata_enrichment(source,destination)
+            else:require(sha256(destination)==protected[source],'Staged source differs: '+source.name)
         else:shutil.copy2(source,destination)
     os.environ.update(CAPSTONE_ISAACLAB_PATH=str(lab),ISAACLAB_PATH=str(lab),
         ISAAC_SIM_ROOT=str((lab/'_isaac_sim').resolve()),OMNI_KIT_ACCEPT_EULA='YES',
