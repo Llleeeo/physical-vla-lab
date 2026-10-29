@@ -259,3 +259,33 @@ audit also still passes on the saved raw trace. No new GPU workload was launched
 physical fixed-gain performance is pending. Even a pass removes only this gain
 schedule, not the remaining orientation/posture/motion dependencies. See
 [preparation evidence](../../results/summaries/2026-10-29-fixed-gain-probe-preparation.json).
+
+
+## Fixed-feedback-gain physical result — 2026-10-29
+
+The user-run `fixed-9-8` probe passes both the explicit-packet and fixed-gain
+physical gates: all 209 intervals / 627 physics and OSC updates, initial-state
+identity, runtime safety, explicit jaw context and causal robot-motion audit.
+Thirty-seven read-only provenance/execution checks and raw contact recomputation
+match the saved report. The applied gains are 9/8 at every frame. Only the two
+pose-gain fields differ from the recorded packet requests on frames 173–208;
+all other input fields remain exact. All 15 core arrays match the recorded-gain
+baseline for the first 173 frames. First changed action is 173 and measured
+robot/object position is 174, after the gain schedules begin to differ.
+
+| Engineering measurement | Recorded gains | Fixed 9/8 gains |
+| --- | --- | --- |
+| Complete control intervals | 209 | 209 |
+| Continuous bilateral contact | 1.20 s | 1.20 s |
+| Minimum final retained lift | 74.861 mm | 72.577 mm |
+| Final relative-position jitter | 0.131 mm | 0.160 mm |
+| Independent contact/lift/retention result | pass | pass |
+
+This removes the need for the recorded pose-gain switch on this one exposed
+case. It does not establish an improvement: retained lift is slightly lower and
+position jitter slightly higher. Nor does it establish a frozen complete
+controller or learned-policy interface. Posture/orientation settings, callback
+modes and motion references remain recorded dependencies. Keep both passing
+baselines. Original FSM failed labels, report files, limits and source data are
+unchanged. No runtime code changed for this result update; the prior 177 CPU
+checks apply. See [source-hashed evidence](../../results/summaries/2026-10-29-fixed-gain-probe-result.json).

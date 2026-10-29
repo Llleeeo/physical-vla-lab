@@ -106,6 +106,23 @@ pass. No new physical result or learned-policy improvement is claimed. Remaining
 posture/orientation/motion schedules are still recorded dependencies. See
 [preparation evidence](../../results/summaries/2026-10-29-fixed-gain-probe-preparation.json).
 
+## Fixed-feedback-gain grasp: one exposed case
+
+The fixed-9/8 physical probe passes all 209 intervals and independent grasp
+checks with 627 physics and OSC updates, matching initial conditions and unchanged
+native limits. Raw packet/contact recomputation and 37 provenance/execution
+checks pass. Only gain fields differ over frames 173–208; first 173 core frames
+are exactly equal to the recorded-gain packet baseline.
+
+Bilateral contact lasts 1.20 s, minimum final retained lift is 72.577 mm and
+relative-position jitter is 0.160 mm. The recorded-gain comparison was 74.861 mm
+and 0.131 mm. The fixed-gain case passes the same criteria but does not improve
+these measurements. The gain schedule is unnecessary for this single exposed
+case; broader reliability and the remaining controller/motion contract are
+unverified. Recorded requests still drive execution, not VLA predictions. The
+original collector labels and raw reports remain unchanged; prior 177 CPU checks
+apply, with no runtime changes. See [hashed result](../../results/summaries/2026-10-29-fixed-gain-probe-result.json).
+
 ## Earlier DynamicVLA integration: irregular egg-object task
 
 Task: `grasp_sliding_motion_on_flat_surface_1s1p_g9wvkk1`. Earlier shorthand called the object a ball; the target is an egg. This task remains a difficult development case.

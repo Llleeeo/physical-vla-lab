@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Fixed-feedback-gain packet grasp passes
+
+- User-run fixed-9/8 packet execution completes all 209 intervals / 627 physics and OSC updates safely. The independent grasp and fixed-gain gates pass.
+- Read-only raw audit confirms that only the two feedback-gain fields change over frames 173–208. First 173 core frames exactly match the recorded-gain baseline; first changed action is 173 and measured state 174. All 37 provenance/execution checks pass.
+- Bilateral contact lasts 1.2 s, final retained lift is at least 72.577 mm and relative-position jitter is 0.160 mm. These are slightly worse than the recorded-gain baseline but pass the same engineering criteria; no performance improvement or learned-policy result is claimed. Runtime unchanged, prior 177 CPU passes apply.
+
 ## 2026-10-29 — Isolated fixed-feedback-gain probe prepared
 
 - Inventory of the passing explicit request stream identifies gains, posture/orientation, relative-speed and callback-mode schedules as remaining dependencies.
