@@ -113,3 +113,22 @@ def test_native_body_identity_and_contact_impulse_sign_are_not_positional(tmp_pa
         handle['actions'] = np.zeros((7, 9)); handle['obs/object_vel'] = np.zeros((7, 1, 3)); handle['obs/ee_pos'] = np.zeros((7, 3))
     result = module.snapshot(tmp_path)
     assert result['first_three_recorded_contact_impulses_Ns'] == [[-1., -2., -3.], [4., 5., 6.], [0., 0., 0.]]
+
+
+@pytest.mark.parametrize('episode_saved,trace,render,expected', [
+    (False, {'calls': 0}, False, 'no_evaluable_episode'),
+    (True, {'calls': 0}, True, 'force_observation_missing'),
+    (True, {'calls': 2, 'unsupported_signatures': 1}, True, 'force_signature_unsupported'),
+    (True, {'calls': 2}, False, 'review_incomplete'),
+    (True, {'calls': 2}, True, 'measurement_recorded'),
+])
+def test_startup_measurement_status_never_treats_zero_records_as_zero_force(episode_saved, trace, render, expected):
+    import importlib.util
+    from pathlib import Path
+    path = Path(__file__).resolve().parents[1] / 'scripts/run_hgwind_startup_diagnostic.py'
+    spec = importlib.util.spec_from_file_location('startup_coordinator_test', path)
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    # A physical safety abort can still produce valid diagnostic evidence.
+    result = dict(episode_saved=episode_saved, force_trace=trace,
+        render_complete=render, physics_launcher_exit=1)
+    assert module.diagnostic_status(result) == expected

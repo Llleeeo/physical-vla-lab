@@ -1,0 +1,33 @@
+{
+  "schema": "physical-vla-lab.startup-native-abort.v1",
+  "date": "2026-10-29",
+  "diagnostic": "20261029_223230_177327",
+  "run": "20261029_223230_505509_joint_online-expert_native-expert_target-capture",
+  "stage": "native scene loading before completed script inspection / episode recording",
+  "error_type": "std::system_error",
+  "error_message": "Invalid argument",
+  "physics_launcher_exit": 1,
+  "force_call_records": 0,
+  "evaluable_episodes": 0,
+  "videos_generated": 0,
+  "measurement_recorded": false,
+  "grasp_evaluated": false,
+  "learned_policy_evaluated": false,
+  "root_cause_identified": false,
+  "force_hypothesis_updated": false,
+  "raw_artifacts_preserved": true,
+  "changes": [
+    "Expose native terminate/what()/Aborted messages in launcher console.",
+    "Report no_evaluable_episode and STARTUP_DIAGNOSTIC_FAILED instead of a generic COMPLETED on this failure.",
+    "Keep failed physical grasps with saved evidence distinct from missing measurements; never infer zero force from zero log rows."
+  ],
+  "cpu_checks_passed": 240,
+  "gpu_retry_started_during_fix": false,
+  "next_action": "One manual retry of the unchanged diagnostic command; no automatic retry or parameter/SDK change. Repeated native startup abort requires focused startup investigation.",
+  "evidence_sha256": {
+    "simulation.log": "db7439fec5bad89c29e94e1d469503efe7a6bb634ec38fe99ac552e2666f9d99",
+    "plan.json": "ae33ceed9124cdb6ba0a3cf62299ce7cf36ed8f2046c764e5e5febe716eea94f",
+    "diagnostic.json": "f201433b2ef75f5bb2cc602723afe17a7854e4a119e18a504199417fe7445e5b",
+    "startup_force_calls.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

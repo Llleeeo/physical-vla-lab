@@ -303,7 +303,7 @@ def main():
         try:
             for line in process.stdout:
                 log.write(line);log.flush()
-                if any(x in line for x in ['COLLECT ATTEMPT','HGWIND_EFFORT_PROBE_ACTIVE','SAFETY ABORT','Traceback','RuntimeError','ValueError']):print(line.rstrip(),flush=True)
+                if any(x in line for x in ['COLLECT ATTEMPT','HGWIND_EFFORT_PROBE_ACTIVE','SAFETY ABORT','Traceback','RuntimeError','ValueError','terminate called','what():','Aborted','Segmentation fault']):print(line.rstrip(),flush=True)
             code=process.wait()
         except KeyboardInterrupt:
             os.killpg(process.pid,signal.SIGTERM)

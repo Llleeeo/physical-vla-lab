@@ -2,6 +2,12 @@
 
 Snapshot: **2026-10-29, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Passive startup measurement: native scene-load abort, no force evidence
+
+User run `20261029_223230_505509` exits while opening/loading the Task stage: C++ `std::system_error`, `Invalid argument`, then native abort. No episode or video is saved; `startup_force_calls.jsonl` has zero rows. This occurs before completed script inspection and the first force proxy installation. It is not a grasp failure or evidence that the fan applied no force. The native crash's cause is not established; the startup-force hypothesis remains untested.
+
+The coordinator now emits `STARTUP_DIAGNOSTIC_FAILED status=no_evaluable_episode`, records observation availability separately and exposes native fatal messages. 240 CPU checks and diagnostic scene preflight pass. No GPU retry or control/physics/SDK change was made during this correction. One manual retry of the same command is proposed; a repeated native abort calls for startup investigation, not repeated grasp tuning. Original logs and the initial diagnostic JSON are preserved. See [source-hashed execution diagnosis](../../results/summaries/2026-10-29-startup-native-scene-abort.json).
+
 ## Earliest divergence isolated to startup physics
 
 CPU analysis of raw 180 Hz evidence places ball velocity divergence in cases1/7 at the first physical step, about5.56ms, before meaningful arm divergence. Initial ball mass/inertia/COM/transform, first motor action and next control-frame EE positions match. The first three contact-step records report zero ball contact impulse. Original cases1/7 were third/second attempts within a worker; original case18 was first and reproduces exactly in a fresh probe. This process-history association and the fan's force-calling startup path are hypotheses, not an identified root cause.

@@ -20,6 +20,12 @@ The originals for cases1/7 came from the third/second attempt in an existing wor
 
 The frozen fan's `on_update` calls `apply_force_at_pos`; collector startup Play temporarily configures physics_dt=0 while pumping Kit events. Native forces may therefore depend on setup dispatch/cache history not represented by first-frame positions and velocities. The original data do not record those force API calls. We have not established that zero-dt force calls actually occurred, survived reset or caused the later safety abort. Gravity/damping/solver state is not fully ruled out by the initial native-property subset.
 
+## First attempt did not produce a measurement
+
+Run `20261029_223230_505509` aborted natively during scene loading (`std::system_error: Invalid argument`) before completed script inspection and recorder installation. There are no saved episodes, force-call samples or videos. Empty trace counts must not be interpreted as absent wind. The root cause is unknown. Preserve this failure, retry the same command at most once manually, and investigate native startup if it repeats; no SDK upgrade or random parameter adjustment is warranted by this log.
+
+The coordinator now labels missing episodes `STARTUP_DIAGNOSTIC_FAILED status=no_evaluable_episode`. A recorded force measurement is distinct from physical grasp success, and saved physical failures are still rendered. Native fatal lines are printed in the launching terminal. This status fix passes240CPU checks; the retry has not been launched by the agent.
+
 ## One prepared measurement
 
 ```bash
@@ -41,6 +47,6 @@ All force records stream immediately to `<run>/startup_force_calls.jsonl`. The c
 
 ## Verification and rollback
 
-235 portable CPU checks pass, including exact native object/argument identity and return forwarding even at zero dt, preserved native exception, limits that never suppress force calls, getter restoration, native body identity/contact impulse sign and original-worker ordinal parsing. Actual scene preflight and preflight/runtime patch assembly equality pass. Simulator modules parse as Python3.10. No GPU job was launched for this implementation.
+240 portable CPU checks pass, including exact native object/argument identity and return forwarding even at zero dt, preserved native exception, limits that never suppress force calls, getter restoration, native body identity/contact impulse sign and original-worker ordinal parsing. Actual scene preflight and preflight/runtime patch assembly equality pass. Simulator modules parse as Python3.10. No GPU job was launched for this implementation.
 
 Remove the new modules/entry points and the optional flag, or revert the milestone commit, to roll back. The frozen worker, asset scripts, existing probe wrapper, control parameters, source trajectories and prior reports are unchanged. Historical diagnostics and video files remain available.

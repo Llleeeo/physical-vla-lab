@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Missing startup measurements labelled explicitly
+
+- First passive diagnostic aborts natively at scene load with std::system_error/Invalid argument, before episode or force recording; preserve all raw files. No grasp or wind hypothesis is evaluated.
+- Expose native fatal messages; classify missing episodes, missing force observations, unsupported signatures and incomplete videos separately. Print FAILED for incomplete diagnostics; saved physical failures can still be valid measurements.
+- Five status regressions bring portable CPU checks to240 passes. One manual retry is proposed; native crash root cause remains unknown, no GPU retry/SDK/physics/control changes during this fix.
+
 ## 2026-10-29 — Startup physics evidence and passive force trace
 
 - Locate cases1/7 ball velocity divergence at the first180Hz physics step, with matching initial native properties/first robot command and no nonzero recorded ball impulse over the first three steps. Recover original worker ordinals3/2 versus passing case18 ordinal1; reset history remains a hypothesis.
