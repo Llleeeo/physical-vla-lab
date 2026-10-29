@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Startup physics evidence and passive force trace
+
+- Locate cases1/7 ball velocity divergence at the first180Hz physics step, with matching initial native properties/first robot command and no nonzero recorded ball impulse over the first three steps. Recover original worker ordinals3/2 versus passing case18 ordinal1; reset history remains a hypothesis.
+- Add an opt-in fan force-call forwarding trace, separate worker, CPU history analysis and one-attempt coordinator that renders saved success/failure. Physics, native force arguments and controller settings stay unchanged; observation cannot capture pre-installation force history.
+- Eight new regressions bring portable CPU checks to235 passes. Actual scene preflight, Python3.10 simulator parsing and byte-identical preflight/runtime patch assembly pass; GPU execution remains pending.
+
 ## 2026-10-29 — Bounded contract batch produces one passing pair
 
 - Verify all three native regenerations and the sole eligible 29D surrogate; traj_00018 teacher reproduces all15 core arrays exactly and surrogate passes269 intervals/807updates,1.767s bilateral contact and57.277mm retained lift.

@@ -2,6 +2,12 @@
 
 Snapshot: **2026-10-29, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Earliest divergence isolated to startup physics
+
+CPU analysis of raw 180 Hz evidence places ball velocity divergence in cases1/7 at the first physical step, about5.56ms, before meaningful arm divergence. Initial ball mass/inertia/COM/transform, first motor action and next control-frame EE positions match. The first three contact-step records report zero ball contact impulse. Original cases1/7 were third/second attempts within a worker; original case18 was first and reproduces exactly in a fresh probe. This process-history association and the fan's force-calling startup path are hypotheses, not an identified root cause.
+
+A [single passive force-call diagnostic](STARTUP_PHYSICS_DIAGNOSTIC.md) is prepared, with all saved outcomes automatically rendered. It changes recording only, forwarding native forces unchanged. 235 CPU checks and actual scene preflight pass; GPU execution is pending. Initial loading/force-accumulator history is partly outside observer coverage. No new grasp or VLA result follows. See [source-hashed diagnosis](../../results/summaries/2026-10-29-startup-physics-diagnosis.json).
+
 ## Bounded batch completed: one passing surrogate, two teacher safety aborts
 
 Batch `20261029_215343_401088` finishes without the earlier recording error. The four new saved runs have five verified RGB videos each (20 new videos); both existing references add ten videos. All are saved-state review renderings, not new physics, formal training pixels or completed human review.

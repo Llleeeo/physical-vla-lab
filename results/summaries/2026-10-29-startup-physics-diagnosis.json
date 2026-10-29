@@ -1,0 +1,128 @@
+{
+  "schema": "physical-vla-lab.startup-trace-preparation.v1",
+  "date": "2026-10-29",
+  "batch": "20261029_215343_401088",
+  "gpu_launched": false,
+  "learned_policy_evaluated": false,
+  "physics_parameters_changed": false,
+  "controller_commands_changed": false,
+  "cpu_checks_passed": 235,
+  "actual_scene_preflight_passed": true,
+  "runtime_patch_order_byte_identical": true,
+  "cases": [
+    {
+      "episode": "traj_00001",
+      "attempt_index": 60,
+      "source_worker_context": {
+        "worker_marker_line": 27266,
+        "sample_line": 27953,
+        "attempts_in_this_worker_through_source": [
+          58,
+          59,
+          60
+        ],
+        "ordinal_in_worker": 3
+      },
+      "initial_native_properties_exact": {
+        "initial_mass": true,
+        "initial_inertia": true,
+        "initial_com": true,
+        "initial_transform": true
+      },
+      "first_native_velocity_discrepancy_index": 1,
+      "first_ball_linear_velocity_delta_m_s": [
+        0.004831869155168533,
+        -2.0226920138810556e-10,
+        -0.00015138834714889526
+      ],
+      "first_command_exact": true,
+      "first_control_ee_positions_exact": true
+    },
+    {
+      "episode": "traj_00007",
+      "attempt_index": 144,
+      "source_worker_context": {
+        "worker_marker_line": 64376,
+        "sample_line": 64993,
+        "attempts_in_this_worker_through_source": [
+          143,
+          144
+        ],
+        "ordinal_in_worker": 2
+      },
+      "initial_native_properties_exact": {
+        "initial_mass": true,
+        "initial_inertia": true,
+        "initial_com": true,
+        "initial_transform": true
+      },
+      "first_native_velocity_discrepancy_index": 1,
+      "first_ball_linear_velocity_delta_m_s": [
+        0.004739776253700256,
+        -1.9841417397969963e-10,
+        0.0
+      ],
+      "first_command_exact": true,
+      "first_control_ee_positions_exact": true
+    },
+    {
+      "episode": "traj_00018",
+      "attempt_index": 345,
+      "source_worker_context": {
+        "worker_marker_line": 155003,
+        "sample_line": 155469,
+        "attempts_in_this_worker_through_source": [
+          345
+        ],
+        "ordinal_in_worker": 1
+      },
+      "initial_native_properties_exact": {
+        "initial_mass": true,
+        "initial_inertia": true,
+        "initial_com": true,
+        "initial_transform": true
+      },
+      "first_native_velocity_discrepancy_index": null,
+      "first_ball_linear_velocity_delta_m_s": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "first_command_exact": true,
+      "first_control_ee_positions_exact": true
+    }
+  ],
+  "verified_findings": [
+    "Cases1/7 ball velocity diverges at first180Hz physical step; first motor action and initial ball mass,inertia,COM,transform match. First control-frame EE positions remain equal.",
+    "Both originals and regenerations have zero recorded ball contact impulse over the first three physics steps. This does not certify absent unrecorded solver state.",
+    "Source case1 is third attempt in worker,case7 second,case18 first; all new probes are fresh workers.",
+    "Case18 startup and full native reproduction match. Historical source scenes and native force-call traces cannot be reconstructed by simply matching first-frame q/object state."
+  ],
+  "hypotheses_not_proven": [
+    "Native wind updates during zero-physics-dt Play/setup may contribute startup force history.",
+    "Worker reset history or cached physics/script state may contribute; process ordinal is association only."
+  ],
+  "prepared_measurement": {
+    "entry": "scripts/run_hgwind_startup_diagnostic.py --run",
+    "episode": "traj_00001",
+    "new_physics_runs": 1,
+    "trace": "startup_force_calls.jsonl",
+    "render_saved_success_and_failure": true,
+    "camera_count": 5,
+    "camera_fps": 30,
+    "semantics": "Fan module interface getter is locally proxied; force arguments/return values/exceptions forwarded. No force suppression, clearing, extra update or control change.",
+    "coverage": "Installation begins after initial script inspection, refreshes before resets/Play. Earliest loading updates/preexisting force accumulators are outside observation; first6 control frames and up to2048calls retained. Trace can affect wall timing, so simulator-level noninterference remains unverified until execution.",
+    "output": "data/derived/hgwind_startup_diagnostics/<timestamp>/diagnostic.json"
+  },
+  "evidence_sha256": {
+    "startup_physics_diagnosis.json": "6a163b45fb86fb9f376b42afec26c68ce4672da9eba973c778702ba65d26df65",
+    "source_collection_log": "6be81ae687db6939c54206de9f507798e1ca2de965b40cef09968c5c7d09b601",
+    "batch.json": "9368ac5fd5f201d4829c50a0cae6ac2126daf3146e8012733a3352eff84113fb",
+    "traj_00001_teacher_report": "0f2b31919aa681034c3dce77ce6d77cef4831d0235eae0b58b408adbcfdfdbe7",
+    "traj_00001_fresh_replay": "e3ab9e4c1ffd7a5042f38e9ab7a8ab0a7a860c13fabcb131ea739f91cb86ef39",
+    "traj_00007_teacher_report": "76237658bec36242a9d952e84743cc3f0e47fa5e3863fa374d52af7a4d331df2",
+    "traj_00007_fresh_replay": "22cf9f41527e8c5c50449b8849f8e55b437ae237ff3fd090c7227eb1a6960bdd",
+    "traj_00018_teacher_report": "f83a2bac867ab775bb9114d4bb82839f8afd4cbfc9cd1a764b1fb39603f24c44",
+    "traj_00018_fresh_replay": "22921d1a654ee50d7fe22e81044d857c19f6ef9cc88a0cc3f659abaad257c988"
+  }
+}

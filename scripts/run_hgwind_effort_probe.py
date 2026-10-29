@@ -31,6 +31,7 @@ def main():
     parser.add_argument('--task-feedforward',choices=('logged','zero'),default='logged',help='One-factor task-acceleration diagnostic; gravity compensation stays unchanged')
     parser.add_argument('--kinematics-run',type=Path,help='Passing native live-kinematics baseline required for zero task feedforward')
     parser.add_argument('--trace-cartesian-targets',action='store_true',help='Read-only original upper Cartesian requests; native-expert only')
+    parser.add_argument('--trace-startup-forces',action='store_true',help='Passive startup force forwarding trace; native expert capture only')
     parser.add_argument('--cartesian-target-run',type=Path,help='Passing upper-target capture; regenerate native inner commands from current robot state (expert diagnostic)')
     parser.add_argument('--packet-baseline-run',type=Path,help='Passing upper-feedback or recorded packet run; execute explicit packets without online task/skill steps')
     parser.add_argument('--packet-gain-profile',choices=('recorded','fixed-9-8'),default='recorded',help='Opt-in one-factor constant pose gains; requires a passing recorded packet baseline')
@@ -46,6 +47,7 @@ def main():
     require(args.jacobian_method=='shifted-tool' or args.tracking=='live-jacobian','Native pinch calculation is only a live-Jacobian component diagnostic')
     require(args.task_feedforward!='zero' or (args.tracking=='live-jacobian' and args.jacobian_method=='native-pinch' and args.kinematics_run is not None),'First provide a passing native-pinch --kinematics-run for zero task feedforward')
     require(not args.trace_cartesian_targets or args.tracking=='native-expert','Upper target capture requires the unchanged original expert')
+    require(not args.trace_startup_forces or (args.tracking=='native-expert' and args.trace_cartesian_targets and args.cartesian_target_run is None and args.packet_baseline_run is None),'Startup tracing requires an unmodified native expert capture')
     require(args.cartesian_target_run is None or (args.tracking=='native-expert' and not args.trace_cartesian_targets),'Upper target replay requires native-expert and excludes read-only capture')
     require(args.packet_gain_profile=='recorded' or args.packet_baseline_run is not None,'Fixed gain probe requires a passing packet baseline')
     require(args.packet_posture_profile=='recorded' or (args.packet_baseline_run is not None and args.packet_gain_profile=='fixed-9-8'),'Measured posture requires the passing fixed-9-8 packet baseline')
@@ -123,6 +125,12 @@ def main():
             from capstone_vla.cartesian_target_trace import patch_capture_collector
             patched=patch_capture_collector(patched)
             path=ROOT/'src/capstone_vla/cartesian_target_trace.py';plan['adapter_sha256'][str(path)]=sha256(path)
+        if args.trace_startup_forces:
+            from capstone_vla.hgwind_startup_trace import patch_startup_collector
+            patched=patch_startup_collector(patched)
+            plan['trace_startup_forces']=True
+            for dependency in ['src/capstone_vla/hgwind_startup_trace.py','scripts/sim/run_hgwind_startup_probe_worker.py']:
+                plan['adapter_sha256'][str(ROOT/dependency)]=sha256(ROOT/dependency)
         plan.update(reference='online-expert',reference_frames=720,frames=720,patch_sha256=hashlib.sha256(patched.encode()).hexdigest(),
             original_profile_wrapper=str(wrapper),original_depth_helper=str(ROOT/'scripts/run_hgwind_depth_worker.py'),original_depth_bias_m=meta['capstone_expert_control']['depth_bias']['requested_downward_goal_bias_m'],
             reference_fidelity='Fresh frozen online expert with source smooth-lift/depth profile; saved source actions are not executed.')
@@ -269,6 +277,7 @@ def main():
              '--kit_args=--portable-root '+str(ROOT/'data/derived/.cache/isaacsim/linux')+' --/renderer/multiGpu/autoEnable=false --/renderer/multiGpu/enabled=false --/renderer/multiGpu/maxGpuCount=1 --/app/extensions/fsWatcherEnabled=false']
     if args.tracking in ('native-expert','logged-command','live-jacobian'):
         command[2]=str(ROOT/'scripts/sim/run_hgwind_native_expert_worker.py')
+        if args.trace_startup_forces:command[2]=str(ROOT/'scripts/sim/run_hgwind_startup_probe_worker.py')
         if args.tracking=='native-expert':
             i=command.index('--repair-action-reference');del command[i:i+2]
         command.extend(['--episode_s',str(plan['frames']/60) if plan.get('independent_packets') else '12','--no-expert-config'])
