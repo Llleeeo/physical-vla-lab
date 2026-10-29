@@ -2,6 +2,12 @@
 
 Snapshot: **2026-10-29, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Prepared integrated action contract — physical result pending
+
+The [ball action contract](BALL_ACTION_CONTRACT.md) freezes the successful gains/posture configuration and replaces iterative field deletion with one complete 29D float32 command gate. All varying upper-command fields are explicit; fixed settings remain in the controller, and the 30D proprioceptive schema includes the latched robot posture. Unlike the earlier packet reference, collision callbacks stay enabled for all 209 ticks. This is an integrated change, not a source-exact or one-factor replay.
+
+205 portable CPU checks pass. The real 209-frame preflight preserves gripper events, null semantics and solver modes; maximum position roundtrip error is 0.000237 mm. Pinned upstream configuration and official checkpoint projection shapes support the proposed widths without changing the 32D heads. No new model was instantiated, trained or run. Physical grasp validation is pending; existing ball HDF5 does not supply all new labels. Validate this gate and then 3–5 distinct development episodes before deciding label generation and cohort conversion.
+
 ## Wind-driven spherical-object cohort
 
 Task: `grasp_wind_driven_motion_1s1p_hgprgew`.

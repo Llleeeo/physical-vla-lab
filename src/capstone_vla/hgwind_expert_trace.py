@@ -21,9 +21,15 @@ def configure(plan):
             import h5py
             from .cartesian_packets import PacketStreamExecutor,build_packets
             _require(sha256(plan['source'])==plan['source_reference_sha256'],'Packet jaw source changed')
-            with h5py.File(plan['source'],'r') as handle:
-                packets=build_packets(json.loads(path.read_text()),handle['actions'][:,7:],plan.get('packet_gain_profile','recorded'),
-                    'recorded' if plan.get('packet_posture_profile')=='latched' else plan.get('packet_posture_profile','recorded'))
+            if plan.get('action_contract'):
+                from .ball_action_contract import decode_stream, SCHEMA
+                _require(plan['action_contract']==SCHEMA, 'Unknown action contract')
+                _require(sha256(plan['action_vectors'])==plan['action_vectors_sha256'], 'Action labels changed')
+                packets=decode_stream(np.load(plan['action_vectors'],allow_pickle=False))
+            else:
+                with h5py.File(plan['source'],'r') as handle:
+                    packets=build_packets(json.loads(path.read_text()),handle['actions'][:,7:],plan.get('packet_gain_profile','recorded'),
+                        'recorded' if plan.get('packet_posture_profile')=='latched' else plan.get('packet_posture_profile','recorded'))
             _STATE['packet_executor']=PacketStreamExecutor(packets,plan.get('packet_gain_profile','recorded'),plan.get('packet_posture_profile','recorded'),plan.get('robot_posture_configuration'))
             if plan.get('packet_posture_profile')!='latched':
                 (Path(plan['output'])/'packet_requests.json').write_text(json.dumps(packets,indent=2,allow_nan=False)+'\n')

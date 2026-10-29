@@ -151,7 +151,11 @@ def analyze(output):
                 from capstone_vla.posture_anchor import compute_anchor
                 expected_anchor=compute_anchor(original['obs/joint_pos'][0,:7],plan['robot_posture_configuration'])
             packets=build_packets(capture,original['actions'][:,7:],plan.get('packet_gain_profile','recorded'),plan.get('packet_posture_profile','recorded'),expected_anchor)
-        require(json.loads((output/'packet_requests.json').read_text())==packets,'Executed packet stream differs from source')
+        if plan.get('action_contract'):
+            from capstone_vla.ball_action_contract import decode_stream
+            require(sha256(plan['action_vectors'])==plan['action_vectors_sha256'],'Action vector labels changed')
+            packets=decode_stream(np.load(plan['action_vectors'],allow_pickle=False),expected_anchor)
+        require(json.loads((output/'packet_requests.json').read_text())==packets,'Executed packet stream differs from expected decoded inputs')
         payload=json.loads((output/'cartesian_packet_execution.json').read_text())
         segments=json.loads((output/'original_expert_control_references.json').read_text())
         require(payload.get('packet_gain_profile','recorded')==plan.get('packet_gain_profile','recorded'),'Executed gain profile differs from plan')
@@ -181,7 +185,7 @@ def analyze(output):
         report['packet_fixed_gains_probe_passed']=bool(isolated and report['packet_controller_probe_passed'])
         report['limits'][0]='Only pose gains are constant at 9/8; all other recorded numeric settings/motion/gripper schedules remain. Not VLA predictions.'
     report['packet_measured_posture_probe_passed']=None
-    if plan.get('packet_posture_profile') in ('measured','latched'):
+    if plan.get('packet_posture_profile') in ('measured','latched') and not plan.get('action_contract'):
         from capstone_vla.cartesian_packets import audit_posture_profile
         for key in ['packet_posture_reference_report','packet_posture_reference_requests']:
             require(sha256(plan[key])==plan[key+'_sha256'],'Posture reference changed: '+key)
@@ -193,7 +197,7 @@ def analyze(output):
             packet_measured_posture_probe_passed=posture_probe_passed if plan['packet_posture_profile']=='measured' else None)
         report['limits'][0]='Only posture handling differs from the passing fixed-9/8 baseline; other recorded motion/settings/gripper schedules remain. Not VLA predictions.'
     report['packet_latched_posture_probe_passed']=None
-    if plan.get('packet_posture_profile')=='latched':
+    if plan.get('packet_posture_profile')=='latched' and not plan.get('action_contract'):
         initialization=payload['posture_initialization']
         require(initialization['configuration']==plan['robot_posture_configuration'],'Executed posture configuration differs from plan')
         with h5py.File(ep/'replay.hdf5','r') as recorded:
@@ -204,6 +208,28 @@ def analyze(output):
         report['packet_measured_posture_probe_passed']=None
         report['latched_posture_matches_raw_robot_context']=robot_context_matches
         report['limits'][0]='Posture is initialized from measured robot joints and declared sampled robot variation, then held; target motion/other settings remain recorded. Not VLA predictions.'
+    report['ball_action_contract_passed']=None
+    if plan.get('action_contract'):
+        from capstone_vla.ball_action_contract import audit_contract
+        contract_audit=audit_contract(payload,np.load(plan['action_vectors'],allow_pickle=False))
+        with h5py.File(ep/'replay.hdf5','r') as recorded:
+            raw_q=recorded['obs/joint_pos'][:,:7]
+        contexts=np.asarray([e['latched_posture_context']['measured_joint_position_rad'] for e in payload['calls']])
+        robot_context_matches=bool(np.array_equal(raw_q,contexts) and np.array_equal(
+            raw_q[0],np.asarray(payload['posture_initialization']['initial_joint_position_rad'])))
+        contract_audit['robot_context_matches_raw_recording']=robot_context_matches
+        report['ball_action_contract_audit']=contract_audit
+        report['ball_action_contract_passed']=bool(report['packet_controller_probe_passed']
+            and all(contract_audit[k] for k in ['decoded_actions_match_motor_boundary',
+                'fixed_collision_callbacks_always_enabled','live_posture_verified',
+                'robot_context_matches_raw_recording']))
+        report['limits']=[
+            'Expert-labelled 29D float32 command surrogate, not a trained model or a learned-policy success.',
+            'Absolute world pose, velocity, acceleration, relative-motion references and explicit control modes; no hidden per-frame settings.',
+            'Fixed 9/8 gains, live-initialized declared robot posture, always-on non-target collision callbacks and unchanged native hard limits.',
+            'A single exposed initial condition; validate 3-5 different development episodes before cohort conversion/training.',
+            'Original collector/FSM labels remain untouched; independent contact/lift/retention checks decide this engineering gate.']
+        print('BALL_ACTION_CONTRACT_PASSED '+str(report['ball_action_contract_passed']),flush=True)
     (output/'report.json').write_text(json.dumps(report,indent=2)+'\n')
     print('HGWIND_EFFORT_PROBE_COMPLETED '+json.dumps({k:report[k] for k in ['mode','reference','tracking','tracking_branch_verified','recorded_frames','completed_frames','full_source_length_completed','initial_state_match','motion_tracking_passed','native_expert_reference_passed','control_reference_replay_passed','live_kinematics_component_passed','task_feedforward_ablation_passed','cartesian_target_capture_verified','cartesian_feedback_replay_passed','packet_controller_probe_passed','packet_fixed_gains_probe_passed','packet_measured_posture_probe_passed','packet_latched_posture_probe_passed','expert_early_success','baseline_ready_for_cartesian']}))
     print('INDEPENDENT_GRASP '+str(None if grasp is None else grasp['status']));print('REPORT '+str(output/'report.json'))

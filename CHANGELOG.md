@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-29 — Complete ball action-contract gate prepared
+
+- Stop successive one-field deletions; freeze passing fixed gains/live-latched posture and prepare one integrated float32 command-interface check. Explicit 29D actions carry pose, independent velocity/acceleration references, null masks, controller modes and binary jaws; 30D robot-state schema exposes the robot posture anchor.
+- Every other native input is fixed, robot-derived or rejected as unsupported. Always enable both non-target collision callbacks; no predicted safety-disable or hidden terminal/expert schedule. Preserve the native hard-limit/effort pipeline and all original data/reports.
+- Actual 209-frame CPU preflight preserves jaw/null/mode labels, with maximum position roundtrip error 0.000237 mm. Real pinned upstream configuration accepts 29D actions/30D state; local official checkpoint projections retain width 32. This is shape compatibility, not a new model forward or learning result.
+- Twelve regressions bring portable CPU checks to 205 passes; simulator Python 3.10 parsing passes. Physical result remains pending. Existing 40 processed 9D recordings need upper-command labels before this representation can train. Next gate is one integrated episode, then 3–5 distinct development episodes, not unlimited micro-ablations.
+
 ## 2026-10-29 — Live-initialized latched posture grasps successfully
 
 - Both user runs complete 209 intervals / 627 physics and OSC updates with safe, independently verified grasping. Runtime anchor generation, raw robot-state correspondence and isolated input-change audits pass; 40 read-only checks pass per run.

@@ -1,0 +1,57 @@
+{
+  "schema": "physical-vla-lab.ball-action-contract-preparation.v1",
+  "date": "2026-10-29",
+  "status": "prepared_physical_validation_pending",
+  "task": "grasp_wind_driven_motion_1s1p_hgprgew",
+  "action_dim": 29,
+  "state_dim": 30,
+  "control_hz": 60,
+  "physics_hz": 180,
+  "frames": 209,
+  "source_replay_sha256": "e1b54faae644b64f8148b0fe0397d74287f06d7c48fa97ee34a054339a72e3d3",
+  "parent_report_sha256": "9c57c3f0af75275e9052f125852525407dfbf89dae6378594b42edc769786bc0",
+  "action_array_sha256": "0881a61858fc023569f6e6ee5bf843f4990857a87a19ee676943f94b85aa7315",
+  "maximum_position_roundtrip_error_mm": 0.00023697457408627189,
+  "maximum_quaternion_sign_invariant_error": 3.6750859186271585e-08,
+  "gripper_null_and_controller_modes_preserved": true,
+  "always_enabled_collision_callbacks": true,
+  "callback_activation_changed_frames": 36,
+  "hidden_terminal_schedule_removed_frames": 15,
+  "cpu_tests_passed": 205,
+  "simulator_python310_parse": true,
+  "upstream_commit": "434dc7105cf6d559018d15af5fecbcdad44f036e",
+  "checkpoint_projection_shapes": {
+    "action_in": [
+      720,
+      32
+    ],
+    "action_out": [
+      32,
+      720
+    ],
+    "state": [
+      960,
+      32
+    ]
+  },
+  "upstream_configuration_accepted": true,
+  "upstream_delta_action": false,
+  "model_instantiated": false,
+  "gpu_started": false,
+  "learned_policy_evaluated": false,
+  "physical_grasp_result": null,
+  "existing_40_episode_upper_labels_complete": false,
+  "next": "One integrated physical gate, then 3-5 distinct development episodes; no open-ended field deletion.",
+  "limitations": [
+    "Shape/codec compatibility only; not a new model load/forward/backward or training result.",
+    "Always-on collision callbacks differ from the successful reference in 36 frames; integrated physical outcome is pending.",
+    "Custom action semantics require fresh upper labels, train-only normalization and adapted observation assembly.",
+    "No held-out physical generalization or real-world result."
+  ],
+  "implementation_sha256": {
+    "src/capstone_vla/ball_action_contract.py": "7075baedc680a0dd96cf8ea7a07d0496090ca2db98078261d0fa0d1be8578017",
+    "src/capstone_vla/hgwind_expert_trace.py": "06cc67a0f231eeaf339732faf260026c4862247427f1378be11ba797b29ba8c5",
+    "scripts/run_hgwind_action_contract.py": "3d9f68950698319d42f3a4c38af22488cc29d5df9cdf547fe99fb05c8c46ed62",
+    "scripts/analyze_hgwind_effort_probe.py": "55c26050d84f8fed2e14414db1aa768433965e98d2c0898e8a728cb20fdfdc51"
+  }
+}
