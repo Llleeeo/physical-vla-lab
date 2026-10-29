@@ -26,9 +26,10 @@ ATTEMPTS = [58, 59, 60]
 HISTORY = ROOT / 'data/derived/hgwind_history_diagnostics/20261029_234931_549595'
 
 
-def prepare(native_backtrace=False, stage_load_barrier=False, fresh_control=False, omit_setup_force_once=False, trace_gripper_drives=False):
+def prepare(native_backtrace=False, stage_load_barrier=False, fresh_control=False, omit_setup_force_once=False, trace_gripper_drives=False, restore_gripper_gains=False):
     require(not fresh_control or stage_load_barrier, 'Fresh control requires the matched stage-load barrier')
     require(not omit_setup_force_once or (fresh_control and stage_load_barrier), 'Omission requires matched-startup fresh60')
+    require(not restore_gripper_gains or (fresh_control and omit_setup_force_once and trace_gripper_drives), "Gain control requires observed fresh60 plus force omission")
     attempts = [60] if fresh_control else list(ATTEMPTS)
     from capstone_vla.inotify_preflight import require_headroom
     watcher_preflight = require_headroom()
@@ -47,7 +48,7 @@ def prepare(native_backtrace=False, stage_load_barrier=False, fresh_control=Fals
     require((lab / 'VERSION').read_text().strip() == '2.2.1' and ((lab / '_isaac_sim').resolve() / 'VERSION').read_text().startswith('4.5.0'), 'SDK changed')
     require(not os.environ.get('CONDA_PREFIX'), 'Run from the existing project interpreter outside Conda')
     stamp = datetime.now(ZoneInfo('Asia/Hong_Kong')).strftime('%Y%m%d_%H%M%S_%f')
-    out = ROOT / 'data/derived/hgwind_history_diagnostics' / (stamp + ('_fresh60' if fresh_control else '') + ('_omit1' if omit_setup_force_once else ''))
+    out = ROOT / 'data/derived/hgwind_history_diagnostics' / (stamp + ('_fresh60' if fresh_control else '') + ('_omit1' if omit_setup_force_once else '') + ('_gains' if restore_gripper_gains else ''))
     plan.pop('native_debugger', None)
     plan.update(output=str(out), worker_output=str(out / 'worker_output'), attempt_offset=attempts[0], fresh_control=fresh_control,
         history_attempts=attempts, inotify_preflight=watcher_preflight, native_debugger_requested=native_backtrace, stage_load_barrier=stage_load_barrier,
@@ -120,6 +121,15 @@ def prepare(native_backtrace=False, stage_load_barrier=False, fresh_control=Fals
             episode=source.name, attempt_offset=index, expected_episode_seed=meta['episode_seed'], expected_variation=meta['trajectory_variation'])
         cases[str(index)] = case
     plan['history_cases'] = cases
+    if restore_gripper_gains:
+        from capstone_vla.gripper_gain_control import prepare_control
+        plan['gripper_gain_control'] = prepare_control(plan, ROOT)
+        worker_entry = ROOT/'scripts/sim/run_hgwind_gripper_gain_worker.py'
+        for path in [ROOT/'src/capstone_vla/gripper_gain_control.py',worker_entry]:
+            plan['adapter_sha256'][str(path)] = sha256(path)
+        for case in cases.values():
+            case['gripper_gain_control'] = plan['gripper_gain_control']
+            case['adapter_sha256'] = dict(plan['adapter_sha256'])
     os.environ['ROBOPHYS_CAPSTONE_OFFLINE_TASK'] = '1'
     os.environ['ROBOPHYS_TASK_CONTEXT'] = Path(manifest['task_context']).read_text()
     sys.path.insert(0, str(Path(plan['worker']).parents[1]))
@@ -212,6 +222,11 @@ def finish(out, code, render=False):
         from capstone_vla.setup_force_control import audit_intervention
         result['setup_force_control'] = audit_intervention(plan)
         startup_ok = startup_ok and result['setup_force_control']['verified']
+    if plan.get('gripper_gain_control'):
+        from capstone_vla.gripper_gain_control import audit_control
+        result['gripper_gain_control'] = audit_control(plan)
+        startup_ok = startup_ok and result['gripper_gain_control']['verified']
+        result['condition'] = 'fresh60_omit1_post_usd_gripper_gain_reapplication'
     result['complete'] = startup_ok and code == 0 and sorted(episodes)==attempts and order==attempts and all(x['analysis_complete'] and (not render or x['render_complete']) for x in result['cases'])
     target = next((x for x in result['cases'] if x['attempt_index']==60),{})
     result['target_grasp_status'] = target.get('grasp', 'not_evaluated')
@@ -248,6 +263,10 @@ def finish(out, code, render=False):
             first_step_history_velocity_delta_m_s=matched.get('first_step_ball_velocity_delta_m_s'),
             all_history_core_arrays_exact=matched.get('all_core_arrays_exact'),
             pre_recording_native_calls=target.get('force_trace', {}).get('pre_recording_returned_calls'))), flush=True)
+    if plan.get('gripper_gain_control'):
+        result['interpretation'] = 'One measured warm-gain reproduction after native frame0 USD setup, combined with existing explicit setup-force omission. Both finger DOFs driven with mimic retained. Diagnostic only; require native readbacks and independent grasp, not a production fix or learned-policy result.'
+        print('GRIPPER_GAIN_CONTROL verified='+str(result['gripper_gain_control']['verified']).lower()
+            +' grasp='+result['target_grasp_status'],flush=True)
     if plan.get('trace_gripper_drives'):
         result['gripper_observation_available'] = bool(result['cases']) and all(
             row.get('gripper_drive_observation',{}).get('verified') for row in result['cases'])
@@ -278,6 +297,7 @@ def main():
     parser.add_argument('--stage-load-barrier',action='store_true',help='Experimental stopped-timeline stage attach barrier before robot USD edits')
     parser.add_argument('--omit-setup-force-once',action='store_true',help='Experimental: omit the pinned second pre-recording wind call in fresh60 only')
     parser.add_argument('--trace-gripper-drives',action='store_true',help='Passive native/USD finger-drive observations; no setters or extra simulation steps')
+    parser.add_argument('--restore-gripper-gains',action='store_true',help='Diagnostic: reapply measured warm finger gains after original frame0 setup; mimic retained')
     parser.add_argument('--render',action='store_true',help='Opt in to five-view review videos; default analyzes only')
     parser.add_argument('--finish',type=Path,help='Analyze/render a completed run without launching physics again')
     args=parser.parse_args()
@@ -285,11 +305,12 @@ def main():
         require(not args.run,'--finish never launches collection')
         out=args.finish.resolve();out.relative_to(ROOT/'data/derived/hgwind_history_diagnostics')
         return finish(out,json.loads((out/'worker_exit.json').read_text())['exit_code'],render=args.render)
-    plan,command,lab=prepare(args.native_backtrace,args.stage_load_barrier,args.fresh_control,args.omit_setup_force_once,args.trace_gripper_drives)
+    plan,command,lab=prepare(args.native_backtrace,args.stage_load_barrier,args.fresh_control,args.omit_setup_force_once,args.trace_gripper_drives,args.restore_gripper_gains)
     plan['render_requested'] = args.render
     if args.stage_load_barrier:print('STARTUP_WORKAROUND stage_load_barrier=true efficacy=unverified physics_parameters_unchanged=true',flush=True)
     if args.omit_setup_force_once:print('SETUP_FORCE_CONTROL omit_event=1 modified_forcing_history=true efficacy=unverified',flush=True)
     if args.trace_gripper_drives:print('GRIPPER_TRACE requested=true setters=false',flush=True)
+    if args.restore_gripper_gains:print('GRIPPER_GAIN_CONTROL requested=true one_reapplication=true production_fix=false',flush=True)
     print('RENDER_MODE '+('enabled' if args.render else 'skipped; raw trajectories retained'),flush=True)
     print('COMMAND '+shlex.join(command),flush=True)
     if not args.run:return 0
@@ -308,7 +329,7 @@ def main():
         try:
             for line in process.stdout:
                 log.write(line);log.flush()
-                if any(s in line for s in ['HISTORY_ATTEMPT','COLLECT ATTEMPT','SAFETY ABORT','Traceback','Error:','terminate called','what():','Aborted','CAPSTONE_NATIVE','STAGE_LOAD_BARRIER','SETUP_FORCE_CONTROL','GRIPPER_TRACE','DONE attempts','FATAL']):print(line.rstrip(),flush=True)
+                if any(s in line for s in ['HISTORY_ATTEMPT','COLLECT ATTEMPT','SAFETY ABORT','Traceback','Error:','terminate called','what():','Aborted','CAPSTONE_NATIVE','STAGE_LOAD_BARRIER','SETUP_FORCE_CONTROL','GRIPPER_TRACE','GRIPPER_GAIN_CONTROL','DONE attempts','FATAL']):print(line.rstrip(),flush=True)
             code=process.wait()
         except KeyboardInterrupt:
             os.killpg(process.pid,signal.SIGTERM)

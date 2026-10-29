@@ -14,7 +14,7 @@ The [Linux watch-resource shortage](docs/project/NATIVE_STARTUP_RESOURCES.md) ha
 
 The [single wind-force intervention](docs/project/SETUP_FORCE_CONTROL.md#observed-result-startup-ball-mismatch-removed-finger-response-differs) now restores exact ball velocity/pose through native rows0..500, but grasp still fails. Recorded close targets match; actual fingers close more slowly and first contact is about89ms later. Next inspect actual gripper drive/reset state. This is modified-force expert evidence, with no learned-policy success or general reset fix.
 
-A [passive gripper-drive pair](docs/project/GRIPPER_DRIVE_DIAGNOSTIC.md) is prepared to record actual reset/closure gains, caps and targets.300 CPU checks and scene/entry preflight pass; simulator measurements are pending.
+The [passive gripper-drive pair](docs/project/GRIPPER_DRIVE_DIAGNOSTIC.md#observed-result-30-october) now verifies a concrete initialization mismatch: first-episode setup reports requested10500/140 gains but native readback remains10000/1000 on the first finger and0/0 on the mimic finger; later history episodes retain10500/140 on both. At closure both conditions have the same70N force ceiling and0.05m/s speed ceiling. Known motion arrays remain exact under observation. A single opt-in post-setup gain reapplication is CPU validated (314 checks); physical efficacy remains pending. It reproduces the warm configuration with mimic retained, not a certified production gripper model or learned-policy result.
 
 | Workstream | Verified progress | Remaining work |
 |---|---|---|

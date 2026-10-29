@@ -1,0 +1,51 @@
+{
+  "schema": "physical-vla-lab.gripper-gain-reapplication-preparation.v1",
+  "date": "2026-10-30",
+  "implemented": true,
+  "physical_efficacy_pending": true,
+  "maximum_attempts": 1,
+  "render": false,
+  "gpu_by_agent": false,
+  "training_eligible": false,
+  "learned_policy_evaluated": false,
+  "purpose": "Reapply actual measured warm10500/140 gains after original fresh frame0 drive setup, retaining mimic; diagnostic reproduction, not production model certification.",
+  "inherited_intervention": "One previously verified setup-force omission remains explicitly enabled.",
+  "changed_properties": [
+    "Native stiffness and damping of exactly Panda finger DOFs7/8, once after original ensure"
+  ],
+  "invariants_checked": [
+    "Exact original ensure arguments/result",
+    "Native readback after targeted save_to_usd=False setter",
+    "Unchanged arm gains",
+    "Unchanged caps, targets, authored USD/mimic and measured state across setter",
+    "Frame1 and selected later gain/cap persistence"
+  ],
+  "failures": "Unexpected initial state, extra ensure call, unavailable native readbacks or changed unrelated properties stop control. Intervention verification and independent grasp remain separate.",
+  "validation": {
+    "portable_cpu_checks": 314,
+    "final_focused_checks": 67,
+    "sdk_python310_parse": "passed",
+    "actual_scene_preflight": "passed",
+    "entry_isolation": {
+      "collector_assembly_exact": true,
+      "default_no_gain_setter": true,
+      "entry_only_when_requested": true,
+      "scene_controller_limits_pinned": true,
+      "case_hashes_pinned": true,
+      "maximum_attempts": 1,
+      "render": false,
+      "gpu": false
+    }
+  },
+  "source_hashes": {
+    "src/capstone_vla/gripper_gain_control.py": "40ac641fd5dfd93694863186c2a731cd29490b97d96ff6a3713dac87dce4a954",
+    "scripts/sim/run_hgwind_gripper_gain_worker.py": "54b224c192bae5013126e5449228e7982b8684c4aed51d22606d3b4933f82e45",
+    "scripts/run_hgwind_history_diagnostic.py": "189fd17beaa28108f8aab6cb014a34968e3c9ec772a784ed81fd9d56aac17ae9",
+    "tests/test_gripper_gain_control.py": "0241532f06782bfa95104704b293965a12d87697fc5126183e2e70dc8205f4d7",
+    "results/summaries/2026-10-30-gripper-drive-result.json": "39afdf16668461617fb23c671ae563ac4277aa3bb69d3716168055a84754863a"
+  },
+  "preflight_hashes": {
+    "capstone_gripper_gain_isolation.json": "83081eb850f969c9bcebea315b62d4f4fbb2d87c8922c44aabc4fe20acec5637"
+  },
+  "rollback": "Omit --restore-gripper-gains; default collector and previous passive control entry remain unchanged."
+}

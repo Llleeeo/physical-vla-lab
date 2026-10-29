@@ -1,0 +1,198 @@
+{
+  "schema": "physical-vla-lab.gripper-drive-result.v1",
+  "date": "2026-10-30",
+  "pair_run_id": "20261030_015645_885994",
+  "comparison_ready": true,
+  "independently_rechecked_full_motion_arrays": true,
+  "history_core_arrays_exact": true,
+  "fresh_omission_core_arrays_exact": true,
+  "outcomes": {
+    "history60": "pass",
+    "fresh60_omit1": "safety_abort_fail"
+  },
+  "first_close_frame": 154,
+  "at_close": {
+    "history": {
+      "stiffness": [
+        10500,
+        10500
+      ],
+      "damping": [
+        140,
+        140
+      ]
+    },
+    "fresh_omit": {
+      "stiffness": [
+        10000,
+        0
+      ],
+      "damping": [
+        1000,
+        0
+      ]
+    },
+    "both": {
+      "max_efforts_N": [
+        70,
+        70
+      ],
+      "max_velocities_m_s": [
+        0.05000000074505806,
+        0.05000000074505806
+      ]
+    }
+  },
+  "frame0_before_force": {
+    "both_gains": [
+      [
+        10000,
+        0
+      ],
+      [
+        1000,
+        0
+      ]
+    ],
+    "history_max_efforts_N": [
+      70,
+      70
+    ],
+    "fresh_max_efforts_N": [
+      7.199999809265137,
+      0
+    ]
+  },
+  "observation": "First fresh episode force configuration returns true and records requested gains10500/140, but live gains remain10000/1000 on first finger and0/0 on mimic. Later history episodes retain10500/140 on both. At closure native force/speed ceilings and applied targets match.",
+  "code_evidence": {
+    "method": "Expert.ensure_gripper_force",
+    "gain_set_before_usd_force_authoring": true,
+    "usd_drive_added_on_mimic_in_first_episode": true
+  },
+  "interpretation": "Measured initialization/history-dependent gain mismatch. Later USD authoring after native gain setup is a candidate overwrite mechanism, not a proven native internal event. No successful correction has been tested.",
+  "next": "One opt-in fresh60+existing setup-force omission control: restore the requested measured warm gains after original ensure call, read back and verify; no arm/target/cap/scene update.",
+  "limitations": [
+    "Warm settings actuate both DOFs while mimic coupling remains; diagnostic reproduction is not certification of correct production gripper modeling.",
+    "Restoring gains cannot be called a grasp fix before a physical result.",
+    "Earlier forces were intentionally changed in fresh condition; no training or learned-policy claim."
+  ],
+  "learned_policy_evaluated": false,
+  "training_eligible": false,
+  "rendering_requested": false,
+  "new_gpu_run_by_agent": false,
+  "source_hashes": {
+    "data/derived/hgwind_gripper_diagnostics/20261030_015645_885994/report.json": "3ddfa09d71e0b53de2191cd04ef928b04079e0986465ae430f9521a9cd387b08",
+    "data/derived/hgwind_history_diagnostics/20261030_015646_128641/report.json": "6f2ef72d63655d04b9e893cb386697a62223af626af1102770ba84272e528f45",
+    "data/derived/hgwind_history_diagnostics/20261030_015646_128641/attempt_00060/gripper_drive_trace.jsonl": "15dc98b1a36c956457f127e64e7a724531552c3fd960d131fb4fe59821984600",
+    "data/derived/hgwind_history_diagnostics/20261030_015646_128641/attempt_00058/gripper_drive_trace.jsonl": "c32b1aaf79359bc9a8352f44803403bc65aa12fb77a87b42942034aa54b11047",
+    "data/derived/hgwind_history_diagnostics/20261030_015646_128641/attempt_00059/gripper_drive_trace.jsonl": "46da13eac4161473cc0004187f6190c407248df5d37bd52cf860c887c8d608a3",
+    "data/derived/hgwind_history_diagnostics/20261030_020224_663508_fresh60_omit1/report.json": "403d5d3f8e94bc8ec97cca31793f380cf1220f542c5fb7fc6915a9df1b7994f0",
+    "data/derived/hgwind_history_diagnostics/20261030_020224_663508_fresh60_omit1/attempt_00060/gripper_drive_trace.jsonl": "35c3893988ec1c6e01b44344af4a5f9a1337a4f720a387774c9327baaa609058",
+    "data/derived/hgwind_current_baseline_20261027/repo/Scripts/expert_data/expert.py": "27b864d7dd4a33d621bf6e22f1e615fa0ca143cfaf744425829c666f9752ac58"
+  },
+  "validation": {
+    "portable_cpu_checks": 314,
+    "sdk_python310_parse": "passed four files",
+    "real_scene_and_entry_isolation": "passed",
+    "gain_control_gpu_pending": true
+  },
+  "initialization_call_arguments": {
+    "args": [
+      70.0
+    ],
+    "kwargs": {
+      "speed": 0.05,
+      "reconfigure": true
+    }
+  },
+  "initialization_calls": {
+    "history_58": {
+      "frame": 0,
+      "returned": true,
+      "before_kp": [
+        10000.0,
+        0.0
+      ],
+      "before_kd": [
+        1000.0,
+        0.0
+      ],
+      "after_kp": [
+        10000.0,
+        0.0
+      ],
+      "after_kd": [
+        1000.0,
+        0.0
+      ],
+      "bookkeeping_stiffness": 10500.0,
+      "bookkeeping_damping": 140.0
+    },
+    "history_59": {
+      "frame": 0,
+      "returned": true,
+      "before_kp": [
+        10000.0,
+        0.0
+      ],
+      "before_kd": [
+        1000.0,
+        0.0
+      ],
+      "after_kp": [
+        10500.0,
+        10500.0
+      ],
+      "after_kd": [
+        140.0,
+        140.0
+      ],
+      "bookkeeping_stiffness": 10500.0,
+      "bookkeeping_damping": 140.0
+    },
+    "history_60": {
+      "frame": 0,
+      "returned": true,
+      "before_kp": [
+        10000.0,
+        0.0
+      ],
+      "before_kd": [
+        1000.0,
+        0.0
+      ],
+      "after_kp": [
+        10500.0,
+        10500.0
+      ],
+      "after_kd": [
+        140.0,
+        140.0
+      ],
+      "bookkeeping_stiffness": 10500.0,
+      "bookkeeping_damping": 140.0
+    },
+    "fresh_60": {
+      "frame": 0,
+      "returned": true,
+      "before_kp": [
+        10000.0,
+        0.0
+      ],
+      "before_kd": [
+        1000.0,
+        0.0
+      ],
+      "after_kp": [
+        10000.0,
+        0.0
+      ],
+      "after_kd": [
+        1000.0,
+        0.0
+      ],
+      "bookkeeping_stiffness": 10500.0,
+      "bookkeeping_damping": 140.0
+    }
+  }
+}

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-30 — Actual gripper gain mismatch measured
+
+- Verify passive pair and recheck all original history/fresh control arrays. First episode reports requested10500/140 gains but native readback remains10000/1000 and0/0; later history episodes retain10500/140 on both fingers. Closure caps match70N/0.05m/s. No corrected grasp result yet.
+- Add opt-in one-attempt post-USD initialization gain reapplication, with native readback, arm/property invariance and later persistence checks. Reproduce measured warm actuation while retaining mimic coupling; diagnostic only, excluded from training.314 CPU checks, SDK parsing and real scene/entry isolation pass. Original/frozen sources and data remain unchanged; no GPU/render by agent.
+
 ## 2026-10-30 — Passive gripper-drive pair prepared
 
 - Add opt-in native/USD drive snapshots at reset, initialization and closure, plus before/after original force-configuration calls. Preserve original arguments/results/exceptions; no simulator setter or extra physics update added. Missing/nonfinite readings remain errors.

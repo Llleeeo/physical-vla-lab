@@ -2,9 +2,15 @@
 
 Snapshot: **2026-10-30, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
-## Passive drive observation prepared; measurement pending
+## Observed native gripper initialization mismatch
 
-The [gripper-drive pair](GRIPPER_DRIVE_DIAGNOSTIC.md) now records actual native gains/limits/targets and authored USD/mimic properties under the two known conditions.300 CPU checks, actual scene/collector/entry isolation and SDK Python3.10 parsing pass. No new simulator result or gain difference is claimed.
+The passive drive pair completes with `comparison_ready=true`. Independent rechecks confirm15 original core arrays for all three history episodes, and15 exact arrays against the previous fresh-omission failure. Target history60 succeeds; fresh60+omit1 still aborts at190recorded frames. The observer did not change these known arrays.
+
+At frame0 before `ensure_gripper_force`, both have native Kp[10000,0]/Kd[1000,0]. Both call `ensure_gripper_force(70, speed=.05, reconfigure=True)` exactly once. In the fresh episode it returns true and records requested10500/140, but native gains stay unchanged. In history59/60 the same call yields Kp[10500,10500]/Kd[140,140], retained at first close frame154. At closure native caps are equal:70N and0.05m/s on both fingers; applied targets and USD/mimic properties also match in the compared snapshots. The7.2N/0N fresh cap is a **pre-configuration frame0** reading, not the closure cap.
+
+The frozen method sets native gains before authoring USD maxForce and adding a missing second-finger drive schema. That first-episode USD addition and the post-call gain mismatch are measured; an internal native overwrite mechanism remains inferred. Both warm active finger gains coexist with mimic coupling, so copying them is diagnostic reproduction, not certification of mechanically correct production actuation.
+
+A bounded one-attempt `--restore-gripper-gains` control is implemented and CPU validated: preserve the verified force omission, reapply only the measured requested finger gains after original setup, require native readback and unchanged arm gains/caps/targets/USD/state, then observe persistence.314 portable checks, SDK Python3.10 parsing and real scene/entry-isolation preflight pass. No new GPU/render run by agent and no successful correction yet. [Measured evidence](../../results/summaries/2026-10-30-gripper-drive-result.json) · [protocol and command](GRIPPER_DRIVE_DIAGNOSTIC.md#one-explicit-gain-reapplication-control).
 
 ## Observed result: startup ball mismatch removed, finger response differs
 
