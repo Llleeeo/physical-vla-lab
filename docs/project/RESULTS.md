@@ -51,6 +51,13 @@ target truth access is blocked at their safety-world boundary. Numeric settings 
 motion still come from the recorded stream. 160 portable CPU checks and real
 preflight pass; its physical result and learned-policy contract remain pending.
 
+The first packet physical attempt stops at frame 0 because the new safety wrapper
+omitted an optional emitted-geometry query and falsely classified the fan mesh as
+missing. This was reproduced with frozen native code and corrected without
+loosening geometry or robot limits. All 163 CPU checks and scene preflight pass;
+the corrected physical packet run remains pending. This run provides no grasp
+performance evidence. See [the protocol diagnosis](../../results/summaries/2026-10-29-packet-geometry-protocol-fix.json).
+
 ## Earlier DynamicVLA integration: irregular egg-object task
 
 Task: `grasp_sliding_motion_on_flat_surface_1s1p_g9wvkk1`. Earlier shorthand called the object a ball; the target is an egg. This task remains a difficult development case.

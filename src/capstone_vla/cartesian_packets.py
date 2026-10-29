@@ -21,7 +21,9 @@ class TargetBlindSafetyWorld:
         self.blocked_paths = set()
 
     def __getattr__(self, name):
-        require(name in ('pose', 'vel', 'velocity_reference', 'deformable_surface'), 'Unsupported safety world method: '+name)
+        if name not in ('pose', 'vel', 'velocity_reference', 'deformable_surface', 'emission_surface'):
+            raise AttributeError('Unsupported safety world method: '+name)
+
         def access(path, *args, **kwargs):
             path = str(path)
             if path == self.forbidden or path.startswith(self.forbidden+'/'):
@@ -29,7 +31,7 @@ class TargetBlindSafetyWorld:
                 raise ValueError('Target truth access forbidden in safety adapter')
             self.accessed_paths.add(path)
             method = getattr(self.world, name, None)
-            if method is None and name == 'deformable_surface':
+            if method is None and name in ('deformable_surface', 'emission_surface'):
                 return None
             require(callable(method), 'Missing geometry method: '+name)
             return method(path, *args, **kwargs)
@@ -109,7 +111,8 @@ class PacketStreamExecutor:
         # Catch/Grasp step is called; target tracking/contact/phase logic stays idle.
         self.owner._update_environment_obstacles(blind)
         require(not blind.blocked_paths, 'Geometry helper attempted target truth access')
-        require(not getattr(self.owner, '_environment_missing_narrow_phase', []), 'Non-target collision geometry is incomplete')
+        missing_geometry=getattr(self.owner, '_environment_missing_narrow_phase', [])
+        require(not missing_geometry, 'Non-target collision geometry is incomplete: '+', '.join(missing_geometry))
         self.geometry_paths.update(blind.accessed_paths)
         callbacks = {key:getattr(self.owner, CALLBACKS[key][1].split('.')[-1]) for key in CALLBACKS}
         event = dict(call_id=len(self.events), frame=index, inputs=encode(dict(packet['inputs'], **packet['safety_callbacks'])),

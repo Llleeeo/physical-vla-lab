@@ -91,3 +91,28 @@ The existing retained-context target replay also still passes CPU preflight.
 Omit `--packet-baseline-run` to restore the earlier paths. Original source data,
 frozen RoboPhys, task physics and previous reports are unchanged. No GPU workload
 was launched by the agent while preparing this interface.
+
+
+## First-run protocol defect and correction — 2026-10-29
+
+The first physical packet attempt stops at frame 0, before an arm request. Its
+inventory contains every static background surface but lists the fan as missing.
+This is an adapter defect, not evidence that the fan asset is absent: the native
+geometry helper queries the optional `emission_surface` method after constructing
+a rigid mesh. The wrapper rejected that attribute with `ValueError`; the native
+helper catches the exception and classifies the whole body as missing.
+
+A CPU reproduction using the actual frozen geometry method confirms a complete
+rigid mesh under a direct world query and a missing mesh under the old wrapper.
+The corrected wrapper forwards `emission_surface` for non-target paths, including
+real emitted triangles, and raises `AttributeError` for unsupported attributes so
+normal `getattr(world, optional_name, None)` capability checks work. Target and
+child-path rejection, caught-access detection and geometry completeness checks
+remain active. Error messages now include the missing paths.
+
+Three added regression cases bring the suite to 163 passes. Frozen native geometry
+produces exactly matching triangles and bounds with direct/corrected wrapped
+queries, for both no-emission and emitted-surface CPU fixtures. Python 3.10 parsing
+and real scene preflight pass. The original failure log is retained; the correction
+has not yet been physically rerun. Use the same command above; it writes a new
+output directory. See [the diagnosis](../../results/summaries/2026-10-29-packet-geometry-protocol-fix.json).

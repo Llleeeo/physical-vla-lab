@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Fix optional safety-geometry protocol in packet adapter
+
+- First physical packet attempt stops at frame 0: the adapter omitted the native optional `emission_surface` query, causing an existing fan mesh to be reported as missing. Reproduced offline with the frozen native geometry code.
+- Forward non-target emitted geometry and use normal `AttributeError` semantics for unsupported optional attributes. Preserve target/subpath blocking and geometry completeness checks; missing paths now appear in errors.
+- Three added regressions bring the portable suite to 163 passes. Native geometry matches direct queries with and without emitted surfaces on a CPU fixture; scene preflight passes. Physical rerun is pending; no task, limit or source-data changes.
+
 ## 2026-10-29 — Explicit request stream without online expert decisions prepared
 
 - Added a packet boundary around native Cartesian feedback with explicit binary jaws and a 15-frame Cartesian hold replacing the expert joint tail. The online task/skill decision call is bypassed.

@@ -98,7 +98,7 @@ def test_safety_target_and_descendants_are_blocked_before_read():
         with pytest.raises(ValueError,match='Target truth'):blind.pose(path)
     assert not reads
     blind.pose('/fan');assert reads==['/fan']
-    with pytest.raises(ValueError,match='Unsupported safety'):blind.contact('/a','/b')
+    with pytest.raises(AttributeError,match='Unsupported safety'):blind.contact('/a','/b')
 
 
 def test_caught_target_access_or_missing_geometry_stops_before_motor(monkeypatch):
@@ -152,3 +152,40 @@ def test_audit_rejects_wrong_gripper_action_and_short_stream(monkeypatch):
     payload=executor.payload();payload['calls'][1]['jaw_action']['joint_positions']=[.04,.04]
     assert not audit_packets(payload,packets,segments,3)['packet_execution_verified']
     assert not audit_packets(executor.payload(),packets,segments[:1],1)['packet_execution_verified']
+
+
+def test_optional_emission_surface_preserves_real_geometry_and_blocks_target():
+    mesh=np.arange(9,dtype=float).reshape(1,3,3);reads=[]
+    def emission(path):reads.append(path);return mesh
+    blind=TargetBlindSafetyWorld(SimpleNamespace(emission_surface=emission),'/ball')
+    assert blind.emission_surface('/fan') is mesh
+    assert reads==['/fan']
+    for path in ['/ball','/ball/mesh']:
+        with pytest.raises(ValueError,match='Target truth'):blind.emission_surface(path)
+    assert reads==['/fan'] and blind.blocked_paths=={'/ball','/ball/mesh'}
+
+
+def test_optional_attribute_lookup_follows_world_protocol():
+    blind=TargetBlindSafetyWorld(SimpleNamespace(),'/ball')
+    assert getattr(blind,'future_optional_geometry',None) is None
+    assert blind.emission_surface('/fan') is None
+    assert blind.deformable_surface('/fan') is None
+    with pytest.raises(AttributeError):blind.contact('/a','/b')
+
+
+def test_optional_geometry_probe_no_longer_discards_existing_fan_mesh(monkeypatch):
+    packets,robot,owner,world,policy=setup(monkeypatch)
+    def refresh(blind):
+        # Native geometry handles errors by recording the body as missing.
+        # An adapter error during its optional emission query must not remove
+        # an otherwise complete rigid mesh from the inventory.
+        try:
+            blind.pose('/fan')
+            surface=getattr(blind,'emission_surface',None)
+            assert surface('/fan') is None
+            owner._environment_missing_narrow_phase=[]
+        except Exception:
+            owner._environment_missing_narrow_phase=['/fan']
+    owner._update_environment_obstacles=refresh
+    PacketStreamExecutor(packets).step(policy,world,0,1/60)
+    assert robot.arms==1 and not owner._environment_missing_narrow_phase

@@ -1,0 +1,29 @@
+{
+  "schema": "physical-vla-lab.packet-geometry-protocol-fix.v1",
+  "date": "2026-10-29",
+  "original_run_status": "ABORTED_AT_FIRST_DECISION_BEFORE_ARM_REQUEST",
+  "simulation_log_sha256": "aba07bb48f95c711e7059d96dd310f8e3bd1cd10b558f39e2d0e9095f03137e5",
+  "plan_sha256": "1b6b29c15c247633e284d52035a9506aac17326c154ac0aece5e04a0881aec9d",
+  "missing_geometry_name": "fan",
+  "root_cause": "TargetBlindSafetyWorld rejected the optional emission_surface lookup with ValueError. Native CollisionSafety catches the exception and lists an otherwise present non-target rigid mesh as missing.",
+  "cpu_old_adapter_failure_reproduced": true,
+  "correction": [
+    "Forward emission_surface only for non-target paths, preserving actual emitted geometry.",
+    "Unknown attributes raise AttributeError, supporting native getattr(..., None) capability checks.",
+    "Retain target/subpath blocking and missing-geometry rejection; include missing paths in errors."
+  ],
+  "native_geometry_cpu_fixture": {
+    "without_emission": "exact triangle/bounds equality",
+    "with_emission": "exact triangle/bounds equality",
+    "note": "Uses frozen native geometry code on a small rigid-mesh fixture; not a new physical rollout."
+  },
+  "portable_cpu_tests_passed": 163,
+  "new_regressions": 3,
+  "simulator_python310_parse_passed": true,
+  "real_scene_preflight_passed": true,
+  "task_physics_changed": false,
+  "limits_changed": false,
+  "original_data_or_failure_log_changed": false,
+  "physical_rerun_started": false,
+  "physical_grasp_result": null
+}
