@@ -2,6 +2,10 @@
 
 The original attempts58,59,60 occurred in one worker. Their saved lengths are720,363,319 control frames; the first two failed grasping without a safety abort and the third succeeded. A fresh-worker attempt60 instead differs in ball velocity after the first physical step and eventually aborts on motion feasibility. This experiment tests whether reproducing the original within-worker history changes that mismatch. It does not identify a unique reset/cache/force mechanism or evaluate a learned policy.
 
+## Next control prepared
+
+Use the [single setup-force intervention](SETUP_FORCE_CONTROL.md) to test the specific extra call; this is a modified-force experiment, not another unmodified reproduction. Runtime outcome is pending.
+
 ## Matched fresh60 result: history contrast persists
 
 The user run `20261030_003531_182273_fresh60` passes the watcher admission probe and stage-load barrier, then records 169 frames / 168 completed control intervals. No native startup abort occurs in this launch; this is not a general stability guarantee. The independent engineering grasp check fails: bilateral contact lasts 0.4667 s without sustained lift. Joint offset 4 (the fifth arm joint) reaches 2.6393 rad/s against a 2.61 limit, and required braking conflicts with acceleration/jerk bounds. Safety stops the worker with exit 1; limits are retained.

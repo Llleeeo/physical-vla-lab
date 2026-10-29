@@ -26,8 +26,9 @@ ATTEMPTS = [58, 59, 60]
 HISTORY = ROOT / 'data/derived/hgwind_history_diagnostics/20261029_234931_549595'
 
 
-def prepare(native_backtrace=False, stage_load_barrier=False, fresh_control=False):
+def prepare(native_backtrace=False, stage_load_barrier=False, fresh_control=False, omit_setup_force_once=False):
     require(not fresh_control or stage_load_barrier, 'Fresh control requires the matched stage-load barrier')
+    require(not omit_setup_force_once or (fresh_control and stage_load_barrier), 'Omission requires matched-startup fresh60')
     attempts = [60] if fresh_control else list(ATTEMPTS)
     from capstone_vla.inotify_preflight import require_headroom
     watcher_preflight = require_headroom()
@@ -46,7 +47,7 @@ def prepare(native_backtrace=False, stage_load_barrier=False, fresh_control=Fals
     require((lab / 'VERSION').read_text().strip() == '2.2.1' and ((lab / '_isaac_sim').resolve() / 'VERSION').read_text().startswith('4.5.0'), 'SDK changed')
     require(not os.environ.get('CONDA_PREFIX'), 'Run from the existing project interpreter outside Conda')
     stamp = datetime.now(ZoneInfo('Asia/Hong_Kong')).strftime('%Y%m%d_%H%M%S_%f')
-    out = ROOT / 'data/derived/hgwind_history_diagnostics' / (stamp + ('_fresh60' if fresh_control else ''))
+    out = ROOT / 'data/derived/hgwind_history_diagnostics' / (stamp + ('_fresh60' if fresh_control else '') + ('_omit1' if omit_setup_force_once else ''))
     plan.pop('native_debugger', None)
     plan.update(output=str(out), worker_output=str(out / 'worker_output'), attempt_offset=attempts[0], fresh_control=fresh_control,
         history_attempts=attempts, inotify_preflight=watcher_preflight, native_debugger_requested=native_backtrace, stage_load_barrier=stage_load_barrier,
@@ -77,6 +78,14 @@ def prepare(native_backtrace=False, stage_load_barrier=False, fresh_control=Fals
         plan['matched_history_plan_sha256'] = sha256(HISTORY/'plan.json')
         plan['matched_history_report_sha256'] = sha256(HISTORY/'report.json')
         plan['reference_fidelity'] = 'Fresh native worker, original attempt60 only, same verified stage-load barrier/collector as history58/59/60; no saved source actions execute.'
+    worker_entry = ROOT/'scripts/sim/run_hgwind_history_worker.py'
+    if omit_setup_force_once:
+        from capstone_vla.setup_force_control import prepare_intervention
+        plan['setup_force_control'] = prepare_intervention(plan, ROOT)
+        worker_entry = ROOT/'scripts/sim/run_hgwind_setup_force_worker.py'
+        for path in [ROOT/'src/capstone_vla/setup_force_control.py', worker_entry]:
+            plan['adapter_sha256'][str(path)] = sha256(path)
+        plan['reference_fidelity'] = 'Matched fresh60 with one explicitly omitted pre-recording wind force call; modified forcing history, no training/VLA claim.'
     # Resolve original failed as well as successful episodes by attempt identity.
     sources = {}
     for meta_path in Path(plan['source']).parent.parent.glob('*/meta.json'):
@@ -112,7 +121,7 @@ def prepare(native_backtrace=False, stage_load_barrier=False, fresh_control=Fals
     from pxr import Usd
     from dataset.scene_signature import stage_physics_signature
     require(stage_physics_signature(Usd.Stage.Open(plan['task']))['sha256'] == plan['physics_sha256'], 'Physical scene changed')
-    command = [str(lab/'isaaclab.sh'), '-p', str(ROOT/'scripts/sim/run_hgwind_history_worker.py'),
+    command = [str(lab/'isaaclab.sh'), '-p', str(worker_entry),
         '--task', plan['task'], '--out_root', plan['worker_output'], '--episodes',str(len(attempts)),'--max_attempts',str(len(attempts)),
         '--target_successes','0','--seed','202610280','--attempt_offset',str(attempts[0]),'--variation','1.0','--control_hz','60',
         '--grasp_mode','physical','--arm_execution','inverse_dynamics','--catch-targeting-mode','auto',
@@ -133,7 +142,7 @@ def finish(out, code, render=False):
     attempts = plan.get('history_attempts', ATTEMPTS)
     episodes = index_saved_episodes(plan['worker_output'], TASK_ID, expected=attempts)
     result = dict(schema='physical-vla-lab.hgwind-history.v1', worker_exit=code,
-        requested_attempts=attempts, condition='fresh60_matched_startup' if plan.get('fresh_control') else 'history58_59_60', saved_attempts=sorted(episodes), cases=[], learned_policy_evaluated=False,
+        requested_attempts=attempts, condition='fresh60_single_setup_force_omission' if plan.get('setup_force_control') else ('fresh60_matched_startup' if plan.get('fresh_control') else 'history58_59_60'), saved_attempts=sorted(episodes), cases=[], learned_policy_evaluated=False,
         complete=False, physical_success=False, render_requested=render, stage_load_barrier_requested=bool(plan.get('stage_load_barrier')), stage_load_barrier_evidence=json.loads((out/'stage_load_barrier.json').read_text()) if (out/'stage_load_barrier.json').exists() else None, native_backtrace=str(out/'native_backtrace.log') if (out/'native_backtrace.log').exists() else None, interpretation='Incomplete history cannot answer the attempt60 history hypothesis.')
     for index, episode in sorted(episodes.items()):
         case = plan['history_cases'][str(index)]; location = Path(case['output'])
@@ -178,7 +187,10 @@ def finish(out, code, render=False):
         if trace.exists():
             calls = [json.loads(line) for line in trace.read_text().splitlines()]
             row['force_trace'] = dict(calls=len(calls),pre_recording_calls=sum(x['frame'] is None for x in calls),
-                zero_configured_dt_calls=sum(x['physics_dt_s']==0 for x in calls),sha256=sha256(trace))
+                zero_configured_dt_calls=sum(x['physics_dt_s']==0 for x in calls),
+                omitted_calls=sum(x['status']=='omitted_by_setup_force_control' for x in calls),
+                pre_recording_returned_calls=sum(x['frame'] is None and x['status']=='returned' for x in calls),
+                returned_native_calls=sum(x['status']=='returned' for x in calls),sha256=sha256(trace))
         row['raw_source_sha256'] = {name:sha256(episode/name) for name in ['meta.json','replay.hdf5','trajectory.hdf5']}
         result['cases'].append(row)
         (out/'report.json').write_text(json.dumps(result,indent=2)+'\n')
@@ -188,6 +200,10 @@ def finish(out, code, render=False):
     stage_evidence = result['stage_load_barrier_evidence'] or {}
     result['stage_load_barrier_verified'] = bool(stage_evidence.get('ready') is True and stage_evidence.get('held_script_instances') == 0 and stage_evidence.get('initial_timeline_time') == stage_evidence.get('final_timeline_time')) if plan.get('stage_load_barrier') else None
     startup_ok = not plan.get('stage_load_barrier') or result['stage_load_barrier_verified'] is True
+    if plan.get('setup_force_control'):
+        from capstone_vla.setup_force_control import audit_intervention
+        result['setup_force_control'] = audit_intervention(plan)
+        startup_ok = startup_ok and result['setup_force_control']['verified']
     result['complete'] = startup_ok and code == 0 and sorted(episodes)==attempts and order==attempts and all(x['analysis_complete'] and (not render or x['render_complete']) for x in result['cases'])
     target = next((x for x in result['cases'] if x['attempt_index']==60),{})
     result['target_grasp_status'] = target.get('grasp', 'not_evaluated')
@@ -213,6 +229,17 @@ def finish(out, code, render=False):
             result['interpretation']='Matched-startup fresh60 control: compare with history60 and the earlier fresh60; no learned policy is evaluated.'
         else:
             result['interpretation']=('Startup attach sequencing changed under an opt-in workaround; this is a modified-startup history experiment. ' if plan.get('stage_load_barrier') else '')+'Compare original and fresh startup/native arrays before attributing any result to history; this remains a development expert experiment.'
+    if plan.get('setup_force_control'):
+        result['interpretation'] = ('One intentionally modified wind-force-history experiment; '
+            'require intervention verification, then compare first native ball step and full original arrays. '
+            'No unique mechanism or general fix follows from a single outcome.')
+        result.update(modified_forcing_history=True, training_eligible=False)
+        print('SETUP_FORCE_CONTROL verified='+str(result['setup_force_control']['verified']).lower(), flush=True)
+        matched = target.get('comparison_to_matched_history', {})
+        print('SETUP_FORCE_COMPARISON '+json.dumps(dict(
+            first_step_history_velocity_delta_m_s=matched.get('first_step_ball_velocity_delta_m_s'),
+            all_history_core_arrays_exact=matched.get('all_core_arrays_exact'),
+            pre_recording_native_calls=target.get('force_trace', {}).get('pre_recording_returned_calls'))), flush=True)
     (out/'report.json').write_text(json.dumps(result,indent=2)+'\n')
     lines=['# Worker-history video review','','Raw trajectories retained. Rendering is optional; skipped views have not been visually reviewed.','']
     for row in result['cases']:
@@ -236,6 +263,7 @@ def main():
     parser.add_argument('--native-backtrace',action='store_true')
     parser.add_argument('--fresh-control',action='store_true',help='Run original attempt60 alone using the matched history startup barrier')
     parser.add_argument('--stage-load-barrier',action='store_true',help='Experimental stopped-timeline stage attach barrier before robot USD edits')
+    parser.add_argument('--omit-setup-force-once',action='store_true',help='Experimental: omit the pinned second pre-recording wind call in fresh60 only')
     parser.add_argument('--render',action='store_true',help='Opt in to five-view review videos; default analyzes only')
     parser.add_argument('--finish',type=Path,help='Analyze/render a completed run without launching physics again')
     args=parser.parse_args()
@@ -243,9 +271,10 @@ def main():
         require(not args.run,'--finish never launches collection')
         out=args.finish.resolve();out.relative_to(ROOT/'data/derived/hgwind_history_diagnostics')
         return finish(out,json.loads((out/'worker_exit.json').read_text())['exit_code'],render=args.render)
-    plan,command,lab=prepare(args.native_backtrace,args.stage_load_barrier,args.fresh_control)
+    plan,command,lab=prepare(args.native_backtrace,args.stage_load_barrier,args.fresh_control,args.omit_setup_force_once)
     plan['render_requested'] = args.render
     if args.stage_load_barrier:print('STARTUP_WORKAROUND stage_load_barrier=true efficacy=unverified physics_parameters_unchanged=true',flush=True)
+    if args.omit_setup_force_once:print('SETUP_FORCE_CONTROL omit_event=1 modified_forcing_history=true efficacy=unverified',flush=True)
     print('RENDER_MODE '+('enabled' if args.render else 'skipped; raw trajectories retained'),flush=True)
     print('COMMAND '+shlex.join(command),flush=True)
     if not args.run:return 0
@@ -264,7 +293,7 @@ def main():
         try:
             for line in process.stdout:
                 log.write(line);log.flush()
-                if any(s in line for s in ['HISTORY_ATTEMPT','COLLECT ATTEMPT','SAFETY ABORT','Traceback','Error:','terminate called','what():','Aborted','CAPSTONE_NATIVE','STAGE_LOAD_BARRIER','DONE attempts','FATAL']):print(line.rstrip(),flush=True)
+                if any(s in line for s in ['HISTORY_ATTEMPT','COLLECT ATTEMPT','SAFETY ABORT','Traceback','Error:','terminate called','what():','Aborted','CAPSTONE_NATIVE','STAGE_LOAD_BARRIER','SETUP_FORCE_CONTROL','DONE attempts','FATAL']):print(line.rstrip(),flush=True)
             code=process.wait()
         except KeyboardInterrupt:
             os.killpg(process.pid,signal.SIGTERM)

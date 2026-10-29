@@ -2,6 +2,10 @@
 
 Snapshot: **2026-10-30, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Next bounded force-history experiment prepared
+
+The [setup-force control](SETUP_FORCE_CONTROL.md) now supports one explicitly modified fresh60 attempt: omit only the pinned second pre-recording wind submission. All other native submissions, controller settings, limits and scene parameters are retained.287 portable CPU checks, final56 focused checks, existing SDK Python3.10 parsing and actual scene/collector preflight pass. Physical result and hypothesis efficacy remain unverified; no GPU run or rendering by agent.
+
 ## Matched fresh60 result: history contrast persists
 
 The user run `20261030_003531_182273_fresh60` passes the watcher admission probe and stage-load barrier, then records 169 frames / 168 completed control intervals. No native startup abort occurs in this launch; this is not a general stability guarantee. The independent engineering grasp check fails: bilateral contact lasts 0.4667 s without sustained lift. Joint offset 4 (the fifth arm joint) reaches 2.6393 rad/s against a 2.61 limit, and required braking conflicts with acceleration/jerk bounds. Safety stops the worker with exit 1; limits are retained.

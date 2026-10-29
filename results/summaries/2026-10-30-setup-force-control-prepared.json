@@ -1,0 +1,53 @@
+{
+  "schema": "physical-vla-lab.setup-force-control-prepared.v1",
+  "date": "2026-10-30",
+  "purpose": "One bounded development causal probe of the observed extra pre-recording force submission",
+  "candidate": {
+    "baseline": "20261030_003531_182273_fresh60",
+    "event": 1,
+    "phase": "pre_recording",
+    "body": "/Root/Dynamics/ball_y9bssvn",
+    "force_x_N": 0.6705899834632874,
+    "matching": "Exact complete call signature, configured dt and simulation clock, plus first call returned"
+  },
+  "intervention": "Omit this single native submission, record omission, forward every other call. No force clear or extra Kit/physics update.",
+  "modified_forcing_history": true,
+  "training_eligible": false,
+  "implemented": true,
+  "simulator_efficacy": "unverified",
+  "gpu_launched": false,
+  "render_requested": false,
+  "attempt_budget": 1,
+  "controls": {
+    "native_collector_assembly": "exact history baseline",
+    "task_and_physics_signature": "unchanged",
+    "controller_and_limits": "unchanged",
+    "existing_behavior_script_source": "unchanged",
+    "default_flow": "no intervention without explicit flag"
+  },
+  "validation": {
+    "portable_cpu_checks": 287,
+    "final_focused_checks": 56,
+    "sdk_python310_parse": "passed",
+    "actual_scene_preflight": "passed",
+    "matched_collector_hash": "exact",
+    "inotify_probe": "512/512",
+    "actual_default_vs_opt_in_isolation": {
+      "default_flow_unmodified": true,
+      "collector_assembly_identical": true,
+      "scene_controller_seed_depth_identical": true,
+      "new_entry_only_for_opt_in": true
+    }
+  },
+  "rollback": "Omit --omit-setup-force-once; separate module/worker can be reverted without changing frozen or raw sources",
+  "next": "User executes one opt-in fresh60 attempt without rendering; verify intervention before interpreting initial motion and grasp separately",
+  "source_hashes": {
+    "src/capstone_vla/setup_force_control.py": "cc9bb3b7f2d7e24734638085f34530cebf55270dd73406d3efc5a664794a9d71",
+    "scripts/sim/run_hgwind_setup_force_worker.py": "215f31dc2a59004fd015a0827acbcf6030c0c81432b9b44fd247f8131a603637",
+    "scripts/run_hgwind_history_diagnostic.py": "0bff68b5fc7438e0b9b237dab838861afea959883fdb3556d5618f4f1ad56352",
+    "tests/test_setup_force_control.py": "c2477329fb18da75f3be2b5db4d0b6215d0aa49805830f41aafe6246eb8bac32",
+    "tests/test_hgwind_history.py": "cafcd1f1eea571fad6dd7a9a13ecb88240860e718f46390a50ad6605203e6966"
+  },
+  "preflight_log_sha256": "dd7b5ba7210164c6435e9410af178367b795fbe44d7264e798a3bbd6314003ea",
+  "default_isolation_log_sha256": "484f76ed8d74ba2e9a0bba051f5ad8fe462699c5105c1586bf841be44eccc571"
+}

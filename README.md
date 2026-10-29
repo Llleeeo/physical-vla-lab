@@ -12,6 +12,8 @@ The guarded worker-history launch now reproduces all three selected original epi
 
 The [Linux watch-resource shortage](docs/project/NATIVE_STARTUP_RESOURCES.md) has recovered after VS Code reload: 512/512 allocation and CPU scene-loading checks pass with zero watch errors. The matched fresh60 run now starts normally but reproduces the earlier safety-aborted failure exactly in 15 arrays, while history58/59/60 reproduces original success. This isolates a worker-history/reset contrast beyond the loading barrier; the specific mechanism remains unknown. [Matched-control evidence](docs/project/WORKER_HISTORY_DIAGNOSTIC.md#matched-fresh60-result-history-contrast-persists).
 
+A [single pre-recording wind-force intervention](docs/project/SETUP_FORCE_CONTROL.md) is now prepared: omit exactly one pinned repeated submission and compare startup/native arrays before grasp. 287 portable CPU checks and actual scene preflight pass; simulator efficacy is unverified.
+
 | Workstream | Verified progress | Remaining work |
 |---|---|---|
 | Franka action interface | Recorded-tool FK verified across all 40 ball episodes; explicit Cartesian request execution grasps successfully on one exposed seed without online task/skill decisions | Live policy action contract and learned dynamic grasping |

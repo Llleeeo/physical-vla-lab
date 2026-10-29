@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-30 — Bounded setup-force intervention prepared
+
+- Add opt-in `--omit-setup-force-once` for matched fresh60 only. Pin the verified baseline trace; require the exact first/second call signature and normal first native return, then omit only the second submission. Forward all other calls. Default/frozen sources and control limits remain unchanged.
+- Separate modified-force provenance and runtime intervention verification from comparison completion/grasp. No training eligibility or VLA claim. 287 portable CPU checks, final56 focused checks, SDK Python3.10 parsing and real scene/collector preflight pass. One user-run attempt without rendering is pending; no simulator efficacy claimed.
+
 ## 2026-10-30 — Matched fresh control measures a history/reset contrast
 
 - Fresh60 starts without native abort, then stops safely at 169 recorded frames. All 15 core arrays match the prior fresh failure; guarded history60 instead matches original successful319-frame recording. Ball velocity differs at the first native physics step despite matching initial recorded state. No unique force/cache mechanism or general crash fix is established.
