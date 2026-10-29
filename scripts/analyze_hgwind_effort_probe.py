@@ -146,10 +146,11 @@ def analyze(output):
             require(sha256(plan[field])==plan[field+'_sha256'],'Packet reference changed: '+field)
         capture=json.loads(Path(plan['cartesian_target_capture']).read_text())
         with h5py.File(source,'r') as original:
-            packets=build_packets(capture,original['actions'][:,7:])
+            packets=build_packets(capture,original['actions'][:,7:],plan.get('packet_gain_profile','recorded'))
         require(json.loads((output/'packet_requests.json').read_text())==packets,'Executed packet stream differs from source')
         payload=json.loads((output/'cartesian_packet_execution.json').read_text())
         segments=json.loads((output/'original_expert_control_references.json').read_text())
+        require(payload.get('packet_gain_profile','recorded')==plan.get('packet_gain_profile','recorded'),'Executed gain profile differs from plan')
         packet_audit=audit_packets(payload,packets,segments,n)
         report['packet_controller_audit']=packet_audit
         report['full_source_length_completed']=full
@@ -162,8 +163,20 @@ def analyze(output):
             'Independent safety uses non-target scene geometry and robot state; target pose/velocity access blocked in its world adapter.',
             'Last Cartesian goal is explicitly held after the 194 source calls; no expert joint-only fallback executes.',
             'Collector expert/FSM success labels are not this probe result. Use the independent contact/lift/retention outcome.']
+    report['packet_fixed_gains_probe_passed']=None
+    if plan.get('packet_gain_profile','recorded')!='recorded':
+        from capstone_vla.cartesian_packets import audit_gain_profile
+        for key in ['packet_gain_reference_report','packet_gain_reference_requests']:
+            require(sha256(plan[key])==plan[key+'_sha256'],'Gain reference changed: '+key)
+        source_packets=json.loads(Path(plan['packet_gain_reference_requests']).read_text())
+        isolated=audit_gain_profile(source_packets,packets,plan['packet_gain_profile'])
+        report['packet_gain_profile']=plan['packet_gain_profile']
+        report['only_pose_gains_changed']=isolated
+        report['changed_gain_frames']=sum(a!=b for a,b in zip(source_packets,packets))
+        report['packet_fixed_gains_probe_passed']=bool(isolated and report['packet_controller_probe_passed'])
+        report['limits'][0]='Only pose gains are constant at 9/8; all other recorded numeric settings/motion/gripper schedules remain. Not VLA predictions.'
     (output/'report.json').write_text(json.dumps(report,indent=2)+'\n')
-    print('HGWIND_EFFORT_PROBE_COMPLETED '+json.dumps({k:report[k] for k in ['mode','reference','tracking','tracking_branch_verified','recorded_frames','completed_frames','full_source_length_completed','initial_state_match','motion_tracking_passed','native_expert_reference_passed','control_reference_replay_passed','live_kinematics_component_passed','task_feedforward_ablation_passed','cartesian_target_capture_verified','cartesian_feedback_replay_passed','packet_controller_probe_passed','expert_early_success','baseline_ready_for_cartesian']}))
+    print('HGWIND_EFFORT_PROBE_COMPLETED '+json.dumps({k:report[k] for k in ['mode','reference','tracking','tracking_branch_verified','recorded_frames','completed_frames','full_source_length_completed','initial_state_match','motion_tracking_passed','native_expert_reference_passed','control_reference_replay_passed','live_kinematics_component_passed','task_feedforward_ablation_passed','cartesian_target_capture_verified','cartesian_feedback_replay_passed','packet_controller_probe_passed','packet_fixed_gains_probe_passed','expert_early_success','baseline_ready_for_cartesian']}))
     print('INDEPENDENT_GRASP '+str(None if grasp is None else grasp['status']));print('REPORT '+str(output/'report.json'))
     return report
 

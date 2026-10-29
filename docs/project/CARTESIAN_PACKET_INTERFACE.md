@@ -216,3 +216,46 @@ pose-only DynamicVLA action contract. Next, define and test a fixed policy-facin
 controller profile and a compatible motion-reference construction against this
 passing baseline before batch conversion/training. See the [source-hashed
 result](../../results/summaries/2026-10-29-cartesian-packet-success.json).
+
+
+## Fixed-feedback-gain diagnostic prepared — 2026-10-29
+
+The successful stream uses 33 numeric API fields plus two callback-mode fields.
+They are not all model actions. In the 194 source calls, pose gains switch from
+9/8 to 4/4 at frame 173; posture, joint-limit margin and orientation-task mode
+also change there. Roll weight switches at 135, orientation preservation changes
+repeatedly, and relative-speed references vary. A static complete controller
+profile is not established by the successful packet run.
+
+The next probe isolates only pose feedback gains. `--packet-gain-profile fixed-9-8`
+keeps the already-used approach gains throughout the stream. Exactly frames
+173–208 (36 frames) change; every pose, motion/acceleration reference, other
+setting, callback mode, jaw command and terminal-hold field remains identical.
+These gains influence error correction; native effort, velocity, acceleration,
+jerk and collision constraints are unchanged. The choice is a development
+comparison, not an optimum or a new manufacturer limit.
+
+Pass a physically successful recorded-gain packet run as `--packet-baseline-run`.
+The runner verifies source/scene/controller fingerprints, follows its pinned
+upper-feedback reference and rejects an ineffective or non-isolated change.
+Runtime and analysis reconstruct the same transformed packets. The audit checks
+actual applied gains and truthful configuration metadata. A separate
+`packet_fixed_gains_probe_passed` requires isolated input changes, all completed
+intervals, initial identity, safety, cadence and independent grasp evidence.
+The original collector FSM is still bypassed; its old failed label is unchanged.
+
+```bash
+python scripts/run_hgwind_effort_probe.py \
+  --tracking native-expert \
+  --packet-baseline-run /path/to/passing-recorded-packet-run \
+  --packet-gain-profile fixed-9-8 --run
+```
+
+The default `recorded` mode remains available. Seven new CPU regressions cover
+exact preservation, invalid profiles, ineffective changes, altered motion/safety/
+jaw requests and truthful runtime gain auditing. All 177 portable checks, actual
+scene preflight and simulator Python 3.10 parsing pass. The prior physical packet
+audit also still passes on the saved raw trace. No new GPU workload was launched;
+physical fixed-gain performance is pending. Even a pass removes only this gain
+schedule, not the remaining orientation/posture/motion dependencies. See
+[preparation evidence](../../results/summaries/2026-10-29-fixed-gain-probe-preparation.json).

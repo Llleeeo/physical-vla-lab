@@ -283,3 +283,62 @@ def test_invalid_robot_pose_stops_before_native_arm_call(monkeypatch):
     packets,robot,owner,world,policy=setup(monkeypatch);robot.position[0]=np.nan
     with pytest.raises(ValueError,match='measured robot pinch'):PacketStreamExecutor(packets).step(policy,world,0,1/60)
     assert robot.arms==0
+
+
+
+def gain_source_packets():
+    source=capture()
+    for i,event in enumerate(source['calls']):
+        event['inputs'].update(position_gain=9. if i==0 else 4.,orientation_gain=8. if i==0 else 4.)
+    return build_packets(source,np.zeros((3,2)))
+
+
+def test_fixed_gains_preserve_every_other_request_and_do_not_mutate_source():
+    from capstone_vla.cartesian_packets import apply_gain_profile,audit_gain_profile
+    source=gain_source_packets();snapshot=copy.deepcopy(source)
+    applied=apply_gain_profile(source,'fixed-9-8')
+    assert source==snapshot and applied[0]==source[0] and applied[1]!=source[1]
+    for before,after in zip(source,applied):
+        assert after['inputs']['position_gain']==9. and after['inputs']['orientation_gain']==8.
+        restored=copy.deepcopy(after)
+        for key in ['position_gain','orientation_gain']:restored['inputs'][key]=before['inputs'][key]
+        assert restored==before
+    assert audit_gain_profile(source,applied,'fixed-9-8')
+    assert apply_gain_profile(source)==source
+
+
+@pytest.mark.parametrize('field',['target_position','target_linear_acceleration','safety_callbacks','gripper_closed'])
+def test_gain_audit_rejects_unrelated_motion_safety_or_gripper_changes(field):
+    from capstone_vla.cartesian_packets import apply_gain_profile,audit_gain_profile
+    source=gain_source_packets();applied=apply_gain_profile(source,'fixed-9-8')
+    if field in applied[1]['inputs']:applied[1]['inputs'][field]=[9.,0.,0.]
+    elif field=='gripper_closed':applied[1][field]=not applied[1][field]
+    else:applied[1][field]['cartesian_velocity_projector']=None
+    assert not audit_gain_profile(source,applied,'fixed-9-8')
+
+
+def test_gain_probe_rejects_unknown_profile_and_no_effect():
+    from capstone_vla.cartesian_packets import apply_gain_profile,audit_gain_profile
+    source=gain_source_packets()
+    with pytest.raises(ValueError,match='Unknown packet gain'):apply_gain_profile(source,'arbitrary')
+    fixed=apply_gain_profile(source,'fixed-9-8')
+    assert not audit_gain_profile(fixed,fixed,'fixed-9-8')
+
+
+def test_fixed_gain_execution_audit_requires_truthful_context(monkeypatch):
+    from capstone_vla.cartesian_packets import apply_gain_profile
+    _,robot,owner,world,policy=setup(monkeypatch)
+    packets=apply_gain_profile(gain_source_packets(),'fixed-9-8')
+    executor=PacketStreamExecutor(packets,'fixed-9-8');segments=[]
+    for i in range(3):
+        arm,_=executor.step(policy,world,i,1/60).actions
+        segments.append(dict(frame=i,goal_position=arm.joint_positions,goal_velocity=arm.joint_velocities,
+            operational_space_reference=robot._pending_operational_space_reference))
+    payload=executor.payload();audit=audit_packets(payload,packets,segments,3)
+    assert audit['packet_execution_verified'] and audit['gain_profile_verified']
+    assert not audit['source_controller_setting_schedule_retained']
+    assert not payload['source_numeric_controller_settings_retained']
+    payload['source_numeric_controller_settings_retained']=True
+    assert not audit_packets(payload,packets,segments,3)['packet_execution_verified']
+    payload=executor.payload();payload['calls'][-1]['inputs']['position_gain']=4.
+    assert not audit_packets(payload,packets,segments,3)['packet_execution_verified']

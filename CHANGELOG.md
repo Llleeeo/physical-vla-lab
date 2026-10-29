@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Isolated fixed-feedback-gain probe prepared
+
+- Inventory of the passing explicit request stream identifies gains, posture/orientation, relative-speed and callback-mode schedules as remaining dependencies.
+- Add opt-in `fixed-9-8` pose gains, gated on the successful recorded packet baseline. Exactly 36 frames change in this source; all other request fields and native limits remain unchanged. Runtime/analysis preserve profile provenance and report an independent fixed-gain gate.
+- Seven new regressions bring the portable suite to 177 passes. Actual scene preflight, saved baseline packet re-audit, exact change isolation and simulator Python 3.10 parsing pass. Physical result is pending; no new GPU rollout.
+
 ## 2026-10-29 — Explicit Cartesian packet execution grasps successfully
 
 - The corrected user-run packet controller completes 209 intervals / 627 physics and OSC updates safely, with no online task/skill decisions or expert joint-only terminal tail. Raw audit and contact recomputation match the saved report.

@@ -22,8 +22,8 @@ def configure(plan):
             from .cartesian_packets import PacketStreamExecutor,build_packets
             _require(sha256(plan['source'])==plan['source_reference_sha256'],'Packet jaw source changed')
             with h5py.File(plan['source'],'r') as handle:
-                packets=build_packets(json.loads(path.read_text()),handle['actions'][:,7:])
-            _STATE['packet_executor']=PacketStreamExecutor(packets)
+                packets=build_packets(json.loads(path.read_text()),handle['actions'][:,7:],plan.get('packet_gain_profile','recorded'))
+            _STATE['packet_executor']=PacketStreamExecutor(packets,plan.get('packet_gain_profile','recorded'))
             (Path(plan['output'])/'packet_requests.json').write_text(json.dumps(packets,indent=2,allow_nan=False)+'\n')
         else:
             _STATE['cartesian_replayer']=CartesianTargetReplayer(json.loads(path.read_text()))
@@ -80,6 +80,7 @@ def summary(policy):
         'original_expert_used':'packet_executor' not in _STATE,'packet_requests_own_motors':'packet_executor' in _STATE,'source_success_reused':False,'saved_commands_own_motors':False,
         'shadow_expert_operational_reference_used':False,'shadow_expert_velocity_limit_used':False,
         'source_native_operational_reference_reconstructed':False,'original_control_configuration_used':True,
+        'packet_gain_profile':plan.get('packet_gain_profile','recorded'),'native_effort_configuration_unchanged':True,
         'command_frames':len(rows),'segment_trace_count':len(rows),'source_reference_sha256':plan['source_reference_sha256'],
         'depth_bias_m':plan['original_depth_bias_m'],'control_reference_file':out.name,'cartesian_target_capture_enabled':'cartesian_recorder' in _STATE,'cartesian_upper_target_reexecution':'cartesian_replayer' in _STATE,'saved_inner_control_outputs_used':False,'standalone_policy_controller':False,'training_eligible':False,'vla_policy':False}
 

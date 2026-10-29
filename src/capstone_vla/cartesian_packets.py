@@ -38,7 +38,30 @@ class TargetBlindSafetyWorld:
         return access
 
 
-def build_packets(capture, gripper_targets):
+GAIN_PROFILES = {'recorded': None, 'fixed-9-8': {'position_gain': 9.0, 'orientation_gain': 8.0}}
+
+
+def apply_gain_profile(packets, profile='recorded'):
+    """Change only pose feedback gains; retain independent limits and requests."""
+    require(profile in GAIN_PROFILES, 'Unknown packet gain profile')
+    result = copy.deepcopy(packets)
+    gains = GAIN_PROFILES[profile]
+    if gains is not None:
+        for packet in result:
+            require(all(key in packet['inputs'] for key in gains), 'Missing source pose gains')
+            packet['inputs'].update(gains)
+    return result
+
+
+def audit_gain_profile(source_packets, applied_packets, profile):
+    """Exact whole-stream comparison prevents unrelated changes in the ablation."""
+    expected = apply_gain_profile(source_packets, profile)
+    if applied_packets != expected:
+        return False
+    return bool(profile == 'recorded' or any(a != b for a,b in zip(source_packets, applied_packets)))
+
+
+def build_packets(capture, gripper_targets, gain_profile='recorded'):
     from .cartesian_target_replay import CartesianTargetReplayer
     CartesianTargetReplayer(capture)  # Existing finite-input/clock validation.
     frames = capture['frames']
@@ -61,7 +84,7 @@ def build_packets(capture, gripper_targets):
         callbacks = {key: inputs.pop(key) for key in CALLBACKS}
         packets.append(dict(frame=frame, inputs=inputs, safety_callbacks=callbacks,
             gripper_closed=bool(jaws[frame, 0] < .02), terminal_cartesian_hold=terminal))
-    return packets
+    return apply_gain_profile(packets, gain_profile)
 
 
 def execute_request(expert, packet, callbacks):
@@ -129,7 +152,9 @@ def audit_robot_safety_motion(events):
 
 
 class PacketStreamExecutor:
-    def __init__(self, packets):
+    def __init__(self, packets, gain_profile='recorded'):
+        require(gain_profile in GAIN_PROFILES, 'Unknown packet gain profile')
+        self.gain_profile = gain_profile
         self.packets = copy.deepcopy(packets)
         self.events = []
         self.frames = []
@@ -194,7 +219,8 @@ class PacketStreamExecutor:
         return dict(schema='physical-vla-lab.cartesian-packet-execution.v1', frames=self.frames, calls=self.events,
             online_task_step_called=False, online_skill_step_called=False, expert_joint_fallback_used=False,
             target_truth_read_by_request_adapter=False, non_target_safety_geometry_paths=sorted(self.geometry_paths),
-            fixed_native_gripper_drive_configuration_retained=True, source_numeric_controller_settings_retained=True, source_motion_and_gripper_stream_retained=True,
+            fixed_native_gripper_drive_configuration_retained=True, packet_gain_profile=self.gain_profile,
+            source_numeric_controller_settings_retained=self.gain_profile=='recorded', source_motion_and_gripper_stream_retained=True,
             learned_policy_evaluated=False)
 
 
@@ -214,12 +240,17 @@ def audit_packets(payload, packets, segments, frames):
     boundaries = all(payload.get(key) is False for key in ['online_task_step_called','online_skill_step_called',
         'expert_joint_fallback_used','target_truth_read_by_request_adapter'])
     full = payload['frames']==list(range(len(packets))) and frames==len(packets) and len(segments)==frames
+    profile = payload.get('packet_gain_profile', 'recorded')
+    profile_ok = profile in GAIN_PROFILES
+    if profile_ok and GAIN_PROFILES[profile] is not None:
+        profile_ok = all(all(event['inputs'].get(key)==value for key,value in GAIN_PROFILES[profile].items()) for event in events)
+    profile_ok = profile_ok and payload.get('source_numeric_controller_settings_retained') is (profile=='recorded')
     return dict(alignment=alignment, exact_requests_and_gripper=exact and jaws, safety_jaw_context_matches=jaw_context, causal_robot_safety_motion_verified=motion_context, full_stream_completed=full,
         no_online_skill_decisions_verified=boundaries,
         packet_execution_verified=bool(full and exact and jaws and jaw_context and motion_context and boundaries and alignment['capture_alignment_passed']
-            and not alignment['failed_call_ids']),
+            and profile_ok and not alignment['failed_call_ids']),
         terminal_cartesian_hold_frames=sum(p['terminal_cartesian_hold'] for p in packets),
-        source_controller_setting_schedule_retained=True, learned_policy_evaluated=False)
+        source_controller_setting_schedule_retained=profile=='recorded', packet_gain_profile=profile, gain_profile_verified=profile_ok, learned_policy_evaluated=False)
 
 
 def patch_packet_collector(source):

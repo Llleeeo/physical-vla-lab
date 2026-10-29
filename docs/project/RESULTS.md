@@ -96,6 +96,16 @@ policy-facing settings/motion contract before ball-task training. No runtime
 code changes in this result update; the prior 170 CPU passes remain applicable.
 See [protocol](CARTESIAN_PACKET_INTERFACE.md) and [hashed evidence](../../results/summaries/2026-10-29-cartesian-packet-success.json).
 
+## Prepared fixed-feedback-gain diagnostic
+
+An opt-in probe now fixes only pose gains at 9/8 rather than switching to 4/4
+at frame 173. Exact comparison changes 36 of 209 requested frames and preserves
+every other packet field and native limit. Seven regressions bring the portable
+suite to 177 passes; actual scene preflight and saved passing-packet re-audit
+pass. No new physical result or learned-policy improvement is claimed. Remaining
+posture/orientation/motion schedules are still recorded dependencies. See
+[preparation evidence](../../results/summaries/2026-10-29-fixed-gain-probe-preparation.json).
+
 ## Earlier DynamicVLA integration: irregular egg-object task
 
 Task: `grasp_sliding_motion_on_flat_surface_1s1p_g9wvkk1`. Earlier shorthand called the object a ball; the target is an egg. This task remains a difficult development case.
