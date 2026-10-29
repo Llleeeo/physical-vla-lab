@@ -12,7 +12,7 @@ The guarded worker-history launch now reproduces all three selected original epi
 
 The [Linux watch-resource shortage](docs/project/NATIVE_STARTUP_RESOURCES.md) has recovered after VS Code reload: 512/512 allocation and CPU scene-loading checks pass with zero watch errors. The matched fresh60 run now starts normally but reproduces the earlier safety-aborted failure exactly in 15 arrays, while history58/59/60 reproduces original success. This isolates a worker-history/reset contrast beyond the loading barrier; the specific mechanism remains unknown. [Matched-control evidence](docs/project/WORKER_HISTORY_DIAGNOSTIC.md#matched-fresh60-result-history-contrast-persists).
 
-A [single pre-recording wind-force intervention](docs/project/SETUP_FORCE_CONTROL.md) is now prepared: omit exactly one pinned repeated submission and compare startup/native arrays before grasp. 287 portable CPU checks and actual scene preflight pass; simulator efficacy is unverified.
+The [single wind-force intervention](docs/project/SETUP_FORCE_CONTROL.md#observed-result-startup-ball-mismatch-removed-finger-response-differs) now restores exact ball velocity/pose through native rows0..500, but grasp still fails. Recorded close targets match; actual fingers close more slowly and first contact is about89ms later. Next inspect actual gripper drive/reset state. This is modified-force expert evidence, with no learned-policy success or general reset fix.
 
 | Workstream | Verified progress | Remaining work |
 |---|---|---|

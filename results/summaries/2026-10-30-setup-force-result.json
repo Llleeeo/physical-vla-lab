@@ -1,0 +1,69 @@
+{
+  "schema": "physical-vla-lab.setup-force-result.v1",
+  "date": "2026-10-30",
+  "run_id": "20261030_005620_189348_fresh60_omit1",
+  "intervention_verified": true,
+  "omitted_native_calls": 1,
+  "remaining_pre_recording_native_returns": 3,
+  "native_startup_aborted": false,
+  "worker_exit": 1,
+  "recorded_frames": 190,
+  "completed_intervals": 189,
+  "comparison_evaluable": true,
+  "physical_grasp": "fail",
+  "initial_state_match": true,
+  "ball_velocity_and_transform_exact_native_rows_0_through_500": true,
+  "first_native_ball_difference_row": 501,
+  "first_native_ball_difference_time_s": 2.7833334007300436,
+  "first_zero_gripper_target_frame": {
+    "history": 154,
+    "omission": 154
+  },
+  "gripper_position_targets_exact_through_frame166": true,
+  "precontact_at_frame166": {
+    "ee_position_difference_mm": 0.08861391246318817,
+    "finger_joint_position_difference_mm": [
+      2.1916794776916504,
+      2.4902429580688477
+    ],
+    "sum_finger_joint_position_difference_mm": 4.681922435760498
+  },
+  "first_positive_ball_finger_impulse_steps": {
+    "history": {
+      "panda_rightfinger": 500,
+      "panda_leftfinger": 511
+    },
+    "omission": {
+      "panda_rightfinger": 516,
+      "panda_leftfinger": 520
+    }
+  },
+  "first_right_finger_contact_delay_s": 0.08888888888888889,
+  "bilateral_duration_s": 0.2833333333333323,
+  "sustained_lift": false,
+  "abort": {
+    "joint_offset": 4,
+    "signed_speed_rad_s": -2.6516,
+    "absolute_speed_limit_rad_s": 2.61
+  },
+  "interpretation": "The specific force omission removes the observed ball-startup mismatch through500 physical integration steps in this case. Remaining measured finger closure differs before ball contact despite equal recorded position targets. Actual drive gains/caps/mimic/reset mechanisms remain unidentified; no complete or general fix.",
+  "next": "Inspect actual finger drive configuration at episode initialization and before closure in matched fresh/history conditions; distinguish drive settings from residual solver/mimic state before changing closing parameters.",
+  "modified_forcing_history": true,
+  "training_eligible": false,
+  "learned_policy_evaluated": false,
+  "rendering_requested": false,
+  "new_gpu_run_by_agent": false,
+  "validation": "Independent CPU raw-HDF5 readback, runtime intervention audit, exact501-row ball comparison, target equality and positive raw contact impulse identification. No runtime code change or additional simulator launch.",
+  "source_hashes": {
+    "run_plan": "09e180d1ab713958b18ef6b556bf18b572c6f0c26561c0b7c938240a46e1fabe",
+    "run_report": "a512c6e6b30b80d0ab6f3f5ba0c56d7f3ca19b96d9744290ab664599b2b7aeed",
+    "run_simulation_log": "8fe3c6062696b600cdec81822e301d37377aa0f62eb4c7a36f813cd5db640b8f",
+    "run_audit": "e9e98505c769550e1bc5f86bedcdacdd4f36200fdc1da225f9f47cadfb58f1f1",
+    "new_replay": "bd6933668292488193b9df35e45c1c5241b68af0041a7637dcab45cb048d2d24",
+    "history_replay": "4ebc51e4f27bc15c6b4dbbe3bc81826303c19f4d29570d764bd8dd13d09aab93",
+    "new_force_trace": "0faad327dc47d65057dc3c46bbe789cedd08f40541ae7e60b0a6044402d5eb45",
+    "history_force_trace": "64647e3419e23681c7465c2b5e6764f94479f353d37ba6e7702100d2212bfa11"
+  },
+  "analysis_sha256": "45a6d1fffd864758e83a9c11dd725e4a1b1a192de57e657f755bc5e568c9b4a6",
+  "analysis_script_sha256": "cb67fba0684bc3d8b4935b1cc03c0268f482cda4e6320ae7ffcbf2e2e23c11bb"
+}

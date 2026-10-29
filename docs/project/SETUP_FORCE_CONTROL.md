@@ -1,5 +1,17 @@
 # Single pre-recording wind-force control
 
+## Observed result: startup ball mismatch removed, finger response differs
+
+User run `20261030_005620_189348_fresh60_omit1` verifies exactly one pinned omission and three remaining native setup force returns. No native startup abort occurs in this launch. Independent full-prefix rereading finds ball native transform and linear/angular velocity **exactly equal to successful history for rows0..500**; row501 first differs at2.7833334s. This is evidence that the specific force submission contributed to the earlier startup mismatch in this case. It does not establish an internal accumulation mechanism or a general reset correction.
+
+The episode still fails:190 recorded frames/189 completed intervals, then motion safety stops joint offset4 at-2.6516rad/s against the absolute2.61 limit. Bilateral contact lasts0.2833s without sustained lift.
+
+Both runs first command zero finger-position targets at frame154; those recorded targets match through166. At166, the omission run's finger joints remain2.192/2.490mm farther open while EE position differs by only0.0886mm. Positive raw right-finger/ball impulse begins at native step500 in history versus516 in omission (about88.9ms later); left-finger steps are511 versus520. Thus the remaining visible discrepancy includes finger closure before contact, not just a different free-moving ball path. Equal saved position targets do not establish equal native velocity targets, gains, force/speed limits or solver/mimic state.
+
+`Expert.ensure_gripper_force` can change live drive gains/caps and USD drive attributes, while its free-travel branch preserves some authored properties. That is a code-supported reset/drive-history hypothesis, not a measured difference in gain values. Existing records lack the full actual drive properties at closure. Next inspect those properties at episode initialization and before closure in matched conditions, before changing parameters. Zero explicit finger entries in `get_applied_joint_efforts` are not measurements of the position drive's actual force.
+
+This is an expert development experiment with modified forcing history, excluded from training. No VLA, new GPU run or rendering by the agent. [Source-hashed result](../../results/summaries/2026-10-30-setup-force-result.json).
+
 ## Question and scope
 
 Matched fresh60 reproduces the old failure exactly, while history58/59/60 reproduces original success. Fresh60 observes two identical early force calls followed by two higher-force calls; history60 observes one early call followed by the same two higher-force calls. Both recordings begin with matching recorded positions/velocities, but their first native ball velocities differ. This motivates one force-history intervention; it does not establish force accumulation.
@@ -34,6 +46,6 @@ If the first-step mismatch disappears, this supports a contribution from this sp
 - `setup_force_control.prepare_intervention` pins the verified control reports/raw-force trace and unchanged task/controller/collector dependencies.
 - The separate opt-in worker installs the proxy before entering the existing history worker. Default startup and passive recording source remain unchanged.
 - `setup_force_control.audit_intervention` blocks comparison/success certification if the intervention lacks evidence. Root results explicitly mark modified forcing history and exclude training eligibility.
-- 287 portable CPU checks pass; the final focused56 checks and actual scene/native-assembly preflight pass. SDK Python3.10 parses the new entry/module and coordinator. No GPU experiment has been run for this intervention.
+- 287 portable CPU checks pass; the final focused56 checks and actual scene/native-assembly preflight pass. SDK Python3.10 parses the new entry/module and coordinator. The subsequent user-run outcome is documented above; these CPU checks are preparation evidence.
 
 [Preparation provenance](../../results/summaries/2026-10-30-setup-force-control-prepared.json).

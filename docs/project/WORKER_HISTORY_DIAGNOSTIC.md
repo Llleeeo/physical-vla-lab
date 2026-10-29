@@ -2,9 +2,9 @@
 
 The original attempts58,59,60 occurred in one worker. Their saved lengths are720,363,319 control frames; the first two failed grasping without a safety abort and the third succeeded. A fresh-worker attempt60 instead differs in ball velocity after the first physical step and eventually aborts on motion feasibility. This experiment tests whether reproducing the original within-worker history changes that mismatch. It does not identify a unique reset/cache/force mechanism or evaluate a learned policy.
 
-## Next control prepared
+## Current setup-force result
 
-Use the [single setup-force intervention](SETUP_FORCE_CONTROL.md) to test the specific extra call; this is a modified-force experiment, not another unmodified reproduction. Runtime outcome is pending.
+The [single setup-force result](SETUP_FORCE_CONTROL.md#observed-result-startup-ball-mismatch-removed-finger-response-differs) now removes the ball startup mismatch through native rows0..500, while actual finger closure differs before contact and grasp still fails. Next inspect drive/reset state. This is a modified-force development experiment; no general fix or VLA result follows.
 
 ## Matched fresh60 result: history contrast persists
 

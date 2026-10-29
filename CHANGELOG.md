@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-30 — Setup force control removes initial ball mismatch
+
+- User-run omission verified: exactly one suppressed submission, three remaining native setup force calls. Ball pose and linear/angular velocity match successful history exactly for native rows0..500; first difference moves to row501 at2.7833s. A specific startup-force contribution is supported for this case; no general reset fix or accumulation mechanism is established.
+- Grasp still fails after190frames. Equal close-position targets yield different precontact finger motion:2.192/2.490mm farther open at frame166 versus0.0886mm EE error; first right-finger impulse arrives about88.9ms later. Next inspect actual drive/reset state. Analysis/docs only, raw sources retained, no new GPU/render by agent.
+
 ## 2026-10-30 — Bounded setup-force intervention prepared
 
 - Add opt-in `--omit-setup-force-once` for matched fresh60 only. Pin the verified baseline trace; require the exact first/second call signature and normal first native return, then omit only the second submission. Forward all other calls. Default/frozen sources and control limits remain unchanged.
