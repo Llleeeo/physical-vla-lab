@@ -1,0 +1,39 @@
+# Bounded original worker-history diagnostic
+
+The original attempts58,59,60 occurred in one worker. Their saved lengths are720,363,319 control frames; the first two failed grasping without a safety abort and the third succeeded. A fresh-worker attempt60 instead differs in ball velocity after the first physical step and eventually aborts on motion feasibility. This experiment tests whether reproducing the original within-worker history changes that mismatch. It does not identify a unique reset/cache/force mechanism or evaluate a learned policy.
+
+## Run once
+
+```bash
+cd /home/robophys/Capstone_Project_Yuan_Haoming
+
+data/derived/hf_pilot_render_repo/.venv/bin/python \
+  scripts/run_hgwind_history_diagnostic.py --native-backtrace --run
+```
+
+Without `--run`, only CPU preflight executes. Exactly one native worker receives `--attempt_offset58`, `--max_attempts3` and no success-count target. Original seeds, variation, smooth-lift profile,2mm depth, physical jaws, effort execution,12s budget, reset code and safety exits remain. A safety abort or planned native restart ends that worker; the coordinator never replaces the missing attempts with fresh processes. GDB is the existing optional child debugger used in the measured fresh control; its previous success does not establish a native-crash fix.
+
+The independent entry restores and rotates the passive force and Cartesian observers at each original attempt boundary. Control/force calls remain native. Per-attempt labels, command traces and startup-force records cannot carry into the next recording. Initial loading updates remain outside complete force-observer coverage. The same patched source is checked at preflight and actual native entry before execution.
+
+Original failed/successful recordings are checksum pinned by attempt index. Each saved result is independently analyzed against its own original, with decoded action/state and raw180Hz ball velocity comparison. Attempt60 also compares against the already saved fresh-worker failure. Original force-call history is not available. Matching episode seeds and sampled variation are checked before interpreting the result.
+
+## Output and interpretation
+
+A fresh directory under `data/derived/hgwind_history_diagnostics/<timestamp>/` contains the plan, single-worker log, observed attempt order, individual attempt folders and final `report.json`. Physics outcomes and delivery completion are distinct. A partial prefix is explicitly incomplete; no episode is counted as tested when it did not run.
+
+All saved results receive five30Hz saved-state review videos; they are not formal training renders. `VIDEO_REVIEW.md` links the views. User review is pending. Render preparation uses copies, preserves raw collector files, and reports analysis/render errors independently.
+
+If collection ended but rendering was interrupted, continue delivery only:
+
+```bash
+data/derived/hf_pilot_render_repo/.venv/bin/python \
+  scripts/run_hgwind_history_diagnostic.py --finish <HISTORY_OUTPUT-directory>
+```
+
+Interpret the three raw comparisons before drawing conclusions. If earlier attempts already differ from their originals, the original history was not fully reproduced. If the prefix matches and attempt60 recovers, that supports a process-history effect in this exposed sequence; it does not distinguish fan caches, force accumulators or other solver/reset state. A different grasp outcome alone is insufficient. The frozen29D policy contract and previous failures remain unchanged.
+
+## Validation and rollback
+
+251 portable CPU checks pass, including eight new checks for strict sequence, observer restoration, independent per-attempt traces, partial-prefix retention, body-path velocity matching and all-saved-outcome render delivery even when analysis fails. Actual scene/three-source preflight passes, original HDF5 readers work, and the actual native-entry patch assembly matches its expected hash. Simulator-side code parses as Python3.10. These are preparation checks; the three-attempt GPU run has not been launched by the agent.
+
+Remove the new history module, worker, runner and tests, or revert the preparation commit. Existing single-attempt tools, frozen collector/control and original trajectories are preserved.

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Bounded original worker-history comparison prepared
+
+- Add one-worker attempts58/59/60 with original seed/profile/depth/reset and safety exits retained; no restart loop or success-target replacement. Pin all three original recordings and the prior fresh control.
+- Rotate passive force/Cartesian recorders per attempt, restore prior wrappers, analyze each saved result and automatically render all saved successes/failures. Resume delivery with `--finish` without launching collection again.
+- Eight new regressions bring portable CPU checks to251. Real scene/three-source preflight, Python3.10 parsing and actual native-entry assembly hash pass. GPU result and human video review remain pending.
+
 ## 2026-10-29 — Passive force measurement reproduces the saved failure
 
 - User's GDB launch passes scene loading; the earlier native crash does not recur and remains unexplained. The native teacher again aborts at169 recorded/168completed intervals;15 compared action/observation/native arrays match the earlier uninstrumented failure exactly.

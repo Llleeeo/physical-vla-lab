@@ -2,6 +2,12 @@
 
 Snapshot: **2026-10-29, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Worker-history experiment prepared; physical result pending
+
+The [new bounded command](WORKER_HISTORY_DIAGNOSTIC.md) executes original attempts58/59/60 in one native worker, then analyzes/renders every saved result. Original outcomes were failed720frames, failed363frames and successful319frames. An unchanged safety exit can truncate this sequence; no automatic worker restart is allowed. Compare startup physics and full arrays with originals and the previously measured fresh attempt60 before interpreting a grasp outcome.
+
+251 CPU checks, actual scene/three-source preflight and native-entry assembly verification pass. No GPU sequence has been run by the agent and no history cause or physical improvement is claimed. See [preparation provenance](../../results/summaries/2026-10-29-worker-history-preparation.json).
+
 ## Startup force measurement: reproduced failure, observed setup calls
 
 User run `20261029_225526_640181` reaches simulation under GDB, records169frames/168completed intervals, and renders five30Hz views of85frames each. The15 compared action/observation/native arrays match the prior uninstrumented fresh teacher1 failure exactly. This establishes observed noninterference for those arrays in this run, not a general claim about logging/debugger timing.

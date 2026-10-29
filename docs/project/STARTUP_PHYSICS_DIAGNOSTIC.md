@@ -8,7 +8,7 @@ The joint-offset4 speed is2.6393rad/s versus the2.61 bound; required braking con
 
 Ten force API calls are observed: four before control-frame recording at the same0.033333334s clock reading, followed by six marked control frames. Setup force x-components are0.670589983,0.670589983,1.668164968,1.668164968N. All calls return normally and report configured dt1/60s. This configured value is not the native integration-step record. No zero-dt call was observed in coverage, so the earlier zero-dt hypothesis remains unsupported. Equal clock readings do not prove force accumulation or absence of internal stepping; original force-call histories are unavailable.
 
-The two earlier C++ scene-load crashes do not recur in this launch. No native crash stack was saved and no crash fix is established. Proposed next step: compare original worker history58/59/60 with the already recorded fresh attempt60, preserving settings and every outcome. This experiment is not implemented/run yet; even a history effect would not isolate a unique fan/cache/solver cause. [Source hashes and measured values](../../results/summaries/2026-10-29-startup-force-measurement.json).
+The two earlier C++ scene-load crashes do not recur in this launch. No native crash stack was saved and no crash fix is established. Proposed next step: compare original worker history58/59/60 with the already recorded fresh attempt60, preserving settings and every outcome. The [bounded history runner](WORKER_HISTORY_DIAGNOSTIC.md) is now implemented and CPU validated; GPU execution remains pending. Even a history effect would not isolate a unique fan/cache/solver cause. [Source hashes and measured values](../../results/summaries/2026-10-29-startup-force-measurement.json).
 
 ## Verified evidence
 

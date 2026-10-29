@@ -1,0 +1,125 @@
+{
+  "schema": "physical-vla-lab.hgwind-worker-history-preparation.v1",
+  "prepared": true,
+  "gpu_run_started": false,
+  "learned_policy_evaluated": false,
+  "attempts": [
+    58,
+    59,
+    60
+  ],
+  "one_worker": true,
+  "maximum_attempts": 3,
+  "automatic_worker_restart": false,
+  "source_log_sha256": "6be81ae687db6939c54206de9f507798e1ca2de965b40cef09968c5c7d09b601",
+  "original_worker_context": {
+    "worker_marker_line": 27266,
+    "sample_line": 27953,
+    "attempts_in_this_worker_through_source": [
+      58,
+      59,
+      60
+    ],
+    "ordinal_in_worker": 3
+  },
+  "fresh_control": {
+    "run": "20261029_225526_640181_joint_online-expert_native-expert_target-capture",
+    "plan_sha256": "92efbf99abb2dd6b7c22b2884c41051d52cd437e425dd3c6f75b43a9558c55d4",
+    "report_sha256": "0009c1de83e4f292792de5db2c1f4261bffba48f574cf947b6e60ab8ace94155"
+  },
+  "original_cases": [
+    {
+      "attempt_index": 58,
+      "episode": "failed_00057",
+      "frames": 720,
+      "episode_seed": 3321754177,
+      "source_files": [
+        {
+          "path": "meta.json",
+          "bytes": 782345,
+          "sha256": "03dc5484a0d227b4ae11f258490aa55e2d25afab2230343348aabc24b7b040d7"
+        },
+        {
+          "path": "replay.hdf5",
+          "bytes": 12407545,
+          "sha256": "2ad36c3989758e976018fee63ec71bab3fe24a9fe46ff64221ad21091e25a4ad"
+        },
+        {
+          "path": "trajectory.hdf5",
+          "bytes": 220692,
+          "sha256": "46b4bd721c6887b2b0c7948d5639215190e952f290b9aa5df1d9852632be2458"
+        }
+      ]
+    },
+    {
+      "attempt_index": 59,
+      "episode": "failed_00058",
+      "frames": 363,
+      "episode_seed": 2976810150,
+      "source_files": [
+        {
+          "path": "meta.json",
+          "bytes": 619486,
+          "sha256": "2c4fcebcc1563cfd589a181652621aaadced7e24a99c150a8d2f157cf70b0f38"
+        },
+        {
+          "path": "replay.hdf5",
+          "bytes": 7209101,
+          "sha256": "9a06099d8694137a15e5e837e50b163211b8f4c5045adbf394919c61c0423aa0"
+        },
+        {
+          "path": "trajectory.hdf5",
+          "bytes": 135520,
+          "sha256": "fca89248981b6355fbf7b5b55b21ce51255093a1b33d5c186d5dc74868ffa233"
+        }
+      ]
+    },
+    {
+      "attempt_index": 60,
+      "episode": "traj_00001",
+      "frames": 319,
+      "episode_seed": 3502756008,
+      "source_files": [
+        {
+          "path": "meta.json",
+          "bytes": 817678,
+          "sha256": "5bc4f1c8cdf4234c8fda6a9363b62529c364b6edaf8436219f279475eef8feed"
+        },
+        {
+          "path": "replay.hdf5",
+          "bytes": 6696053,
+          "sha256": "6cfb3d8f57b5886954b2ef4fac35632a593e19572a14c83c1dbe3a5851d1982b"
+        },
+        {
+          "path": "trajectory.hdf5",
+          "bytes": 124924,
+          "sha256": "6550b7b6c38495206121bc653ef6bd03962858821d64a7e30d7dec630026dd9b"
+        }
+      ]
+    }
+  ],
+  "scene_sha256": "83330198e8a5a70758eda7b8ead447f61b3289c4206d738507ab6c77a806a6c7",
+  "physics_sha256": "6d147dbf49e5132c459cad3cf9cd9aa9b8e12160721f42b761ccecec56ad1a19",
+  "frozen_worker_sha256": "a0c1a9431fb679cb7b2b5f3416243b86557ca8890edcc45053a5fbbcdb084989",
+  "assembled_worker_sha256": "f0f1beb9ad4162078625162caf6f0a41f99dab5c9cd377c73e99ccd9524a032e",
+  "code_sha256": {
+    "src/capstone_vla/hgwind_history.py": "0e503bcc658a5478f038c5c48d3a597b4f46a9b318aa615999328653b31cfd83",
+    "scripts/sim/run_hgwind_history_worker.py": "e844b3072cf2310a6cb3647a0a78780bcad3f9b21d09d6bb759d010e2b116aaf",
+    "scripts/run_hgwind_history_diagnostic.py": "bdb7c80152d925aa8724b84a7819c4b0864b365e7b72501e821cfb7217736cca"
+  },
+  "validation": {
+    "portable_cpu_checks": 251,
+    "final_history_checks": 8,
+    "actual_scene_preflight": true,
+    "original_three_hdf5_readers": true,
+    "actual_native_entry_assembly_matches": true,
+    "simulator_code_python310_parse": true
+  },
+  "delivery": "Analyze each saved attempt against its own original; render every saved outcome to five30Hzreview views. Resume only delivery with --finish. Partial sequences are incomplete history, not replaced trials.",
+  "limits": [
+    "No new physical result or recovery is claimed.",
+    "Original failed attempts58/59 need not become successes. Compare their trajectories before interpreting attempt60.",
+    "Even reproduction of source60 supports at most a within-worker history effect in this development sequence, not a unique fan/cache/solver cause.",
+    "Original native startup crash cause remains unknown."
+  ]
+}
