@@ -1,0 +1,42 @@
+{
+  "schema": "physical-vla-lab.packet-jaw-context-diagnosis.v1",
+  "date": "2026-10-29",
+  "original_status": "SAFETY_ABORT_DURING_POSTCONTACT_MOTION",
+  "report_sha256": "c2ce9ae61868a8215719699ac0ad1406b7bbacb27129ed9b672ecbf85bd2ae86",
+  "execution_trace_sha256": "ffa7a71b7a4a5b30cd1cd73106b420c9ce1caa16371664411278a72989616a0f",
+  "simulation_log_sha256": "11d69113ea158e5af8b45150bb46bc36988705b62b1f3a5dd0781a013f0f9d24",
+  "recorded_frames": 175,
+  "completed_intervals": 174,
+  "first_contact_frame": 135,
+  "first_bilateral_frame": 137,
+  "bilateral_duration_s": 0.6333333333333311,
+  "retained_lift_before_abort_mm": 19.141778349876404,
+  "applied_upper_inputs_exact_to_passing_prefix": true,
+  "robot_joint_state_exact_through_frame": 151,
+  "first_arm_command_difference_frame": 151,
+  "first_robot_state_difference_frame": 152,
+  "jacobian_and_whole_arm_halfspaces_exact_at_first_command_difference": true,
+  "source_close_request_first_frame": 118,
+  "source_safety_jaw_flag_matches_source_commands": true,
+  "packet_safety_jaw_flag_stayed_false": true,
+  "verified_defect": "Explicit jaw actuation did not update the geometry owner jaw-command flag, so terminal safety kept the fixed fully-open finger proxy after CLOSE.",
+  "correction": "Synchronize the geometry jaw mode from the explicit packet before geometry/servo evaluation and audit it per frame; do not fabricate contacts or grasp confirmation.",
+  "frozen_native_geometry_cpu_fixture": {
+    "open_closed_reopen_sample_counts": [
+      3,
+      1,
+      3
+    ],
+    "note": "Native prefix selects palm plus fully-open finger proxy before CLOSE, palm alone after CLOSE; unchanged whole-arm model remains responsible for live fingers."
+  },
+  "limits_changed": false,
+  "whole_arm_collision_code_changed": false,
+  "target_truth_access_added": false,
+  "portable_cpu_tests_passed": 166,
+  "new_regressions": 3,
+  "real_scene_preflight_passed": true,
+  "original_report_or_trace_rewritten": false,
+  "corrected_physical_run_started": false,
+  "corrected_grasp_result": null,
+  "conclusion": "Stale jaw-context defect verified; restoration of the full physical grasp is pending the corrected run."
+}

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Synchronize explicit jaw commands with safety geometry
+
+- Packet rollout reaches bilateral contact but aborts during lift: 174 completed intervals, first changed arm command at frame 151, with matching robot state/Jacobian/whole-arm halfspaces at that boundary.
+- Identified omitted jaw context: explicit CLOSE starts at frame 118 while the geometry owner remains in fully-open mode. Synchronize that mode before servo evaluation and audit it per frame; closing is not a grasp certificate.
+- Three new regressions bring the portable suite to 166 passes. Frozen native geometry-prefix checks and scene preflight pass. Limits, whole-arm collision code, source data and failed reports remain unchanged; corrected physical outcome is pending.
+
 ## 2026-10-29 — Fix optional safety-geometry protocol in packet adapter
 
 - First physical packet attempt stops at frame 0: the adapter omitted the native optional `emission_surface` query, causing an existing fan mesh to be reported as missing. Reproduced offline with the frozen native geometry code.

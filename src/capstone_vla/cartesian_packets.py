@@ -109,6 +109,10 @@ class PacketStreamExecutor:
         blind = TargetBlindSafetyWorld(world, role_path(self.owner.target))
         # Only the geometry refresh is reused. Neither controller.step nor a
         # Catch/Grasp step is called; target tracking/contact/phase logic stays idle.
+        # This is the commanded jaw mode, not a contact/grasp certificate.
+        # Native terminal safety drops its fixed fully-open finger proxy once
+        # CLOSE is requested; the whole-arm model still checks live fingers.
+        self.owner._jaws_closed = bool(packet['gripper_closed'])
         self.owner._update_environment_obstacles(blind)
         require(not blind.blocked_paths, 'Geometry helper attempted target truth access')
         missing_geometry=getattr(self.owner, '_environment_missing_narrow_phase', [])
@@ -116,7 +120,7 @@ class PacketStreamExecutor:
         self.geometry_paths.update(blind.accessed_paths)
         callbacks = {key:getattr(self.owner, CALLBACKS[key][1].split('.')[-1]) for key in CALLBACKS}
         event = dict(call_id=len(self.events), frame=index, inputs=encode(dict(packet['inputs'], **packet['safety_callbacks'])),
-            gripper_closed=packet['gripper_closed'], terminal_cartesian_hold=packet['terminal_cartesian_hold'], completed=False)
+            gripper_closed=packet['gripper_closed'], safety_gripper_closed=bool(self.owner._jaws_closed), terminal_cartesian_hold=packet['terminal_cartesian_hold'], completed=False)
         self.events.append(event)
         self.frames.append(index)
         try:
@@ -153,12 +157,13 @@ def audit_packets(payload, packets, segments, frames):
     jaws = all(np.array_equal(np.asarray(event['jaw_action']['joint_indices']), [7,8])
         and np.array_equal(np.asarray(event['jaw_action']['joint_positions'],np.float32), np.full(2,0. if packet['gripper_closed'] else .04,np.float32))
         for event,packet in zip(events,packets))
+    jaw_context = len(events)==len(packets) and all(event.get('safety_gripper_closed') is packet['gripper_closed'] for event,packet in zip(events,packets))
     boundaries = all(payload.get(key) is False for key in ['online_task_step_called','online_skill_step_called',
         'expert_joint_fallback_used','target_truth_read_by_request_adapter'])
     full = payload['frames']==list(range(len(packets))) and frames==len(packets) and len(segments)==frames
-    return dict(alignment=alignment, exact_requests_and_gripper=exact and jaws, full_stream_completed=full,
+    return dict(alignment=alignment, exact_requests_and_gripper=exact and jaws, safety_jaw_context_matches=jaw_context, full_stream_completed=full,
         no_online_skill_decisions_verified=boundaries,
-        packet_execution_verified=bool(full and exact and jaws and boundaries and alignment['capture_alignment_passed']
+        packet_execution_verified=bool(full and exact and jaws and jaw_context and boundaries and alignment['capture_alignment_passed']
             and not alignment['failed_call_ids']),
         terminal_cartesian_hold_frames=sum(p['terminal_cartesian_hold'] for p in packets),
         source_controller_setting_schedule_retained=True, learned_policy_evaluated=False)

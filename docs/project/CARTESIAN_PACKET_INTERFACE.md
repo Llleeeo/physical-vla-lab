@@ -116,3 +116,33 @@ queries, for both no-emission and emitted-surface CPU fixtures. Python 3.10 pars
 and real scene preflight pass. The original failure log is retained; the correction
 has not yet been physically rerun. Use the same command above; it writes a new
 output directory. See [the diagnosis](../../results/summaries/2026-10-29-packet-geometry-protocol-fix.json).
+
+
+## Jaw geometry context defect and correction — 2026-10-29
+
+After the optional-query fix, the packet run reaches first contact at frame 135
+and bilateral contact at frame 137, but aborts during post-contact motion after
+174 completed intervals (175 recorded states). It has 0.633 s bilateral contact
+and about 19.14 mm retained lift before the abort. Its source upper inputs match
+exactly. Recorded robot states remain exact through frame 151; the first arm
+command difference is at frame 151 and measured-state divergence begins at 152.
+The Jacobian and whole-arm constraint matrix/bounds still match at that first
+changed command, directing investigation to the terminal projection context.
+
+The source CLOSE command and source geometry-owner `_jaws_closed` flag both start
+at frame 118. The new packet actuator issues that CLOSE correctly but omitted the
+geometry-owner flag, which stays false in its recorded telemetry. The native
+terminal projector uses this flag to decide whether the fixed fully-open finger
+proxy is valid. Native comments explain that closing fingers move relative to
+the pinch frame; their ongoing collision checks remain in the whole-arm model.
+A frozen native geometry-prefix CPU fixture confirms the open/closed/reopen mode
+switch without changing the whole-arm code or margins.
+
+The packet adapter now copies the explicit commanded jaw mode into safety context
+before geometry/servo evaluation and records `safety_gripper_closed` per call.
+The audit requires correspondence to the packet. It does not set physical-grasp
+or contact flags, run a skill decision or read target truth. Three new regressions
+cover ordering, close/reopen propagation, stale-context rejection and preservation
+of independent contact/skill state. All 166 CPU checks and scene preflight pass.
+The failed run is retained. **Full grasp restoration remains pending a physical
+rerun with the same command above.** See [the source-hashed diagnosis](../../results/summaries/2026-10-29-packet-jaw-context-diagnosis.json).

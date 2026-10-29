@@ -189,3 +189,46 @@ def test_optional_geometry_probe_no_longer_discards_existing_fan_mesh(monkeypatc
     owner._update_environment_obstacles=refresh
     PacketStreamExecutor(packets).step(policy,world,0,1/60)
     assert robot.arms==1 and not owner._environment_missing_narrow_phase
+
+
+def test_explicit_close_and_reopen_reach_safety_before_servo(monkeypatch):
+    packets,robot,owner,world,policy=setup(monkeypatch)
+    packets[2]['gripper_closed']=False
+    owner._jaws_closed=True  # Deliberately stale initial context.
+    geometry_modes=[];servo_modes=[]
+    refresh=owner._update_environment_obstacles
+    def check_geometry(blind):
+        geometry_modes.append(owner._jaws_closed)
+        refresh(blind)
+    owner._update_environment_obstacles=check_geometry
+    original=robot.operational_space_pinch_action
+    def check_servo(**inputs):
+        servo_modes.append(owner._jaws_closed)
+        return original(**inputs)
+    robot.operational_space_pinch_action=check_servo
+    executor=PacketStreamExecutor(packets)
+    for frame in range(3):executor.step(policy,world,frame,1/60)
+    assert geometry_modes==servo_modes==[False,True,False]
+    assert robot.jaws==[False,True,False]
+    assert [event['safety_gripper_closed'] for event in executor.events]==[False,True,False]
+
+
+def test_stale_safety_jaw_context_cannot_pass_packet_audit(monkeypatch):
+    packets,robot,owner,world,policy=setup(monkeypatch);executor=PacketStreamExecutor(packets);segments=[]
+    for frame in range(3):
+        arm,_=executor.step(policy,world,frame,1/60).actions
+        segments.append(dict(frame=frame,goal_position=arm.joint_positions,goal_velocity=arm.joint_velocities,
+            operational_space_reference=robot._pending_operational_space_reference))
+    payload=copy.deepcopy(executor.payload())
+    assert audit_packets(payload,packets,segments,3)['packet_execution_verified']
+    payload['calls'][1]['safety_gripper_closed']=False
+    audit=audit_packets(payload,packets,segments,3)
+    assert not audit['packet_execution_verified'] and not audit['safety_jaw_context_matches']
+
+
+def test_close_request_does_not_fabricate_contact_or_skill_phase(monkeypatch):
+    packets,robot,owner,world,policy=setup(monkeypatch)
+    owner._physical_grasp_confirmed=False;owner.phase='initial'
+    executor=PacketStreamExecutor(packets)
+    executor.step(policy,world,0,1/60);executor.step(policy,world,1,1/60)
+    assert owner._jaws_closed and not owner._physical_grasp_confirmed and owner.phase=='initial'

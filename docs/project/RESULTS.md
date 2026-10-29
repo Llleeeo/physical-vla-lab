@@ -58,6 +58,14 @@ loosening geometry or robot limits. All 163 CPU checks and scene preflight pass;
 the corrected physical packet run remains pending. This run provides no grasp
 performance evidence. See [the protocol diagnosis](../../results/summaries/2026-10-29-packet-geometry-protocol-fix.json).
 
+The corrected geometry-protocol packet run reaches bilateral contact, then aborts
+after 174 completed intervals. The first command divergence occurs at frame 151
+while robot state, Jacobian and whole-arm constraints still match the passing
+reference. Explicit CLOSE began at frame 118, but the new adapter left the native
+terminal geometry context in fully-open mode. That omission is fixed and audited;
+166 CPU tests and scene preflight pass. The corrected full physical result is
+pending. See [the jaw-context diagnosis](../../results/summaries/2026-10-29-packet-jaw-context-diagnosis.json).
+
 ## Earlier DynamicVLA integration: irregular egg-object task
 
 Task: `grasp_sliding_motion_on_flat_surface_1s1p_g9wvkk1`. Earlier shorthand called the object a ball; the target is an egg. This task remains a difficult development case.
