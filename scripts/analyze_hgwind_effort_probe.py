@@ -146,7 +146,11 @@ def analyze(output):
             require(sha256(plan[field])==plan[field+'_sha256'],'Packet reference changed: '+field)
         capture=json.loads(Path(plan['cartesian_target_capture']).read_text())
         with h5py.File(source,'r') as original:
-            packets=build_packets(capture,original['actions'][:,7:],plan.get('packet_gain_profile','recorded'),plan.get('packet_posture_profile','recorded'))
+            expected_anchor = None
+            if plan.get('packet_posture_profile')=='latched':
+                from capstone_vla.posture_anchor import compute_anchor
+                expected_anchor=compute_anchor(original['obs/joint_pos'][0,:7],plan['robot_posture_configuration'])
+            packets=build_packets(capture,original['actions'][:,7:],plan.get('packet_gain_profile','recorded'),plan.get('packet_posture_profile','recorded'),expected_anchor)
         require(json.loads((output/'packet_requests.json').read_text())==packets,'Executed packet stream differs from source')
         payload=json.loads((output/'cartesian_packet_execution.json').read_text())
         segments=json.loads((output/'original_expert_control_references.json').read_text())
@@ -177,18 +181,31 @@ def analyze(output):
         report['packet_fixed_gains_probe_passed']=bool(isolated and report['packet_controller_probe_passed'])
         report['limits'][0]='Only pose gains are constant at 9/8; all other recorded numeric settings/motion/gripper schedules remain. Not VLA predictions.'
     report['packet_measured_posture_probe_passed']=None
-    if plan.get('packet_posture_profile')=='measured':
+    if plan.get('packet_posture_profile') in ('measured','latched'):
         from capstone_vla.cartesian_packets import audit_posture_profile
         for key in ['packet_posture_reference_report','packet_posture_reference_requests']:
             require(sha256(plan[key])==plan[key+'_sha256'],'Posture reference changed: '+key)
         source_packets=json.loads(Path(plan['packet_posture_reference_requests']).read_text())
-        isolated=audit_posture_profile(source_packets,packets,'measured')
-        report.update(packet_posture_profile='measured',packet_gain_profile=plan['packet_gain_profile'],only_posture_target_changed=isolated,
+        isolated=audit_posture_profile(source_packets,packets,plan['packet_posture_profile'],expected_anchor)
+        posture_probe_passed=bool(isolated and packet_audit['posture_profile_verified'] and report['packet_controller_probe_passed'])
+        report.update(packet_posture_profile=plan['packet_posture_profile'],packet_gain_profile=plan['packet_gain_profile'],only_posture_target_changed=isolated,
             changed_posture_frames=sum(a!=b for a,b in zip(source_packets,packets)),
-            packet_measured_posture_probe_passed=bool(isolated and packet_audit['posture_profile_verified'] and report['packet_controller_probe_passed']))
-        report['limits'][0]='Only posture_target is removed versus the passing fixed-9/8 baseline; other recorded motion/settings/gripper schedules remain. Not VLA predictions.'
+            packet_measured_posture_probe_passed=posture_probe_passed if plan['packet_posture_profile']=='measured' else None)
+        report['limits'][0]='Only posture handling differs from the passing fixed-9/8 baseline; other recorded motion/settings/gripper schedules remain. Not VLA predictions.'
+    report['packet_latched_posture_probe_passed']=None
+    if plan.get('packet_posture_profile')=='latched':
+        initialization=payload['posture_initialization']
+        require(initialization['configuration']==plan['robot_posture_configuration'],'Executed posture configuration differs from plan')
+        with h5py.File(ep/'replay.hdf5','r') as recorded:
+            initial_q=recorded['obs/joint_pos'][0,:7]
+            robot_q=np.array([e['latched_posture_context']['measured_joint_position_rad'] for e in payload['calls']])
+            robot_context_matches=bool(np.array_equal(initial_q,np.asarray(initialization['initial_joint_position_rad'])) and np.array_equal(robot_q,recorded['obs/joint_pos'][:,:7]))
+        report['packet_latched_posture_probe_passed']=bool(posture_probe_passed and robot_context_matches)
+        report['packet_measured_posture_probe_passed']=None
+        report['latched_posture_matches_raw_robot_context']=robot_context_matches
+        report['limits'][0]='Posture is initialized from measured robot joints and declared sampled robot variation, then held; target motion/other settings remain recorded. Not VLA predictions.'
     (output/'report.json').write_text(json.dumps(report,indent=2)+'\n')
-    print('HGWIND_EFFORT_PROBE_COMPLETED '+json.dumps({k:report[k] for k in ['mode','reference','tracking','tracking_branch_verified','recorded_frames','completed_frames','full_source_length_completed','initial_state_match','motion_tracking_passed','native_expert_reference_passed','control_reference_replay_passed','live_kinematics_component_passed','task_feedforward_ablation_passed','cartesian_target_capture_verified','cartesian_feedback_replay_passed','packet_controller_probe_passed','packet_fixed_gains_probe_passed','packet_measured_posture_probe_passed','expert_early_success','baseline_ready_for_cartesian']}))
+    print('HGWIND_EFFORT_PROBE_COMPLETED '+json.dumps({k:report[k] for k in ['mode','reference','tracking','tracking_branch_verified','recorded_frames','completed_frames','full_source_length_completed','initial_state_match','motion_tracking_passed','native_expert_reference_passed','control_reference_replay_passed','live_kinematics_component_passed','task_feedforward_ablation_passed','cartesian_target_capture_verified','cartesian_feedback_replay_passed','packet_controller_probe_passed','packet_fixed_gains_probe_passed','packet_measured_posture_probe_passed','packet_latched_posture_probe_passed','expert_early_success','baseline_ready_for_cartesian']}))
     print('INDEPENDENT_GRASP '+str(None if grasp is None else grasp['status']));print('REPORT '+str(output/'report.json'))
     return report
 

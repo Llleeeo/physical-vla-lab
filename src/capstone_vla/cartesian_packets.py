@@ -61,19 +61,21 @@ def audit_gain_profile(source_packets, applied_packets, profile):
     return bool(profile == 'recorded' or any(a != b for a,b in zip(source_packets, applied_packets)))
 
 
-def apply_posture_profile(packets, profile='recorded'):
+def apply_posture_profile(packets, profile='recorded', anchor=None):
     """Use native measured-state redundancy handling, without a saved q target."""
-    require(profile in ('recorded', 'measured'), 'Unknown packet posture profile')
+    require(profile in ('recorded', 'measured', 'latched'), 'Unknown packet posture profile')
+    if profile == 'latched':
+        require(np.asarray(anchor).shape==(7,) and np.isfinite(anchor).all(), 'Missing/invalid latched posture anchor')
     result = copy.deepcopy(packets)
-    if profile == 'measured':
+    if profile in ('measured','latched'):
         for packet in result:
             require('posture_target' in packet['inputs'], 'Missing source posture field')
-            packet['inputs']['posture_target'] = None
+            packet['inputs']['posture_target'] = None if profile=='measured' else np.asarray(anchor,float).tolist()
     return result
 
 
-def audit_posture_profile(source_packets, applied_packets, profile):
-    expected = apply_posture_profile(source_packets, profile)
+def audit_posture_profile(source_packets, applied_packets, profile, anchor=None):
+    expected = apply_posture_profile(source_packets, profile, anchor)
     return bool(applied_packets == expected and (profile == 'recorded'
         or any(a != b for a,b in zip(source_packets, applied_packets))))
 
@@ -107,7 +109,7 @@ def audit_measured_posture(events):
     return True
 
 
-def build_packets(capture, gripper_targets, gain_profile='recorded', posture_profile='recorded'):
+def build_packets(capture, gripper_targets, gain_profile='recorded', posture_profile='recorded', posture_anchor=None):
     from .cartesian_target_replay import CartesianTargetReplayer
     CartesianTargetReplayer(capture)  # Existing finite-input/clock validation.
     frames = capture['frames']
@@ -130,7 +132,7 @@ def build_packets(capture, gripper_targets, gain_profile='recorded', posture_pro
         callbacks = {key: inputs.pop(key) for key in CALLBACKS}
         packets.append(dict(frame=frame, inputs=inputs, safety_callbacks=callbacks,
             gripper_closed=bool(jaws[frame, 0] < .02), terminal_cartesian_hold=terminal))
-    return apply_posture_profile(apply_gain_profile(packets, gain_profile), posture_profile)
+    return apply_posture_profile(apply_gain_profile(packets, gain_profile), posture_profile, posture_anchor)
 
 
 def execute_request(expert, packet, callbacks):
@@ -198,10 +200,15 @@ def audit_robot_safety_motion(events):
 
 
 class PacketStreamExecutor:
-    def __init__(self, packets, gain_profile='recorded', posture_profile='recorded'):
+    def __init__(self, packets, gain_profile='recorded', posture_profile='recorded', posture_configuration=None):
         require(gain_profile in GAIN_PROFILES, 'Unknown packet gain profile')
         self.gain_profile = gain_profile
-        require(posture_profile in ('recorded','measured'), 'Unknown packet posture profile')
+        require(posture_profile in ('recorded','measured','latched'), 'Unknown packet posture profile')
+        self.posture_configuration = copy.deepcopy(posture_configuration)
+        self.posture_initialization = None
+        if posture_profile=='latched':
+            from .posture_anchor import validate_configuration
+            validate_configuration(self.posture_configuration)
         self.posture_profile = posture_profile
         self.packets = copy.deepcopy(packets)
         self.events = []
@@ -224,6 +231,12 @@ class PacketStreamExecutor:
             configure_drive()
             require(getattr(self.owner, '_gripper_drive_configured', False), 'Native gripper drive was not configured')
         require(policy.expert is self.expert, 'Packet probe expects one robot')
+        if self.posture_profile=='latched' and self.posture_initialization is None:
+            require(index==0, 'Latched robot posture must initialize at frame zero')
+            from .posture_anchor import initialize_anchor
+            self.posture_initialization = initialize_anchor(self.expert,self.posture_configuration)
+            self.packets = apply_posture_profile(self.packets,'latched',self.posture_initialization['anchor_rad'])
+        packet = self.packets[index]
         from expert_data.skills.base import role_path
         blind = TargetBlindSafetyWorld(world, role_path(self.owner.target))
         # Only the geometry refresh is reused. Neither controller.step nor a
@@ -248,6 +261,9 @@ class PacketStreamExecutor:
             arm, jaw, pending, applied = execute_request(self.expert, packet, callbacks)
             if self.posture_profile == 'measured':
                 event['measured_posture_context'] = measured_posture_context(self.expert)
+            elif self.posture_profile == 'latched':
+                from .posture_anchor import execution_context
+                event['latched_posture_context'] = execution_context(self.expert,self.posture_initialization['anchor_rad'])
         except Exception as exc:
             event['exception_type'] = type(exc).__name__
             raise
@@ -270,6 +286,7 @@ class PacketStreamExecutor:
             online_task_step_called=False, online_skill_step_called=False, expert_joint_fallback_used=False,
             target_truth_read_by_request_adapter=False, non_target_safety_geometry_paths=sorted(self.geometry_paths),
             fixed_native_gripper_drive_configuration_retained=True, packet_gain_profile=self.gain_profile, packet_posture_profile=self.posture_profile,
+            posture_initialization=copy.deepcopy(self.posture_initialization),
             source_numeric_controller_settings_retained=self.gain_profile=='recorded' and self.posture_profile=='recorded', source_motion_and_gripper_stream_retained=True,
             learned_policy_evaluated=False)
 
@@ -295,7 +312,9 @@ def audit_packets(payload, packets, segments, frames):
     if profile_ok and GAIN_PROFILES[profile] is not None:
         profile_ok = all(all(event['inputs'].get(key)==value for key,value in GAIN_PROFILES[profile].items()) for event in events)
     posture = payload.get('packet_posture_profile','recorded')
-    posture_ok = posture == 'recorded' or (posture == 'measured' and audit_measured_posture(events))
+    from .posture_anchor import audit_latched_posture
+    posture_ok = (posture == 'recorded' or (posture == 'measured' and audit_measured_posture(events))
+        or (posture == 'latched' and audit_latched_posture(events,payload.get('posture_initialization'))))
     settings_retained = profile=='recorded' and posture=='recorded'
     profile_ok = profile_ok and payload.get('source_numeric_controller_settings_retained') is settings_retained
     return dict(alignment=alignment, exact_requests_and_gripper=exact and jaws, safety_jaw_context_matches=jaw_context, causal_robot_safety_motion_verified=motion_context, full_stream_completed=full,

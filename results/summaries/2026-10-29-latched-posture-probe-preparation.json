@@ -1,0 +1,43 @@
+{
+  "schema": "physical-vla-lab.packet-latched-posture-preparation.v1",
+  "date": "2026-10-29",
+  "status": "CPU_AND_SCENE_PREFLIGHT_PASSED_PHYSICAL_RESULT_PENDING",
+  "source_reference_sha256": "e1b54faae644b64f8148b0fe0397d74287f06d7c48fa97ee34a054339a72e3d3",
+  "task_sha256": "83330198e8a5a70758eda7b8ead447f61b3289c4206d738507ab6c77a806a6c7",
+  "passing_fixed_gain_report_sha256": "78b9b025d986e17620f115da7b7b6f92a65b0f77351718ba8df4610eefd274af",
+  "passing_fixed_gain_requests_sha256": "1a750ce7d2e1bf7d0dd30154bc42bcfd158d91d2afe07c31f6b947485f4f6f34",
+  "posture_module_sha256": "02900e250dfeed5880577169b547ee560cf137e22dee26547a99dd1864f7a269",
+  "gain_profile": "fixed-9-8",
+  "posture_profile": "latched",
+  "runtime_initialization": "Read live frame-zero arm joint state once; add the declared sampled IK/homotopy offsets; validate native joint-limit margin; retain the resulting anchor for the whole stream.",
+  "configuration_contains_saved_initial_q": false,
+  "configuration_contains_target_object_state": false,
+  "runtime_executes_saved_per_frame_posture": false,
+  "source_robot_variation_configuration_retained": true,
+  "only_changed_input_field": "posture_target",
+  "first_173_requested_packets_exact": true,
+  "changed_request_frames": 36,
+  "changed_frame_range_inclusive": [
+    173,
+    208
+  ],
+  "total_frames": 209,
+  "all_other_packet_fields_exact": true,
+  "portable_cpu_tests_passed": 193,
+  "new_regression_cases": 7,
+  "scene_preflight_passed": true,
+  "previous_fixed_gain_command_preflight_passed": true,
+  "saved_passing_packet_audit_revalidated": true,
+  "actual_initializer_recorded_state_fixture_passed": true,
+  "simulator_python310_parse_passed": true,
+  "source_task_hashes_unchanged": true,
+  "gpu_launched": false,
+  "physical_result": null,
+  "retained_dependencies": [
+    "Explicit sampled robot posture-variation configuration; a universal nominal profile is not established",
+    "Recorded target pose/motion/acceleration and relative-speed references",
+    "Remaining recorded orientation/controller settings and callback modes",
+    "Explicit recorded gripper commands and native servo memory"
+  ],
+  "scope": "One exposed development case; verifies robot-side initialization and posture lifetime preparation only, not grasp success or learned-policy compatibility."
+}

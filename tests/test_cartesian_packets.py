@@ -419,3 +419,82 @@ def test_native_posture_context_rejects_invalid_resolution(defect):
         _last_differential_ik=dict(posture_source='measured_state',posture_target_rad=np.zeros(7).tolist()))
     if defect=='nonfinite':q[0]=np.nan
     with pytest.raises(ValueError,match='not current measured'):measured_posture_context(robot)
+
+
+
+def latched_configuration():
+    from capstone_vla.posture_anchor import sampled_posture_configuration
+    return sampled_posture_configuration(dict(switches=dict(ik_nullspace=True,path_homotopy=True),
+        ik_seed_offset_rad=[.01]*7,path_homotopy_rank=4,strength=1.))
+
+
+def test_latched_configuration_uses_only_robot_variation_fields():
+    from capstone_vla.posture_anchor import compute_anchor,validate_configuration,validate_anchor_bounds
+    config=latched_configuration();q=np.zeros(7);anchor=compute_anchor(q,config)
+    validate_anchor_bounds(anchor,[-3.]*7,[3.]*7)
+    with pytest.raises(ValueError,match='configuration fields'):validate_configuration(dict(config,target_object_pose=[0,0,0]))
+    with pytest.raises(ValueError,match='configuration fields'):validate_configuration(None)
+    with pytest.raises(ValueError,match='initial robot'):compute_anchor([0.]*6,config)
+    with pytest.raises(ValueError,match='joint-limit'):validate_anchor_bounds(anchor,[0.]*7,[.01]*7)
+
+
+def test_latched_posture_changes_only_lifetime_and_preserves_source():
+    from capstone_vla.cartesian_packets import apply_posture_profile,audit_posture_profile
+    source=posture_source_packets();snapshot=copy.deepcopy(source);anchor=[.1]*7
+    result=apply_posture_profile(source,'latched',anchor)
+    assert source==snapshot and result[:2]==source[:2] and result[2]!=source[2]
+    assert result[2]['terminal_cartesian_hold'] and result[2]['inputs']['posture_target']==anchor
+    assert audit_posture_profile(source,result,'latched',anchor)
+    with pytest.raises(ValueError,match='latched posture anchor'):apply_posture_profile(source,'latched')
+    result[-1]['gripper_closed']=not result[-1]['gripper_closed']
+    assert not audit_posture_profile(source,result,'latched',anchor)
+
+
+def run_latched_fixture(monkeypatch):
+    from capstone_vla.posture_anchor import compute_anchor
+    _,robot,owner,world,policy=setup(monkeypatch)
+    packets=posture_source_packets()
+    for packet in packets:packet['inputs']['posture_target']=[999.]*7  # Must never execute.
+    q=np.zeros(7);reads=[];observed=[]
+    def state():
+        reads.append(q.copy())
+        return SimpleNamespace(position=q.copy(),lower=np.full(7,-3.),upper=np.full(7,3.))
+    robot.arm_motion_state=state;original=robot.operational_space_pinch_action
+    config=latched_configuration();expected=compute_anchor(q,config)
+    def servo(**inputs):
+        observed.append(np.asarray(inputs['posture_target']).copy())
+        np.testing.assert_array_equal(inputs['posture_target'],expected)
+        arm=original(**inputs)
+        projected=len(observed)==2
+        robot._last_differential_ik=dict(posture_source='collision_projection' if projected else 'preflight_endpoint',
+            posture_target_rad=q.tolist() if projected else expected.tolist())
+        return arm
+    robot.operational_space_pinch_action=servo
+    executor=PacketStreamExecutor(packets,'fixed-9-8','latched',config);segments=[]
+    for i in range(3):
+        q[:]=i*.02
+        arm,_=executor.step(policy,world,i,1/60).actions
+        segments.append(dict(frame=i,goal_position=arm.joint_positions,goal_velocity=arm.joint_velocities,
+            operational_space_reference=robot._pending_operational_space_reference))
+    return executor,segments,reads,observed,packets,expected
+
+
+def test_latched_runtime_initializes_once_from_live_q_not_saved_posture(monkeypatch):
+    executor,segments,reads,observed,source,expected=run_latched_fixture(monkeypatch)
+    assert len(reads)==4  # One initialization plus three per-call diagnostics.
+    assert all(np.array_equal(q,expected) for q in observed)
+    assert source[0]['inputs']['posture_target']==[999.]*7
+    assert executor.payload()['posture_initialization']['initial_joint_position_rad']==[0.]*7
+    audit=audit_packets(executor.payload(),executor.packets,segments,3)
+    assert audit['packet_execution_verified'] and audit['posture_profile_verified']
+
+
+@pytest.mark.parametrize('defect',['late_drift','initial_frame','resolved_posture','initial_state'])
+def test_latched_audit_rejects_drift_or_invalid_initialization(monkeypatch,defect):
+    executor,segments,_,_,_,_=run_latched_fixture(monkeypatch)
+    payload=executor.payload()
+    if defect=='late_drift':payload['calls'][-1]['inputs']['posture_target']=[0.]*7
+    elif defect=='initial_frame':payload['posture_initialization']['frame']=1
+    elif defect=='resolved_posture':payload['calls'][0]['latched_posture_context']['native_posture_target_rad']=[0.]*7
+    else:payload['calls'][0]['latched_posture_context']['measured_joint_position_rad']=[.1]*7
+    assert not audit_packets(payload,executor.packets,segments,3)['packet_execution_verified']

@@ -365,3 +365,48 @@ blindly deleting the restoring term or adding seven learned action dimensions.
 Remaining orientation/motion dependencies still require validation. All original
 records and limits remain unchanged; 38 read-only checks pass, and the prior 186
 CPU suite applies because no runtime code changed. See [source-hashed result](../../results/summaries/2026-10-29-measured-posture-probe-result.json).
+
+
+## Robot-side latched posture prepared — 2026-10-29
+
+The next comparison retains posture restoration and tests an explicit lifetime:
+initialize one robot-side anchor at frame zero and keep it through the entire
+209-frame stream. `posture_anchor.py` accepts only declared sampled robot-variation
+configuration. It reads current arm joints from the live robot once, applies the
+native IK/homotopy offset arithmetic and rejects anchors outside the native
+joint-limit margin. Configuration contains no saved initial q, desired anchor,
+object pose or object velocity. The sampled configuration remains an explicit
+experimental dependency; no universal nominal controller profile is claimed.
+
+The runtime rewrites its posture stream from that live initialization before any
+motor action. It never executes the source's per-frame posture field. Actual
+requests are saved at finalization, and the audit independently reconstructs the
+expected anchor from the raw initial recording. It verifies frame-zero identity,
+constant requested posture, native resolved posture and current robot state.
+Native collision projection may still replace posture with current measured q;
+that branch is recorded and validated. Seven new regression cases cover strict
+configuration, bounds, no source mutation, live initialization despite poisoned
+saved posture, one initialization, late drift and invalid initialization/context.
+
+On this exposed case, the generated anchor exactly matches all first 173 source
+requests. Only the last 36 posture fields change from `None` to the retained
+anchor. Fixed gains, EE motion/acceleration, other settings, callbacks, jaws and
+Cartesian hold are unchanged. This deliberately tests keeping the restoring term
+through lift/hold; success cannot be assumed from the earlier passing baseline.
+
+```bash
+python scripts/run_hgwind_effort_probe.py \
+  --tracking native-expert \
+  --packet-baseline-run /path/to/passing-fixed-gain-packet-run \
+  --packet-gain-profile fixed-9-8 \
+  --packet-posture-profile latched --run
+```
+
+The new `packet_latched_posture_probe_passed` requires actual initialized posture
+execution, matching raw robot context, full intervals, safety and independent
+contact/lift/retention checks. Earlier one-factor gain/measured-posture gates are
+`null` for this experiment. Default recorded and measured modes remain available.
+All 193 portable CPU checks, actual scene/old fixed-gain preflight, baseline raw
+audit and Python 3.10 parsing pass. A CPU initializer fixture using the recorded
+initial state also reproduces the exact anchor. No GPU rollout was launched;
+physical result is pending. See [preparation evidence](../../results/summaries/2026-10-29-latched-posture-probe-preparation.json).

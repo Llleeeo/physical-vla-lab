@@ -150,6 +150,17 @@ justify removing the term, adding a required seven-dimensional model output or
 claiming universal cross-task compatibility. No runtime code changes in this
 update; prior 186 CPU checks apply. See [hashed result](../../results/summaries/2026-10-29-measured-posture-probe-result.json).
 
+## Prepared robot-side latched posture
+
+A new comparison generates a posture anchor once from live initial robot joints
+and explicit sampled robot variation, then retains it for all 209 requests.
+Configuration contains no saved initial q/anchor or object state. The first 173
+requests exactly match the passing fixed-gain case; only 36 later posture fields
+change. All 193 portable CPU checks, actual scene and old fixed-gain preflight,
+initializer fixture, baseline re-audit and Python 3.10 parsing pass. No physical
+gripping result or universal controller compatibility is claimed. See
+[preparation evidence](../../results/summaries/2026-10-29-latched-posture-probe-preparation.json).
+
 ## Earlier DynamicVLA integration: irregular egg-object task
 
 Task: `grasp_sliding_motion_on_flat_surface_1s1p_g9wvkk1`. Earlier shorthand called the object a ball; the target is an egg. This task remains a difficult development case.

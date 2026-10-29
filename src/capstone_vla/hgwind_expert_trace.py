@@ -22,9 +22,11 @@ def configure(plan):
             from .cartesian_packets import PacketStreamExecutor,build_packets
             _require(sha256(plan['source'])==plan['source_reference_sha256'],'Packet jaw source changed')
             with h5py.File(plan['source'],'r') as handle:
-                packets=build_packets(json.loads(path.read_text()),handle['actions'][:,7:],plan.get('packet_gain_profile','recorded'),plan.get('packet_posture_profile','recorded'))
-            _STATE['packet_executor']=PacketStreamExecutor(packets,plan.get('packet_gain_profile','recorded'),plan.get('packet_posture_profile','recorded'))
-            (Path(plan['output'])/'packet_requests.json').write_text(json.dumps(packets,indent=2,allow_nan=False)+'\n')
+                packets=build_packets(json.loads(path.read_text()),handle['actions'][:,7:],plan.get('packet_gain_profile','recorded'),
+                    'recorded' if plan.get('packet_posture_profile')=='latched' else plan.get('packet_posture_profile','recorded'))
+            _STATE['packet_executor']=PacketStreamExecutor(packets,plan.get('packet_gain_profile','recorded'),plan.get('packet_posture_profile','recorded'),plan.get('robot_posture_configuration'))
+            if plan.get('packet_posture_profile')!='latched':
+                (Path(plan['output'])/'packet_requests.json').write_text(json.dumps(packets,indent=2,allow_nan=False)+'\n')
         else:
             _STATE['cartesian_replayer']=CartesianTargetReplayer(json.loads(path.read_text()))
     if plan.get('trace_cartesian_targets'):
@@ -74,6 +76,8 @@ def summary(policy):
     if 'cartesian_replayer' in _STATE:
         (root/'cartesian_target_reexecution.json').write_text(json.dumps(_STATE['cartesian_replayer'].payload(),indent=2,allow_nan=False)+'\n')
     if 'packet_executor' in _STATE:
+        if plan.get('packet_posture_profile')=='latched':
+            (root/'packet_requests.json').write_text(json.dumps(_STATE['packet_executor'].packets,indent=2,allow_nan=False)+'\n')
         (root/'cartesian_packet_execution.json').write_text(json.dumps(_STATE['packet_executor'].payload(),indent=2,allow_nan=False)+'\n')
     np.savez(root/'command_diagnostics.npz',requested_joints=np.asarray([x['target'] for x in rows]),assistance=np.asarray(_STATE['assistance']))
     return {'schema':plan['schema'],'tracking':'native-expert','mode':'joint','reference':'online-expert',

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Robot-side latched-posture comparison prepared
+
+- Add an opt-in posture anchor generated once from live initial joints and declared sampled robot variation, retained throughout the stream. Configuration excludes saved q/anchor and object state; native bounds and collision projection remain.
+- First 173 requests exactly match the passing fixed-gain baseline; only the last 36 posture fields change. Save actual runtime requests and audit initialization, constant anchor, native resolved posture and raw robot state with a separate latched-posture gate.
+- Seven new regressions bring the portable suite to 193 passes. Actual scene/previous-mode preflight, initializer fixture, saved baseline re-audit and Python 3.10 parsing pass. Physical result is pending; remaining recorded motion/settings dependencies are explicit. No GPU rollout launched.
+
 ## 2026-10-29 — Measured-posture ablation fails grasp retention
 
 - User-run ablation completes 209 intervals / 627 physics and OSC updates safely. Request isolation and measured-posture audits pass, including exact correspondence to recorded robot q, but independent grasp retention fails.
