@@ -342,3 +342,80 @@ def test_fixed_gain_execution_audit_requires_truthful_context(monkeypatch):
     assert not audit_packets(payload,packets,segments,3)['packet_execution_verified']
     payload=executor.payload();payload['calls'][-1]['inputs']['position_gain']=4.
     assert not audit_packets(payload,packets,segments,3)['packet_execution_verified']
+
+
+
+def posture_source_packets():
+    packets=gain_source_packets()
+    from capstone_vla.cartesian_packets import apply_gain_profile
+    packets=apply_gain_profile(packets,'fixed-9-8')
+    packets[0]['inputs']['posture_target']=[.1]*7
+    packets[1]['inputs']['posture_target']=[.1]*7
+    packets[2]['inputs']['posture_target']=None
+    return packets
+
+
+def test_measured_posture_changes_only_reference_without_source_mutation():
+    from capstone_vla.cartesian_packets import apply_posture_profile,audit_posture_profile
+    source=posture_source_packets();snapshot=copy.deepcopy(source)
+    applied=apply_posture_profile(source,'measured')
+    assert source==snapshot and applied[-1]==source[-1]
+    assert all(p['inputs']['posture_target'] is None for p in applied)
+    for before,after in zip(source,applied):
+        restored=copy.deepcopy(after);restored['inputs']['posture_target']=before['inputs']['posture_target']
+        assert restored==before
+    assert audit_posture_profile(source,applied,'measured')
+    assert apply_posture_profile(source)==source
+
+
+@pytest.mark.parametrize('field',['position_gain','target_linear_acceleration','safety_callbacks','gripper_closed'])
+def test_posture_audit_rejects_unrelated_changes(field):
+    from capstone_vla.cartesian_packets import apply_posture_profile,audit_posture_profile
+    source=posture_source_packets();applied=apply_posture_profile(source,'measured')
+    if field in applied[0]['inputs']:applied[0]['inputs'][field]=4. if field=='position_gain' else [3.,0.,0.]
+    elif field=='gripper_closed':applied[0][field]=not applied[0][field]
+    else:applied[0][field]['cartesian_velocity_projector']=None
+    assert not audit_posture_profile(source,applied,'measured')
+
+
+def test_posture_probe_rejects_unknown_profile_and_no_effect():
+    from capstone_vla.cartesian_packets import apply_posture_profile,audit_posture_profile
+    source=posture_source_packets()
+    with pytest.raises(ValueError,match='Unknown packet posture'):apply_posture_profile(source,'home')
+    applied=apply_posture_profile(source,'measured')
+    assert not audit_posture_profile(applied,applied,'measured')
+
+
+def test_measured_posture_execution_tracks_current_robot_and_audit_rejects_stale_context(monkeypatch):
+    from capstone_vla.cartesian_packets import apply_posture_profile
+    _,robot,owner,world,policy=setup(monkeypatch)
+    packets=apply_posture_profile(posture_source_packets(),'measured')
+    q=np.zeros(7);robot.arm_motion_state=lambda:SimpleNamespace(position=q.copy())
+    original=robot.operational_space_pinch_action
+    def servo(**inputs):
+        assert inputs['posture_target'] is None
+        action=original(**inputs)
+        robot._last_differential_ik=dict(posture_source='measured_state',posture_target_rad=q.tolist())
+        return action
+    robot.operational_space_pinch_action=servo
+    executor=PacketStreamExecutor(packets,'fixed-9-8','measured');segments=[]
+    for i in range(3):
+        q[:]=i*.01
+        arm,_=executor.step(policy,world,i,1/60).actions
+        segments.append(dict(frame=i,goal_position=arm.joint_positions,goal_velocity=arm.joint_velocities,
+            operational_space_reference=robot._pending_operational_space_reference))
+    payload=executor.payload();audit=audit_packets(payload,packets,segments,3)
+    assert audit['posture_profile_verified'] and audit['packet_execution_verified']
+    assert payload['calls'][2]['measured_posture_context']['native_posture_target_rad']==[.02]*7
+    payload['calls'][2]['measured_posture_context']['native_posture_target_rad']=[0.]*7
+    assert not audit_packets(payload,packets,segments,3)['packet_execution_verified']
+
+
+@pytest.mark.parametrize('defect',['stale','nonfinite'])
+def test_native_posture_context_rejects_invalid_resolution(defect):
+    from capstone_vla.cartesian_packets import measured_posture_context
+    q=np.ones(7)*.2
+    robot=SimpleNamespace(arm_motion_state=lambda:SimpleNamespace(position=q.copy()),
+        _last_differential_ik=dict(posture_source='measured_state',posture_target_rad=np.zeros(7).tolist()))
+    if defect=='nonfinite':q[0]=np.nan
+    with pytest.raises(ValueError,match='not current measured'):measured_posture_context(robot)

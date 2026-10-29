@@ -123,6 +123,16 @@ unverified. Recorded requests still drive execution, not VLA predictions. The
 original collector labels and raw reports remain unchanged; prior 177 CPU checks
 apply, with no runtime changes. See [hashed result](../../results/summaries/2026-10-29-fixed-gain-probe-result.json).
 
+## Prepared measured-posture diagnostic
+
+The next probe uses the passing fixed-gain configuration and removes only
+`posture_target`, selecting native current-state redundancy handling. Exact
+comparison changes 173 requests and preserves all other input fields and limits.
+Current measured q and the native resolved posture/source are explicitly audited.
+All 186 portable CPU checks, actual scene preflight, old fixed-gain preflight,
+saved baseline re-audit and 209 native-branch CPU fixtures pass. No new physical
+or learned-policy result is available. See [preparation evidence](../../results/summaries/2026-10-29-measured-posture-probe-preparation.json).
+
 ## Earlier DynamicVLA integration: irregular egg-object task
 
 Task: `grasp_sliding_motion_on_flat_surface_1s1p_g9wvkk1`. Earlier shorthand called the object a ball; the target is an egg. This task remains a difficult development case.

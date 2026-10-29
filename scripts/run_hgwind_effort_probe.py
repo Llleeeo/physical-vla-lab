@@ -34,6 +34,7 @@ def main():
     parser.add_argument('--cartesian-target-run',type=Path,help='Passing upper-target capture; regenerate native inner commands from current robot state (expert diagnostic)')
     parser.add_argument('--packet-baseline-run',type=Path,help='Passing upper-feedback or recorded packet run; execute explicit packets without online task/skill steps')
     parser.add_argument('--packet-gain-profile',choices=('recorded','fixed-9-8'),default='recorded',help='Opt-in one-factor constant pose gains; requires a passing recorded packet baseline')
+    parser.add_argument('--packet-posture-profile',choices=('recorded','measured'),default='recorded',help='One-factor native measured-state posture; requires passing fixed-9-8 packet baseline')
     parser.add_argument('--reference',choices=('saved-targets','recorded-motion'),default='saved-targets')
     parser.add_argument('--host',choices=('local','hongtao'),default='local')
     parser.add_argument('--episode',default='traj_00000')
@@ -47,6 +48,7 @@ def main():
     require(not args.trace_cartesian_targets or args.tracking=='native-expert','Upper target capture requires the unchanged original expert')
     require(args.cartesian_target_run is None or (args.tracking=='native-expert' and not args.trace_cartesian_targets),'Upper target replay requires native-expert and excludes read-only capture')
     require(args.packet_gain_profile=='recorded' or args.packet_baseline_run is not None,'Fixed gain probe requires a passing packet baseline')
+    require(args.packet_posture_profile=='recorded' or (args.packet_baseline_run is not None and args.packet_gain_profile=='fixed-9-8'),'Measured posture requires the passing fixed-9-8 packet baseline')
     gain_reference = None
     if args.packet_baseline_run is not None:
         require(args.tracking=='native-expert' and args.cartesian_target_run is None and not args.trace_cartesian_targets,'Packet probe requires native-expert and a single passing baseline')
@@ -54,7 +56,11 @@ def main():
         packet_report=json.loads((packet_baseline/'report.json').read_text())
         packet_plan=json.loads((packet_baseline/'plan.json').read_text())
         if packet_report.get('packet_controller_probe_passed') is True:
-            require(packet_plan.get('independent_packets') and packet_plan.get('packet_gain_profile','recorded')=='recorded','Gain probe requires the unchanged recorded-gain packet reference')
+            require(packet_plan.get('independent_packets') and packet_plan.get('packet_posture_profile','recorded')=='recorded','Reference must use recorded posture')
+            if args.packet_posture_profile=='measured':
+                require(packet_report.get('packet_fixed_gains_probe_passed') is True and packet_plan.get('packet_gain_profile')=='fixed-9-8','First provide a passing fixed-gain packet baseline')
+            else:
+                require(packet_plan.get('packet_gain_profile','recorded')=='recorded','Gain probe requires the unchanged recorded-gain packet reference')
             gain_reference = dict(root=packet_baseline, report=packet_report, plan=packet_plan)
             args.packet_baseline_run=Path(packet_plan['packet_baseline_report']).parent
             require(sha256(args.packet_baseline_run/'report.json')==packet_plan['packet_baseline_report_sha256'],'Underlying upper-feedback report changed')
@@ -87,7 +93,8 @@ def main():
     if args.packet_baseline_run is not None:output=output.with_name(output.name+'_packets')
     if args.trace_cartesian_targets:output=output.with_name(output.name+'_target-capture')
     if args.packet_gain_profile!='recorded':output=output.with_name(output.name+'_'+args.packet_gain_profile)
-    plan={'packet_gain_profile':args.packet_gain_profile,'independent_packets':args.packet_baseline_run is not None,'trace_cartesian_targets':args.trace_cartesian_targets,'task_feedforward':args.task_feedforward,'schema':'physical-vla-lab.hgwind-effort-probe.v1','mode':args.mode,'host':args.host,'episode':args.episode,
+    if args.packet_posture_profile!='recorded':output=output.with_name(output.name+'_posture-'+args.packet_posture_profile)
+    plan={'packet_posture_profile':args.packet_posture_profile,'packet_gain_profile':args.packet_gain_profile,'independent_packets':args.packet_baseline_run is not None,'trace_cartesian_targets':args.trace_cartesian_targets,'task_feedforward':args.task_feedforward,'schema':'physical-vla-lab.hgwind-effort-probe.v1','mode':args.mode,'host':args.host,'episode':args.episode,
           'tracking':args.tracking,'reference':args.reference,'reference_frames':len(reference_actions),'frames':n,'source_frames':len(actions),'source':str(source),'source_files':row['files'],'source_reference_sha256':sha256(source),
           'task':cohort['task_usd'],'task_sha256':cohort['task_sha256'],'physics_sha256':cohort['physics_sha256'],
           'worker':str(worker),'worker_sha256':sha256(worker),'patch_sha256':hashlib.sha256(patched.encode()).hexdigest(),
@@ -162,7 +169,7 @@ def main():
         for key in ['source_reference_sha256','task_sha256','physics_sha256','worker_sha256','controller_config_sha256','urdf_sha256','cartesian_target_capture_sha256']:
             require(packet_plan[key]==plan[key],'Packet reference differs: '+key)
         require(not packet_plan.get('independent_packets'),'Packet baseline must be the retained-context successful comparison')
-        packets=build_packets(capture,actions[:,7:],args.packet_gain_profile)
+        packets=build_packets(capture,actions[:,7:],args.packet_gain_profile,args.packet_posture_profile)
         if gain_reference is not None:
             from capstone_vla.cartesian_packets import audit_gain_profile
             reference_root=gain_reference['root']
@@ -170,16 +177,25 @@ def main():
             for key in ['source_reference_sha256','task_sha256','physics_sha256','worker_sha256','controller_config_sha256','urdf_sha256','cartesian_target_capture_sha256']:
                 require(prior_plan[key]==plan[key],'Gain probe reference differs: '+key)
             saved_packets=json.loads((reference_root/'packet_requests.json').read_text())
-            require(saved_packets==build_packets(capture,actions[:,7:]),'Passing packet stream differs from current recorded inputs')
-            require(audit_gain_profile(saved_packets,packets,args.packet_gain_profile),'Not an isolated/effective gain change')
-            plan.update(packet_gain_reference_report=str(reference_root/'report.json'),packet_gain_reference_report_sha256=sha256(reference_root/'report.json'),
-                packet_gain_reference_requests=str(reference_root/'packet_requests.json'),packet_gain_reference_requests_sha256=sha256(reference_root/'packet_requests.json'),
-                changed_gain_frames=sum(a!=b for a,b in zip(saved_packets,packets)))
+            require(saved_packets==build_packets(capture,actions[:,7:],prior_plan.get('packet_gain_profile','recorded'),prior_plan.get('packet_posture_profile','recorded')),'Passing packet stream differs from current recorded inputs')
+            if args.packet_posture_profile=='measured':
+                from capstone_vla.cartesian_packets import audit_posture_profile
+                require(audit_posture_profile(saved_packets,packets,'measured'),'Not an isolated/effective posture change')
+                plan.update(packet_posture_reference_report=str(reference_root/'report.json'),packet_posture_reference_report_sha256=sha256(reference_root/'report.json'),
+                    packet_posture_reference_requests=str(reference_root/'packet_requests.json'),packet_posture_reference_requests_sha256=sha256(reference_root/'packet_requests.json'),
+                    changed_posture_frames=sum(a!=b for a,b in zip(saved_packets,packets)))
+            else:
+                require(audit_gain_profile(saved_packets,packets,args.packet_gain_profile),'Not an isolated/effective gain change')
+                plan.update(packet_gain_reference_report=str(reference_root/'report.json'),packet_gain_reference_report_sha256=sha256(reference_root/'report.json'),
+                    packet_gain_reference_requests=str(reference_root/'packet_requests.json'),packet_gain_reference_requests_sha256=sha256(reference_root/'packet_requests.json'),
+                    changed_gain_frames=sum(a!=b for a,b in zip(saved_packets,packets)))
         plan.update(frames=len(packets),reference_frames=len(packets),packet_baseline_report=str(packet_baseline/'report.json'),
             packet_baseline_report_sha256=sha256(packet_baseline/'report.json'),
             reference_fidelity='Explicit recorded upper/motion/settings and binary gripper packets; no online task/skill step or expert joint tail. Terminal pose held through native Cartesian feedback. Non-target geometry safety only; not a learned policy contract.')
     if args.packet_gain_profile!='recorded':
         plan['reference_fidelity']='Only position/orientation feedback gains are fixed at 9/8 for every packet. All other recorded numeric settings/motion, jaws, callback mode, terminal hold and native limits are retained. Not a learned-policy contract.'
+    if args.packet_posture_profile=='measured':
+        plan['reference_fidelity']='Only posture_target is changed to None from the passing fixed-9/8 baseline; native redundancy handling uses current measured joints. Other numeric motion/settings/jaws/callbacks/hold and native limits retained. Not a learned-policy contract.'
     if args.tracking in ('logged-command','live-jacobian'):
         require(args.reference_run is not None,'Provide the passing original-expert reference run')
         ref_root=args.reference_run.resolve();ref_report=ref_root/'report.json';ref=json.loads(ref_report.read_text())
@@ -250,7 +266,8 @@ def main():
     if args.tracking=='live-jacobian':print(f"TASK_METRIC_OK orientation_length_scale_m={plan['operational_orientation_length_scale_m']} coupled_rows={plan['source_coupled_task_metric_rows_verified']} jacobian_method={args.jacobian_method}",flush=True)
     if args.task_feedforward=='zero':print(f"TASK_FEEDFORWARD_ABLATION mode=zero nonzero_source_commands={plan['expected_removed_feedforward_commands']} gravity_compensation=unchanged",flush=True)
     if args.packet_baseline_run is not None:print('PACKET_CONTROLLER no_online_skill_step=true explicit_gripper=true terminal_cartesian_hold=true',flush=True)
-    if args.packet_gain_profile!='recorded':print('PACKET_FIXED_GAINS profile='+args.packet_gain_profile+' changed_frames='+str(plan['changed_gain_frames'])+' all_other_inputs=exact limits=unchanged',flush=True)
+    if args.packet_gain_profile!='recorded' and args.packet_posture_profile=='recorded':print('PACKET_FIXED_GAINS profile='+args.packet_gain_profile+' changed_frames='+str(plan['changed_gain_frames'])+' all_other_inputs=exact limits=unchanged',flush=True)
+    if args.packet_posture_profile=='measured':print('PACKET_MEASURED_POSTURE changed_frames='+str(plan['changed_posture_frames'])+' gains=fixed-9-8 all_other_inputs=exact native_measured_state_audit=true',flush=True)
     if args.cartesian_target_run is not None and args.packet_baseline_run is None:print('CARTESIAN_TARGET_REEXECUTION enabled=true saved_inner_outputs=false native_safety_and_fallback=retained',flush=True)
     if args.trace_cartesian_targets:print('CARTESIAN_TARGET_CAPTURE enabled=true motor_overrides=false callable_descriptors_only=true',flush=True)
     print('REFERENCE_LIMIT '+plan['reference_fidelity'],flush=True);print('OUTPUT '+str(output),flush=True);print('COMMAND '+shlex.join(command),flush=True)

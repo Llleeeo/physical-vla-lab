@@ -61,7 +61,53 @@ def audit_gain_profile(source_packets, applied_packets, profile):
     return bool(profile == 'recorded' or any(a != b for a,b in zip(source_packets, applied_packets)))
 
 
-def build_packets(capture, gripper_targets, gain_profile='recorded'):
+def apply_posture_profile(packets, profile='recorded'):
+    """Use native measured-state redundancy handling, without a saved q target."""
+    require(profile in ('recorded', 'measured'), 'Unknown packet posture profile')
+    result = copy.deepcopy(packets)
+    if profile == 'measured':
+        for packet in result:
+            require('posture_target' in packet['inputs'], 'Missing source posture field')
+            packet['inputs']['posture_target'] = None
+    return result
+
+
+def audit_posture_profile(source_packets, applied_packets, profile):
+    expected = apply_posture_profile(source_packets, profile)
+    return bool(applied_packets == expected and (profile == 'recorded'
+        or any(a != b for a,b in zip(source_packets, applied_packets))))
+
+
+def measured_posture_context(expert):
+    """Check native resolution against the same, not-yet-stepped robot state."""
+    diagnostic = getattr(expert, '_last_differential_ik', {})
+    measured = np.asarray(expert.arm_motion_state().position, float)
+    resolved = np.asarray(diagnostic.get('posture_target_rad'), float)
+    source = diagnostic.get('posture_source')
+    require(source in ('measured_state', 'collision_projection') and measured.shape == (7,)
+        and resolved.shape == (7,) and np.isfinite(measured).all()
+        and np.array_equal(measured, resolved), 'Native posture is not current measured robot state')
+    return dict(measured_joint_position_rad=measured.tolist(), native_posture_target_rad=resolved.tolist(), native_posture_source=source)
+
+
+def audit_measured_posture(events):
+    if not events:
+        return False
+    for event in events:
+        try:
+            context = event['measured_posture_context']
+            measured = np.asarray(context['measured_joint_position_rad'], float)
+            resolved = np.asarray(context['native_posture_target_rad'], float)
+            if (event['inputs'].get('posture_target') is not None or measured.shape != (7,)
+                    or not np.isfinite(measured).all() or not np.array_equal(measured, resolved)
+                    or context['native_posture_source'] not in ('measured_state', 'collision_projection')):
+                return False
+        except (KeyError, ValueError, TypeError):
+            return False
+    return True
+
+
+def build_packets(capture, gripper_targets, gain_profile='recorded', posture_profile='recorded'):
     from .cartesian_target_replay import CartesianTargetReplayer
     CartesianTargetReplayer(capture)  # Existing finite-input/clock validation.
     frames = capture['frames']
@@ -84,7 +130,7 @@ def build_packets(capture, gripper_targets, gain_profile='recorded'):
         callbacks = {key: inputs.pop(key) for key in CALLBACKS}
         packets.append(dict(frame=frame, inputs=inputs, safety_callbacks=callbacks,
             gripper_closed=bool(jaws[frame, 0] < .02), terminal_cartesian_hold=terminal))
-    return apply_gain_profile(packets, gain_profile)
+    return apply_posture_profile(apply_gain_profile(packets, gain_profile), posture_profile)
 
 
 def execute_request(expert, packet, callbacks):
@@ -152,9 +198,11 @@ def audit_robot_safety_motion(events):
 
 
 class PacketStreamExecutor:
-    def __init__(self, packets, gain_profile='recorded'):
+    def __init__(self, packets, gain_profile='recorded', posture_profile='recorded'):
         require(gain_profile in GAIN_PROFILES, 'Unknown packet gain profile')
         self.gain_profile = gain_profile
+        require(posture_profile in ('recorded','measured'), 'Unknown packet posture profile')
+        self.posture_profile = posture_profile
         self.packets = copy.deepcopy(packets)
         self.events = []
         self.frames = []
@@ -198,6 +246,8 @@ class PacketStreamExecutor:
         self.frames.append(index)
         try:
             arm, jaw, pending, applied = execute_request(self.expert, packet, callbacks)
+            if self.posture_profile == 'measured':
+                event['measured_posture_context'] = measured_posture_context(self.expert)
         except Exception as exc:
             event['exception_type'] = type(exc).__name__
             raise
@@ -219,8 +269,8 @@ class PacketStreamExecutor:
         return dict(schema='physical-vla-lab.cartesian-packet-execution.v1', frames=self.frames, calls=self.events,
             online_task_step_called=False, online_skill_step_called=False, expert_joint_fallback_used=False,
             target_truth_read_by_request_adapter=False, non_target_safety_geometry_paths=sorted(self.geometry_paths),
-            fixed_native_gripper_drive_configuration_retained=True, packet_gain_profile=self.gain_profile,
-            source_numeric_controller_settings_retained=self.gain_profile=='recorded', source_motion_and_gripper_stream_retained=True,
+            fixed_native_gripper_drive_configuration_retained=True, packet_gain_profile=self.gain_profile, packet_posture_profile=self.posture_profile,
+            source_numeric_controller_settings_retained=self.gain_profile=='recorded' and self.posture_profile=='recorded', source_motion_and_gripper_stream_retained=True,
             learned_policy_evaluated=False)
 
 
@@ -244,13 +294,17 @@ def audit_packets(payload, packets, segments, frames):
     profile_ok = profile in GAIN_PROFILES
     if profile_ok and GAIN_PROFILES[profile] is not None:
         profile_ok = all(all(event['inputs'].get(key)==value for key,value in GAIN_PROFILES[profile].items()) for event in events)
-    profile_ok = profile_ok and payload.get('source_numeric_controller_settings_retained') is (profile=='recorded')
+    posture = payload.get('packet_posture_profile','recorded')
+    posture_ok = posture == 'recorded' or (posture == 'measured' and audit_measured_posture(events))
+    settings_retained = profile=='recorded' and posture=='recorded'
+    profile_ok = profile_ok and payload.get('source_numeric_controller_settings_retained') is settings_retained
     return dict(alignment=alignment, exact_requests_and_gripper=exact and jaws, safety_jaw_context_matches=jaw_context, causal_robot_safety_motion_verified=motion_context, full_stream_completed=full,
         no_online_skill_decisions_verified=boundaries,
         packet_execution_verified=bool(full and exact and jaws and jaw_context and motion_context and boundaries and alignment['capture_alignment_passed']
-            and profile_ok and not alignment['failed_call_ids']),
+            and profile_ok and posture_ok and not alignment['failed_call_ids']),
         terminal_cartesian_hold_frames=sum(p['terminal_cartesian_hold'] for p in packets),
-        source_controller_setting_schedule_retained=profile=='recorded', packet_gain_profile=profile, gain_profile_verified=profile_ok, learned_policy_evaluated=False)
+        source_controller_setting_schedule_retained=settings_retained, packet_gain_profile=profile, gain_profile_verified=profile_ok,
+        packet_posture_profile=posture, posture_profile_verified=posture_ok, learned_policy_evaluated=False)
 
 
 def patch_packet_collector(source):

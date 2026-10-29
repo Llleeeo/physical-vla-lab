@@ -289,3 +289,45 @@ modes and motion references remain recorded dependencies. Keep both passing
 baselines. Original FSM failed labels, report files, limits and source data are
 unchanged. No runtime code changed for this result update; the prior 177 CPU
 checks apply. See [source-hashed evidence](../../results/summaries/2026-10-29-fixed-gain-probe-result.json).
+
+
+## Measured-posture diagnostic prepared — 2026-10-29
+
+The original upper requests supply a seven-joint `posture_target` for frames
+0–172, then use `None`. The frozen `operational_space_pinch_action` already
+handles `None` by using a copy of current measured joint positions for redundancy
+resolution. Its minimum-norm and joint-limit terms remain. Native collision
+projection can also select current measured posture. This avoids supplying an
+extra expert joint endpoint to a future Cartesian policy interface.
+
+The next one-factor probe keeps the passing fixed-9/8 gains and changes only
+`posture_target` to `None` throughout the stream. Exactly 173 requests change;
+all targets, velocity/acceleration references, other settings, callbacks, jaws,
+terminal hold and native limits remain identical to the passing fixed-gain
+baseline. The default recorded posture mode and earlier baselines remain usable.
+
+`--packet-posture-profile measured` requires a physically passing fixed-gain
+packet baseline, with source/scene/controller fingerprints and full input-change
+isolation checked. Every call logs the current measured arm q, native resolved
+posture and native posture source before any physics step. Execution and audit
+require exact current-state correspondence; stale, nonfinite or saved posture
+resolutions are rejected. The separate `packet_measured_posture_probe_passed`
+combines that audit with full episode execution, safety and independent grasp
+checks. The older one-factor fixed-gain result field is `null` for this distinct
+posture experiment; the fixed gain profile is still checked by the packet audit.
+
+```bash
+python scripts/run_hgwind_effort_probe.py \
+  --tracking native-expert \
+  --packet-baseline-run /path/to/passing-fixed-gain-packet-run \
+  --packet-gain-profile fixed-9-8 \
+  --packet-posture-profile measured --run
+```
+
+Nine new regressions bring the portable suite to 186 passes. Actual scene
+preflight, previous fixed-gain command preflight, saved baseline re-audit and
+simulator Python 3.10 parsing pass. The exact frozen native posture-selection
+branch also passes a 209-recorded-state CPU fixture. This checks native branch
+semantics, not physical grasp performance. No new GPU run was launched; the
+posture probe's physical result is pending. Other orientation/settings and
+motion-reference dependencies remain. See [preparation evidence](../../results/summaries/2026-10-29-measured-posture-probe-preparation.json).

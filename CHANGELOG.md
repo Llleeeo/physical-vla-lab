@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Native measured-posture diagnostic prepared
+
+- Add an opt-in posture probe based on the passing fixed-9/8 packet run: remove only the recorded seven-joint posture endpoint, using the existing native current-state redundancy branch. Exactly 173 input frames change; other requests and limits remain identical.
+- Log and audit current measured q, native posture source and resolved posture, rejecting stale/nonfinite or saved-state resolution. Use a separate measured-posture physical gate; retain earlier modes and reports.
+- Nine new regressions bring the portable suite to 186 passes. Scene and old fixed-gain command preflight, native posture branch CPU fixtures, saved baseline re-audit and Python 3.10 parsing pass. Physical result is pending; no GPU rollout launched.
+
 ## 2026-10-29 — Fixed-feedback-gain packet grasp passes
 
 - User-run fixed-9/8 packet execution completes all 209 intervals / 627 physics and OSC updates safely. The independent grasp and fixed-gain gates pass.

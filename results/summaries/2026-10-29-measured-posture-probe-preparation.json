@@ -1,0 +1,43 @@
+{
+  "schema": "physical-vla-lab.packet-measured-posture-preparation.v1",
+  "date": "2026-10-29",
+  "status": "CPU_AND_SCENE_PREFLIGHT_PASSED_PHYSICAL_RESULT_PENDING",
+  "passing_fixed_gain_report_sha256": "78b9b025d986e17620f115da7b7b6f92a65b0f77351718ba8df4610eefd274af",
+  "passing_fixed_gain_requests_sha256": "1a750ce7d2e1bf7d0dd30154bc42bcfd158d91d2afe07c31f6b947485f4f6f34",
+  "source_reference_sha256": "e1b54faae644b64f8148b0fe0397d74287f06d7c48fa97ee34a054339a72e3d3",
+  "task_sha256": "83330198e8a5a70758eda7b8ead447f61b3289c4206d738507ab6c77a806a6c7",
+  "native_expert_sha256": "27b864d7dd4a33d621bf6e22f1e615fa0ca143cfaf744425829c666f9752ac58",
+  "gain_profile": "fixed-9-8",
+  "posture_profile": "measured",
+  "only_changed_input_field": "posture_target",
+  "changed_frames": 173,
+  "changed_frame_range_inclusive": [
+    0,
+    172
+  ],
+  "total_frames": 209,
+  "all_other_packet_fields_exact": true,
+  "native_semantics": "posture_target=None selects q.copy() from the current measured arm state; native minimum-norm and joint-limit terms remain. If native collision projection replaces the request, posture is also current q.",
+  "native_resolution_observed_and_audited": true,
+  "telemetry_fields": [
+    "measured_joint_position_rad",
+    "native_posture_target_rad",
+    "native_posture_source"
+  ],
+  "native_frozen_posture_branch_cpu_fixtures": 209,
+  "portable_cpu_tests_passed": 186,
+  "scene_preflight_passed": true,
+  "previous_fixed_gain_command_preflight_passed": true,
+  "saved_passing_packet_audit_revalidated": true,
+  "simulator_python310_parse_passed": true,
+  "source_task_hashes_unchanged": true,
+  "gpu_launched": false,
+  "physical_result": null,
+  "old_successful_configurations_preserved": true,
+  "remaining_dependencies": [
+    "Recorded target pose, velocity, acceleration and relative-speed references",
+    "Other posture-independent orientation/controller settings and callback-mode schedule",
+    "Explicit recorded gripper stream and native servo memory"
+  ],
+  "scope": "One-factor posture-reference diagnostic on an exposed development case, not a complete fixed controller or VLA result."
+}
