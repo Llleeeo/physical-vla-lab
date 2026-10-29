@@ -4,7 +4,7 @@ The matched-startup fresh60 run `20261030_000853_155886_fresh60` aborts on the f
 
 ## Independently verified resource shortage
 
-A separate CPU-only Kit process loads the actual task USD with no SimulationApp, PhysX, renderer or scripting extension. It opens the stage but logs30 failures to create file-change watches: `errno28/ENOSPC`. Host inspection finds a65536 watch limit, approximately65512 summed watch references, and64927 in a VS Code `--type=fileWatcher` process. Shared descriptors can be counted twice and snapshots can change. An independent bounded allocation probe confirms only26 of512 requested watches can be created before ENOSPC. All temporary watches/files are released afterward.
+A separate CPU-only Kit process loads the actual task USD with no SimulationApp, PhysX, renderer or scripting extension. It opens the stage but logs32 failures to create file-change watches: `errno28/ENOSPC`. Host inspection finds a65536 watch limit, approximately65512 summed watch references, and64927 in a VS Code `--type=fileWatcher` process. Shared descriptors can be counted twice and snapshots can change. An independent bounded allocation probe confirms only26 of512 requested watches can be created before ENOSPC. All temporary watches/files are released afterward.
 
 The VS Code remote-agent log also reports inotify ENOSPC on this project at2026-10-29T22:21:59.184. Disk availability is357G. Linux documents [ENOSPC from inotify_add_watch](https://man7.org/linux/man-pages/man2/inotify_add_watch.2.html) as a watch-limit/resource failure. This evidence establishes watch exhaustion, **not** its causation of the separate native mutex abort; the small USD loader itself does not crash.
 

@@ -47,7 +47,7 @@
     "renderer_extension_enabled": false,
     "scripting_extension_enabled": false,
     "stage_open_passed": true,
-    "watch_creation_errors_before": 30,
+    "watch_creation_errors_before": 32,
     "watch_creation_errors_after_workspace_file_written": 30,
     "scope": "Minimal USD load succeeds despite watcher errors; it does not reproduce or establish a cause for the full Isaac native abort"
   },
