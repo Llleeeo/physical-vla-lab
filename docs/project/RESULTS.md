@@ -2,6 +2,12 @@
 
 Snapshot: **2026-10-29, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Matched fresh control unavailable; startup resource shortage measured
+
+Fresh60 run `20261030_000853_155886_fresh60` repeats the same Omniverse Client mutex abort during the first guarded update, before any attempt. The loading barrier has not reliably fixed startup. No new grasp result exists; the earlier exact three-episode history reproduction stands.
+
+A separate no-physics/no-renderer CPU USD loader reports30 inotify ENOSPC watch-creation failures; direct resource probing allocates only26/512 watches. Host limit is65536 and VS Code holds approximately64927 watch references. Disk availability is357G. Watch exhaustion is confirmed, while its causal relationship to the Client abort remains unknown. Local watch exclusions await window reload; an admission probe now prevents simulator launch when insufficient.267 CPU checks pass; no GPU was launched by agent. [Evidence and next action](NATIVE_STARTUP_RESOURCES.md).
+
 ## Original worker history reproduced; matched-startup fresh control pending
 
 User run `20261029_234931_549595` executes original attempts58/59/60 in one process and reproduces failed720frames, failed363frames and successful319frames. Independent rereading verifies15 full-length action/observation arrays per episode exactly and the first7 native ball-velocity rows; all initial-state/safety checks pass. Attempt60 independently passes physical grasp evidence:2.4833s bilateral contact and at least60.349mm final lift. The two earlier failures were original failed demonstrations and reproduce as expected.

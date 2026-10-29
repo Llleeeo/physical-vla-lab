@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-30 — Fresh control blocked; inotify exhaustion measured
+
+- Same native Client mutex stack recurs on the first stage-load-barrier update; no attempt starts. The barrier does not reliably avoid the crash.
+- CPU-only USD loader reports30 watch-creation ENOSPC errors. Host watch limit65536 is nearly full, mostly from the project VS Code watcher; direct probe allocates only26/512. Disk has357G available. Native-crash causation remains unproven.
+- Add local watcher exclusions (activation pending window reload) and a prelaunch admission probe with unconditional resource cleanup.267 portable CPU checks pass. No GPU, controller, physics, kernel limit or SDK change by agent.
+
 ## 2026-10-30 — Original three-attempt history reproduces exactly
 
 - Verify user run58/59/60: failed720frames, failed363frames, successful319frames;15 full action/observation arrays per episode and first7 native startup ball-velocity rows match originals exactly. Target60 passes independent grasp/initial-state/safety checks with2.483s contact and60.349mm lift. No learned policy ran.

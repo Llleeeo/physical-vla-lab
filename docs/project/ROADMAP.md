@@ -18,6 +18,8 @@ The [bounded video batch](CONTRACT_VIDEO_BATCH.md) now completes after the recor
 
 The guarded history launch now reproduces all three original episodes exactly in15 full action/observation arrays, including a successful original attempt60. The first native crash does not recur in this launch; general crash avoidance is unverified. Run one matched-startup fresh60 control before attributing recovery to process history or changing reset/force behavior. This separates the history factor from the changed scene-attach scheduling; no learned ball-policy success follows.
 
+The matched fresh-control launch is currently blocked before any attempt. Resolve the measured inotify watch exhaustion (project VS Code exclusions plus window reload and admission probe), then recheck startup before requesting another GPU run. Its connection to the native Client mutex abort is still unproven.
+
 3. Establish the required upper-command labels. Existing 40 ball recordings contain processed 9D targets, not the complete 29D command envelope; preserve them and decide controlled label reexecution versus new collection after the small validation batch.
 4. Freeze episode/physical-condition train/validation/test definitions, fit normalization on training episodes only, and perform a genuine 29D pretrained-model smoke before fine-tuning. Then evaluate camera-feedback Franka rollouts, with latency reported separately. No held-out physical-generalization claim follows from same-task development fitting.
 

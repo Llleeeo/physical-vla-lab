@@ -29,6 +29,8 @@ HISTORY = ROOT / 'data/derived/hgwind_history_diagnostics/20261029_234931_549595
 def prepare(native_backtrace=False, stage_load_barrier=False, fresh_control=False):
     require(not fresh_control or stage_load_barrier, 'Fresh control requires the matched stage-load barrier')
     attempts = [60] if fresh_control else list(ATTEMPTS)
+    from capstone_vla.inotify_preflight import require_headroom
+    watcher_preflight = require_headroom()
     plan = json.loads((FRESH / 'plan.json').read_text())
     require(plan['attempt_offset'] == 60 and plan['seed'] == 202610280, 'Fresh reference differs')
     require(json.loads((FRESH / 'report.json').read_text())['recorded_frames'] == 169, 'Fresh reference changed')
@@ -47,7 +49,7 @@ def prepare(native_backtrace=False, stage_load_barrier=False, fresh_control=Fals
     out = ROOT / 'data/derived/hgwind_history_diagnostics' / (stamp + ('_fresh60' if fresh_control else ''))
     plan.pop('native_debugger', None)
     plan.update(output=str(out), worker_output=str(out / 'worker_output'), attempt_offset=attempts[0], fresh_control=fresh_control,
-        history_attempts=attempts, native_debugger_requested=native_backtrace, stage_load_barrier=stage_load_barrier,
+        history_attempts=attempts, inotify_preflight=watcher_preflight, native_debugger_requested=native_backtrace, stage_load_barrier=stage_load_barrier,
         fresh_reference=str(FRESH), fresh_plan_sha256=sha256(FRESH/'plan.json'), fresh_report_sha256=sha256(FRESH/'report.json'),
         original_worker_context=context, original_log_sha256=sha256(LOG),
         reference_fidelity='One frozen native worker, original attempts58/59/60, normal reset and safety exits; no source actions execute.')

@@ -2,6 +2,10 @@
 
 The original attempts58,59,60 occurred in one worker. Their saved lengths are720,363,319 control frames; the first two failed grasping without a safety abort and the third succeeded. A fresh-worker attempt60 instead differs in ball velocity after the first physical step and eventually aborts on motion feasibility. This experiment tests whether reproducing the original within-worker history changes that mismatch. It does not identify a unique reset/cache/force mechanism or evaluate a learned policy.
 
+## Current environment blocker
+
+The matched fresh60 launch aborts before any attempt with the same Client stack. The stage-load barrier does not reliably avoid startup failure. Inotify resource exhaustion has now been independently measured; see [startup resources](NATIVE_STARTUP_RESOURCES.md) before another simulation. Local VS Code exclusions await window reload and the coordinator now checks watcher headroom before SDK startup.
+
 ## Observed reproduction and one matched-startup control (30 October)
 
 User run `20261029_234931_549595` completes all three requested attempts in one process. A separate CPU reread verifies original file hashes and repeats the full comparison:

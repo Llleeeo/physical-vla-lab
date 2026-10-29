@@ -1,0 +1,103 @@
+{
+  "schema": "physical-vla-lab.inotify-resource-shortage.v1",
+  "date": "2026-10-30",
+  "run_id": "20261030_000853_155886_fresh60",
+  "native_result": {
+    "stage": "first guarded Kit update",
+    "attempts_started": 0,
+    "saved_episodes": 0,
+    "grasp": "not_evaluated",
+    "thread": "OC Tick",
+    "library": "libomniclient.so",
+    "matching_prior_internal_offsets": [
+      "0x5aaffa",
+      "0x5b80ea",
+      "0x709af5",
+      "0x56e0a1",
+      "0x71251e",
+      "0x52410b",
+      "0x54fb2e"
+    ]
+  },
+  "resource_observation": {
+    "max_user_watches": 65536,
+    "max_user_instances": 128,
+    "summed_watch_fd_references": 65512,
+    "largest_process_watch_fd_references": 64927,
+    "largest_process_role": "VS Code --type=fileWatcher",
+    "count_caveat": "Snapshot can change; shared descriptors may be counted more than once. The allocation probe independently confirms ENOSPC.",
+    "vscode_log_observation": "Remote agent reports inotify ENOSPC on this project at2026-10-29T22:21:59.184",
+    "disk_available_df_h": "357G",
+    "disk_full_established": false
+  },
+  "actual_probe": {
+    "schema": "physical-vla-lab.inotify-preflight.v1",
+    "requested": 512,
+    "allocated": 26,
+    "passed": false,
+    "errno": 28,
+    "phase": "add_watch",
+    "scope": "Admission probe only; not an Isaac stability guarantee",
+    "max_user_watches": 65536,
+    "max_user_instances": 128
+  },
+  "cpu_usd_loader": {
+    "simulation_app_started": false,
+    "physics_extension_enabled": false,
+    "renderer_extension_enabled": false,
+    "scripting_extension_enabled": false,
+    "stage_open_passed": true,
+    "watch_creation_errors_before": 30,
+    "watch_creation_errors_after_workspace_file_written": 30,
+    "scope": "Minimal USD load succeeds despite watcher errors; it does not reproduce or establish a cause for the full Isaac native abort"
+  },
+  "findings": "Inotify watch exhaustion is independently verified. It is an actionable startup environment problem; causation of the separate client mutex abort remains unproven.",
+  "changes": {
+    "local_workspace_file": ".vscode/settings.json",
+    "excluded": [
+      "data",
+      "Backgrounds",
+      ".venv*",
+      "third_party",
+      "__pycache__"
+    ],
+    "scope": "VS Code recursive watch notifications only; no data or simulator source changed",
+    "activation": "Pending VS Code window reload; current watcher occupancy unchanged after file creation",
+    "admission_check": "Request512 temporary IN_ATTRIB watches; always close descriptor and remove files; abort before simulator launch if unavailable",
+    "rollback": "Remove new local workspace settings and revert the preflight addition; no kernel parameter changed"
+  },
+  "pending": [
+    "User reloads VS Code window",
+    "Recheck watch allocation and minimal USD warning count",
+    "Only after resources recover, run the matched-startup fresh60 control"
+  ],
+  "validation": {
+    "portable_cpu_tests": 267,
+    "resource_and_history_focused_checks": 24,
+    "new_gpu_run_by_agent": false
+  },
+  "source_hashes": {
+    "report.json": "cc6f29f987fbfc6d8790b7ab6dbf622b8b75e51dac9874f94d652bc7702518ce",
+    "plan.json": "ebf30de7004f8fdb0683cdf518e124081e43ab002b6689d205cd33f2d9ba87db",
+    "simulation.log": "7bd5dfa2e3ca7da555b3ef40c7781f2d9d722467bd902ce0658a6d58ef23810c",
+    "native_backtrace.log": "f8afadbb8ff76ba46b829cb7c79b96f06e7914538d9743282110272db2484692",
+    "stage_load_barrier.json": "69e5929b7c84ed3b3885579ab49a659248bbad089b43fa1110c7fd9af724ab8c"
+  },
+  "diagnostic_hashes": {
+    "workspace_watch_exclusions.json": "8639799b984a1420f5d927066dfd85226685f51ada8124d5dde431602ff71804",
+    "capstone_cpu_usd_loader.kit": "f6c64eb527a65b88da7c72a78e5e3e71168c62c4fa682438ea2bdae99e557792",
+    "capstone_inotify_actual_probe.json": "1c8c5dae73e14dcbef8063e9d5eba558e16159832e83968f70cdf413f657c469",
+    "capstone_cpu_usd_default.log": "90a27a8711acc74a7f4c5a59126d689f41ddb83ce34fb72f5ca148ab234eaf0d",
+    "capstone_cpu_usd_loader.py": "79cc76b016442db3a33996f698b407c1e751b7082e4a919bcd1df95e8a8234d8",
+    "capstone_cpu_usd_after_exclusions.log": "ef590f1357b63d7617c9f52456ea6a85df18d2250907ca0f576f09771db3c90e"
+  },
+  "implementation_hashes": {
+    "src/capstone_vla/inotify_preflight.py": "8609600c98b16f0e40d65874a2517c47cb24e5465cb4e20dbae87a72e8ca8d0f",
+    "scripts/run_hgwind_history_diagnostic.py": "1c2f1be184c55b4eb348e0dee5c269b7b4f99d06a815ccfab02f2b3391e99d35",
+    "tests/test_inotify_preflight.py": "da58e95989051e39b55770cab6236c7d8f87ec55436087ba58338fa25e4fae89"
+  },
+  "references": [
+    "https://man7.org/linux/man-pages/man2/inotify_add_watch.2.html",
+    "https://code.visualstudio.com/docs/setup/linux"
+  ]
+}
