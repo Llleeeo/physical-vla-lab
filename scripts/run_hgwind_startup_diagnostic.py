@@ -32,9 +32,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--episode', choices=['traj_00001', 'traj_00007', 'traj_00018'], default='traj_00001')
     parser.add_argument('--run', action='store_true')
+    parser.add_argument('--native-backtrace', action='store_true', help='Capture native C++ crash stacks with the installed debugger')
     args = parser.parse_args()
     command = [sys.executable, str(ROOT / 'scripts/run_hgwind_effort_probe.py'),
         '--tracking', 'native-expert', '--trace-cartesian-targets', '--trace-startup-forces', '--episode', args.episode]
+    if args.native_backtrace:command.append('--native-backtrace')
     if not args.run:
         return subprocess.run(command, cwd=ROOT).returncode
     stamp = datetime.now(ZoneInfo('Asia/Hong_Kong')).strftime('%Y%m%d_%H%M%S_%f')
@@ -57,8 +59,11 @@ def main():
             process.wait(timeout=30)
             raise
     result = dict(episode=args.episode, physics_launcher_exit=code, run=str(run) if run else None,
-        episode_saved=False, render_complete=False, force_trace=None, learned_policy_evaluated=False)
+        episode_saved=False, render_complete=False, force_trace=None, learned_policy_evaluated=False,
+        native_debugger_requested=args.native_backtrace)
     if run:
+        backtrace = run / 'native_backtrace.log'
+        result['native_backtrace'] = str(backtrace) if backtrace.is_file() else None
         trace = run / 'startup_force_calls.jsonl'
         if trace.exists():
             rows = [json.loads(line) for line in trace.read_text().splitlines()]

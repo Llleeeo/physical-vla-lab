@@ -2,6 +2,12 @@
 
 Snapshot: **2026-10-29, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Repeated scene-load abort: native stack capture prepared
+
+The bounded retry `20261029_224044_493811` reproduces the earlier C++ `std::system_error: Invalid argument` at the same stage. Both runs stop before completed script inspection, save zero episodes and record zero force calls. No wind, grasp or learned-policy conclusion follows. Keep the two failures as execution evidence; the original native crash cause is still unknown.
+
+A [native backtrace option](STARTUP_PHYSICS_DIAGNOSTIC.md) now runs the same entry/SDK child under the installed system GDB, saving the fault stack without modifying forces, scene or control parameters. 243 CPU checks and real scene preflight pass; CPU-only debugger tests preserve 0/7 exit statuses and capture a controlled abort stack. No GPU diagnostic was launched during preparation. This is a new measurement, not a demonstrated native-crash fix. See [source-hashed preparation](../../results/summaries/2026-10-29-repeated-startup-abort-backtrace-preparation.json).
+
 ## Passive startup measurement: native scene-load abort, no force evidence
 
 User run `20261029_223230_505509` exits while opening/loading the Task stage: C++ `std::system_error`, `Invalid argument`, then native abort. No episode or video is saved; `startup_force_calls.jsonl` has zero rows. This occurs before completed script inspection and the first force proxy installation. It is not a grasp failure or evidence that the fan applied no force. The native crash's cause is not established; the startup-force hypothesis remains untested.

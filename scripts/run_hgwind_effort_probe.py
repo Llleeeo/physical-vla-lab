@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import shlex
+import shutil
 import signal
 import subprocess
 import sys
@@ -32,6 +33,7 @@ def main():
     parser.add_argument('--kinematics-run',type=Path,help='Passing native live-kinematics baseline required for zero task feedforward')
     parser.add_argument('--trace-cartesian-targets',action='store_true',help='Read-only original upper Cartesian requests; native-expert only')
     parser.add_argument('--trace-startup-forces',action='store_true',help='Passive startup force forwarding trace; native expert capture only')
+    parser.add_argument('--native-backtrace',action='store_true',help='Run this startup diagnostic child under the existing system GDB')
     parser.add_argument('--cartesian-target-run',type=Path,help='Passing upper-target capture; regenerate native inner commands from current robot state (expert diagnostic)')
     parser.add_argument('--packet-baseline-run',type=Path,help='Passing upper-feedback or recorded packet run; execute explicit packets without online task/skill steps')
     parser.add_argument('--packet-gain-profile',choices=('recorded','fixed-9-8'),default='recorded',help='Opt-in one-factor constant pose gains; requires a passing recorded packet baseline')
@@ -48,6 +50,7 @@ def main():
     require(args.task_feedforward!='zero' or (args.tracking=='live-jacobian' and args.jacobian_method=='native-pinch' and args.kinematics_run is not None),'First provide a passing native-pinch --kinematics-run for zero task feedforward')
     require(not args.trace_cartesian_targets or args.tracking=='native-expert','Upper target capture requires the unchanged original expert')
     require(not args.trace_startup_forces or (args.tracking=='native-expert' and args.trace_cartesian_targets and args.cartesian_target_run is None and args.packet_baseline_run is None),'Startup tracing requires an unmodified native expert capture')
+    require(not args.native_backtrace or args.trace_startup_forces,'Native backtrace is restricted to the explicit startup diagnostic')
     require(args.cartesian_target_run is None or (args.tracking=='native-expert' and not args.trace_cartesian_targets),'Upper target replay requires native-expert and excludes read-only capture')
     require(args.packet_gain_profile=='recorded' or args.packet_baseline_run is not None,'Fixed gain probe requires a passing packet baseline')
     require(args.packet_posture_profile=='recorded' or (args.packet_baseline_run is not None and args.packet_gain_profile=='fixed-9-8'),'Measured posture requires the passing fixed-9-8 packet baseline')
@@ -282,6 +285,14 @@ def main():
             i=command.index('--repair-action-reference');del command[i:i+2]
         command.extend(['--episode_s',str(plan['frames']/60) if plan.get('independent_packets') else '12','--no-expert-config'])
         n=plan['frames']
+    if args.native_backtrace:
+        require(not os.environ.get('CONDA_PREFIX'),'Native debugger requires the existing binary SDK interpreter, outside Conda')
+        debugger=shutil.which('gdb');require(debugger is not None,'System gdb unavailable')
+        child=(lab/'_isaac_sim').resolve()/'kit/python/bin/python3'
+        require(child.is_file(),'SDK Python binary missing')
+        plan['native_debugger_requested']=True
+        plan['adapter_sha256'][str(ROOT/'src/capstone_vla/native_debugger.py')]=sha256(ROOT/'src/capstone_vla/native_debugger.py')
+        print('NATIVE_BACKTRACE enabled=true launch_child_only=true force_and_controller=unchanged',flush=True)
     print(f'CPU_PREFLIGHT_OK mode={args.mode} reference={plan['reference']} source={args.host}/{args.episode} frames={n} effort_pipeline=true primary_tracking={args.tracking} exact_state_replay=false',flush=True)
     if args.tracking=='live-jacobian':print(f"TASK_METRIC_OK orientation_length_scale_m={plan['operational_orientation_length_scale_m']} coupled_rows={plan['source_coupled_task_metric_rows_verified']} jacobian_method={args.jacobian_method}",flush=True)
     if args.task_feedforward=='zero':print(f"TASK_FEEDFORWARD_ABLATION mode=zero nonzero_source_commands={plan['expected_removed_feedforward_commands']} gravity_compensation=unchanged",flush=True)
@@ -293,9 +304,14 @@ def main():
     if args.trace_cartesian_targets:print('CARTESIAN_TARGET_CAPTURE enabled=true motor_overrides=false callable_descriptors_only=true',flush=True)
     print('REFERENCE_LIMIT '+plan['reference_fidelity'],flush=True);print('OUTPUT '+str(output),flush=True);print('COMMAND '+shlex.join(command),flush=True)
     if not args.run:print('DRY_RUN_ONLY: add --run');return 0
-    output.mkdir(parents=True,exist_ok=False);(output/'plan.json').write_text(json.dumps(plan,indent=2)+'\n')
+    output.mkdir(parents=True,exist_ok=False)
+    if args.native_backtrace:
+        from capstone_vla.native_debugger import write_debugger
+        plan['native_debugger']=write_debugger(output,child,debugger)
+    (output/'plan.json').write_text(json.dumps(plan,indent=2)+'\n')
     env=dict(os.environ,TERM='xterm',OMNI_KIT_ACCEPT_EULA='YES',PYTHONDONTWRITEBYTECODE='1',HGWIND_EFFORT_PROBE_MANIFEST=str(output/'plan.json'),
              ISAACLAB_PATH=str(lab),CAPSTONE_ISAACLAB_PATH=str(lab),ISAAC_SIM_ROOT=str((lab/'_isaac_sim').resolve()))
+    if args.native_backtrace:env['PYTHONEXE']=plan['native_debugger']['wrapper']
     packages=[p for p in (lab/'source').iterdir() if p.is_dir()]
     env['PYTHONPATH']=os.pathsep.join([str(ROOT/'src'),*[str(p) for p in packages]])
     with (output/'simulation.log').open('w') as log:
@@ -303,7 +319,7 @@ def main():
         try:
             for line in process.stdout:
                 log.write(line);log.flush()
-                if any(x in line for x in ['COLLECT ATTEMPT','HGWIND_EFFORT_PROBE_ACTIVE','SAFETY ABORT','Traceback','RuntimeError','ValueError','terminate called','what():','Aborted','Segmentation fault']):print(line.rstrip(),flush=True)
+                if any(x in line for x in ['COLLECT ATTEMPT','HGWIND_EFFORT_PROBE_ACTIVE','SAFETY ABORT','Traceback','RuntimeError','ValueError','terminate called','what():','Aborted','Segmentation fault','CAPSTONE_NATIVE_BACKTRACE','CAPSTONE_NATIVE_DEBUGGER','received signal']):print(line.rstrip(),flush=True)
             code=process.wait()
         except KeyboardInterrupt:
             os.killpg(process.pid,signal.SIGTERM)

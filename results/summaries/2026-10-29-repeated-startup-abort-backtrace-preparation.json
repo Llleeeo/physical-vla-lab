@@ -1,0 +1,86 @@
+{
+  "schema": "physical-vla-lab.native-backtrace-preparation.v1",
+  "date": "2026-10-29",
+  "native_startup_aborts": [
+    {
+      "run": "20261029_223230_505509_joint_online-expert_native-expert_target-capture",
+      "diagnostic": "20261029_223230_177327",
+      "error": "std::system_error: Invalid argument",
+      "stage": "scene load after open_stage returned, before completed script inspection",
+      "evaluable_episodes": 0,
+      "force_call_records": 0,
+      "evidence_sha256": {
+        "hgwind_effort_probes/20261029_223230_505509_joint_online-expert_native-expert_target-capture/simulation.log": "db7439fec5bad89c29e94e1d469503efe7a6bb634ec38fe99ac552e2666f9d99",
+        "hgwind_startup_diagnostics/20261029_223230_177327/diagnostic.json": "f201433b2ef75f5bb2cc602723afe17a7854e4a119e18a504199417fe7445e5b"
+      }
+    },
+    {
+      "run": "20261029_224044_493811_joint_online-expert_native-expert_target-capture",
+      "diagnostic": "20261029_224044_165236",
+      "error": "std::system_error: Invalid argument",
+      "stage": "scene load after open_stage returned, before completed script inspection",
+      "evaluable_episodes": 0,
+      "force_call_records": 0,
+      "evidence_sha256": {
+        "hgwind_effort_probes/20261029_224044_493811_joint_online-expert_native-expert_target-capture/simulation.log": "8028a7009d2e330b84c062722c07547f4c7317b6d713b75bd1eac75b9a0c8241",
+        "hgwind_startup_diagnostics/20261029_224044_165236/diagnostic.json": "eded71a90d9875726a7726ef88c706369e5d91465e44924ff04f457d43a5ccae"
+      }
+    }
+  ],
+  "root_cause_identified": false,
+  "force_hypothesis_evaluated": false,
+  "learned_policy_evaluated": false,
+  "raw_artifacts_preserved": true,
+  "new_gpu_run_started": false,
+  "scene_or_controller_parameters_changed": false,
+  "prepared_measurement": {
+    "command": "scripts/run_hgwind_startup_diagnostic.py --native-backtrace --run",
+    "native_debugger": "GNU gdb12.1, existing system installation",
+    "target": "Only the newly launched SDK child; no attachment to existing processes",
+    "output": "native_backtrace.log plus simulation.log and diagnostic.json",
+    "same_startup_entry": true,
+    "same_sdk_python": true,
+    "same_control_and_force_arguments": true,
+    "debugger_environment": "System debugger starts without SDK LD_PRELOAD/LD_LIBRARY_PATH/PYTHONPATH/PYTHONHOME; exact SDK values are restored only to its child",
+    "capture": "Current thread up to40 frames; all threads up to4 frames; stop on native fault",
+    "normal_path": "If child completes and saves an episode, keep existing automatic all-outcome rendering",
+    "limitation": "Debugger can change timing or stop on a different signal; a native crash root cause and simulator recovery are not CPU-verified"
+  },
+  "cpu_tests_passed": 243,
+  "actual_scene_preflight_passed": true,
+  "cpu_debugger_integration": [
+    {
+      "case": "normal_exit",
+      "exit_code": 0,
+      "stack_saved": false
+    },
+    {
+      "case": "exit7",
+      "exit_code": 7,
+      "stack_saved": false
+    },
+    {
+      "case": "controlled_abort",
+      "exit_code": 255,
+      "stack_saved": true,
+      "stack_bytes": 2778
+    },
+    {
+      "case": "actual_sdk_python_sh_normal_CPU_only",
+      "exit_code": 0,
+      "stack_saved": false,
+      "python_version": "3.10",
+      "sdk_library_environment_forwarded": true
+    },
+    {
+      "case": "actual_sdk_python_sh_controlled_abort_CPU_only",
+      "exit_code": 1,
+      "stack_saved": true
+    }
+  ],
+  "interpretation": [
+    "Repeated failures rule out treating the first abort as an isolated observation; do not continue unchanged retries.",
+    "The startup observer was not installed at the point reached in these logs; its force proxy did not record any call.",
+    "The new entry and other initialization differences remain candidates, not diagnosed causes. Capture the native stack before editing wrappers, physics or control parameters."
+  ]
+}

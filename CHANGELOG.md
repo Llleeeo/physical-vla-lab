@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Repeated native abort requires a backtrace
+
+- Preserve the second identical scene-load C++ abort with no episode/force observations; avoid further unchanged retries or unsupported root-cause attribution.
+- Add opt-in GDB launch of the same SDK child, with SDK library environment restored only to that child and fault stacks saved separately. No attachment to existing jobs, new SDK, force or controller change.
+- 243 portable CPU checks, actual scene preflight and five CPU-only debugger integration cases pass, including actual SDK Python3.10 normal/controlled-abort startup without SimulationApp. Isaac debugger run and native-crash diagnosis remain pending.
+
 ## 2026-10-29 — Missing startup measurements labelled explicitly
 
 - First passive diagnostic aborts natively at scene load with std::system_error/Invalid argument, before episode or force recording; preserve all raw files. No grasp or wind hypothesis is evaluated.

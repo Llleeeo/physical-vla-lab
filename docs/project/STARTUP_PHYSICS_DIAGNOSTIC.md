@@ -20,6 +20,25 @@ The originals for cases1/7 came from the third/second attempt in an existing wor
 
 The frozen fan's `on_update` calls `apply_force_at_pos`; collector startup Play temporarily configures physics_dt=0 while pumping Kit events. Native forces may therefore depend on setup dispatch/cache history not represented by first-frame positions and velocities. The original data do not record those force API calls. We have not established that zero-dt force calls actually occurred, survived reset or caused the later safety abort. Gravity/damping/solver state is not fully ruled out by the initial native-property subset.
 
+## Repeated native abort: capture a stack before further changes
+
+Both runs `20261029_223230_505509` and `20261029_224044_493811` abort at the same scene-load point after `open_stage` returns, before completed script inspection. Both force traces are empty and neither saves an episode. The new wrapper/initialization path remains a candidate; no evidence yet identifies a specific root cause. Do not repeat the unchanged command indefinitely.
+
+Use the existing system GDB for one instrumented launch:
+
+```bash
+cd /home/robophys/Capstone_Project_Yuan_Haoming
+
+data/derived/hf_pilot_render_repo/.venv/bin/python \
+  scripts/run_hgwind_startup_diagnostic.py --native-backtrace --run
+```
+
+This launches only its own SDK Python child under GDB. It does not attach to another process, update the SDK, replace the entry or change simulator/control parameters. The system debugger starts without SDK LD_PRELOAD/LD_LIBRARY_PATH/PYTHONPATH/PYTHONHOME; its child receives the exact SDK values via the inferior environment. All other established worker environment/arguments remain in place. The plan pins the debugger helper hash and generated wrapper/command hashes. No debugger download or installation is performed.
+
+A native stop writes `<run>/native_backtrace.log` (40 current-thread frames and four frames per thread), also copied into `simulation.log`; the coordinator includes the path in `diagnostic.json`. If the child exits normally and has saved a trajectory, ordinary analysis/rendering proceeds. No automatic retry loop is added. GDB can change timing or stop on a different signal; examine the actual captured stop before connecting it to the original C++ abort. Debugger execution has not yet been tested with Isaac.
+
+243 portable CPU checks pass. Separate CPU-only integration runs verify exact success/nonzero child statuses (0/7), preserved child library environment and saved stack on a controlled abort (255). Actual scene preflight passes, without GPU launch. Two further CPU-only tests through the actual SDK python.sh/Python3.10 chain preserve a normal exit and capture a deliberately triggered abort (python.sh reports1); SDK library/Python paths reach the child. No SimulationApp or GPU workload is started. These tests verify the diagnostic tool, not recovery of the simulator or physical task.
+
 ## First attempt did not produce a measurement
 
 Run `20261029_223230_505509` aborted natively during scene loading (`std::system_error: Invalid argument`) before completed script inspection and recorder installation. There are no saved episodes, force-call samples or videos. Empty trace counts must not be interpreted as absent wind. The root cause is unknown. Preserve this failure, retry the same command at most once manually, and investigate native startup if it repeats; no SDK upgrade or random parameter adjustment is warranted by this log.
@@ -47,6 +66,6 @@ All force records stream immediately to `<run>/startup_force_calls.jsonl`. The c
 
 ## Verification and rollback
 
-240 portable CPU checks pass, including exact native object/argument identity and return forwarding even at zero dt, preserved native exception, limits that never suppress force calls, getter restoration, native body identity/contact impulse sign and original-worker ordinal parsing. Actual scene preflight and preflight/runtime patch assembly equality pass. Simulator modules parse as Python3.10. No GPU job was launched for this implementation.
+243 portable CPU checks pass, including exact native object/argument identity and return forwarding even at zero dt, preserved native exception, limits that never suppress force calls, getter restoration, native body identity/contact impulse sign and original-worker ordinal parsing. Actual scene preflight and preflight/runtime patch assembly equality pass. Simulator modules parse as Python3.10. No GPU job was launched for this implementation.
 
 Remove the new modules/entry points and the optional flag, or revert the milestone commit, to roll back. The frozen worker, asset scripts, existing probe wrapper, control parameters, source trajectories and prior reports are unchanged. Historical diagnostics and video files remain available.

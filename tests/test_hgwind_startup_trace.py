@@ -132,3 +132,41 @@ def test_startup_measurement_status_never_treats_zero_records_as_zero_force(epis
     result = dict(episode_saved=episode_saved, force_trace=trace,
         render_complete=render, physics_launcher_exit=1)
     assert module.diagnostic_status(result) == expected
+
+
+def test_native_debugger_scripts_quote_paths_and_parse_embedded_python(tmp_path):
+    import ast
+    import sys
+    from pathlib import Path
+    from capstone_vla.native_debugger import write_debugger
+    target = tmp_path / 'debug output with spaces'; target.mkdir()
+    native = tmp_path / 'dummy debugger'; native.write_text('test placeholder')
+    meta = write_debugger(target, sys.executable, native)
+    commands = Path(meta['commands']).read_text()
+    for block in commands.split('python\n')[1:]:
+        ast.parse(block.split('\nend')[0])
+    wrapper = Path(meta['wrapper']).read_text()
+    assert '"$@"' in wrapper and '--return-child-result' in wrapper
+    assert '-u LD_PRELOAD -u LD_LIBRARY_PATH' in wrapper
+    assert '-u PYTHONPATH -u PYTHONHOME' in wrapper
+    assert 'CAPSTONE_NATIVE_CHILD_PRELOAD="${LD_PRELOAD-}"' in wrapper
+    assert Path(meta['wrapper']).stat().st_mode & 0o777 == 0o700
+
+
+def test_native_debugger_preserves_existing_evidence(tmp_path):
+    import sys
+    from capstone_vla.native_debugger import write_debugger
+    debugger = tmp_path / 'debugger'; debugger.write_text('test placeholder')
+    path = tmp_path / 'native_backtrace.log'; path.write_text('preserved crash stack')
+    with pytest.raises(ValueError, match='already exists'):
+        write_debugger(tmp_path, sys.executable, debugger)
+    assert path.read_text() == 'preserved crash stack'
+
+
+def test_native_debugger_rejects_missing_executable_and_multiline_paths(tmp_path):
+    import sys
+    from capstone_vla.native_debugger import write_debugger
+    with pytest.raises(ValueError, match='missing'):
+        write_debugger(tmp_path, sys.executable, tmp_path / 'missing gdb')
+    with pytest.raises(ValueError, match='single-line'):
+        write_debugger(tmp_path, 'bad\nexecutable', sys.executable)
