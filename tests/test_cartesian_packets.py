@@ -10,7 +10,13 @@ from capstone_vla.cartesian_target_trace import encode
 
 class GeometryOwner:
     target='/ball'
-    def __init__(self):self.refreshes=0;self.drive_configurations=0
+    def __init__(self):self.refreshes=0;self.drive_configurations=0;self._prev_ee_p=None;self._prev_ee_q=None
+    def _ee_velocity(self, position, dt):
+        return np.zeros(3) if self._prev_ee_p is None else (position-self._prev_ee_p)/dt
+    def _ee_angular_velocity(self, quaternion, dt):
+        from scipy.spatial.transform import Rotation
+        if self._prev_ee_q is None:return np.zeros(3)
+        return (Rotation.from_quat(quaternion[[1,2,3,0]])*Rotation.from_quat(self._prev_ee_q[[1,2,3,0]]).inv()).as_rotvec()/dt
     def _ensure_gripper_drive(self):
         self.drive_configurations+=1;self._gripper_drive_configured=True
     def _update_environment_obstacles(self,world):
@@ -27,7 +33,8 @@ for name in ['_project_keep_clear_joint_velocity','_environment_safe_translation
 
 
 class Robot:
-    def __init__(self):self.position=np.zeros(3);self.arms=0;self.jaws=[]
+    def __init__(self):self.position=np.zeros(3);self.quaternion=np.array([1.,0.,0.,0.]);self.arms=0;self.jaws=[]
+    def pinch_pose(self):return self.position.copy(),self.quaternion.copy()
     def operational_space_pinch_action(self,**inputs):
         self.arms+=1
         v=np.r_[np.asarray(inputs['target_position'])-self.position,np.zeros(4)]
@@ -232,3 +239,47 @@ def test_close_request_does_not_fabricate_contact_or_skill_phase(monkeypatch):
     executor=PacketStreamExecutor(packets)
     executor.step(policy,world,0,1/60);executor.step(policy,world,1,1/60)
     assert owner._jaws_closed and not owner._physical_grasp_confirmed and owner.phase=='initial'
+
+
+def test_robot_motion_is_current_before_safety_and_servo(monkeypatch):
+    packets,robot,owner,world,policy=setup(monkeypatch);executor=PacketStreamExecutor(packets)
+    seen=[];refresh=owner._update_environment_obstacles;servo=robot.operational_space_pinch_action
+    def geometry(blind):
+        seen.append(('geometry',owner._current_ee_linear_velocity.copy(),owner._current_ee_angular_velocity.copy()))
+        refresh(blind)
+    def act(**inputs):
+        seen.append(('servo',owner._current_ee_linear_velocity.copy(),owner._current_ee_angular_velocity.copy()))
+        return servo(**inputs)
+    owner._update_environment_obstacles=geometry;robot.operational_space_pinch_action=act
+    executor.step(policy,world,0,1/60)
+    robot.position[0]=.001;robot.quaternion=np.array([np.cos(.05),0,0,np.sin(.05)])
+    executor.step(policy,world,1,1/60)
+    for _,linear,angular in seen[:2]:
+        np.testing.assert_array_equal(linear,0);np.testing.assert_array_equal(angular,0)
+    for _,linear,angular in seen[2:]:
+        np.testing.assert_allclose(linear,[.06,0,0],atol=1e-12)
+        np.testing.assert_allclose(angular,[0,0,6.],atol=1e-12)
+
+
+def test_motion_history_advances_once_and_uses_robot_not_target(monkeypatch):
+    from capstone_vla.cartesian_packets import audit_robot_safety_motion
+    packets,robot,owner,world,policy=setup(monkeypatch);executor=PacketStreamExecutor(packets)
+    for frame,position in enumerate([0.,.002,.002]):
+        robot.position[0]=position;executor.step(policy,world,frame,1/60)
+    np.testing.assert_allclose([e['safety_robot_twist_world']['linear_mps'][0] for e in executor.events],[0.,.12,0.],rtol=0.,atol=1.e-15)
+    assert audit_robot_safety_motion(executor.events)
+    np.testing.assert_array_equal(owner._prev_ee_p,robot.position)
+
+
+def test_stale_robot_motion_is_rejected_by_audit(monkeypatch):
+    from capstone_vla.cartesian_packets import audit_robot_safety_motion
+    packets,robot,owner,world,policy=setup(monkeypatch);executor=PacketStreamExecutor(packets)
+    executor.step(policy,world,0,1/60);robot.position[2]=.001;executor.step(policy,world,1,1/60)
+    events=copy.deepcopy(executor.events);events[1]['safety_robot_twist_world']['linear_mps']=[0,0,0]
+    assert not audit_robot_safety_motion(events)
+
+
+def test_invalid_robot_pose_stops_before_native_arm_call(monkeypatch):
+    packets,robot,owner,world,policy=setup(monkeypatch);robot.position[0]=np.nan
+    with pytest.raises(ValueError,match='measured robot pinch'):PacketStreamExecutor(packets).step(policy,world,0,1/60)
+    assert robot.arms==0

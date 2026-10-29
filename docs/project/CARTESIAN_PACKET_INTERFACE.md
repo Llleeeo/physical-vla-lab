@@ -146,3 +146,40 @@ cover ordering, close/reopen propagation, stale-context rejection and preservati
 of independent contact/skill state. All 166 CPU checks and scene preflight pass.
 The failed run is retained. **Full grasp restoration remains pending a physical
 rerun with the same command above.** See [the source-hashed diagnosis](../../results/summaries/2026-10-29-packet-jaw-context-diagnosis.json).
+
+
+## Robot-motion safety context correction — 2026-10-29
+
+The jaw-context-corrected packet rollout completes all 209 intervals safely and
+passes explicit request/jaw/OSC alignment, but fails final grasp retention. First
+arm-command divergence is at frame 156; recorded robot and object pose/velocity
+arrays remain exact through that frame, and the first state difference is 157.
+The first changed command still has the same robot Jacobian and whole-arm
+halfspaces as the passing reference. The measured jaw-mode audit passes.
+
+Native terminal collision safety also reads `_current_ee_linear_velocity` and
+`_current_ee_angular_velocity` from its geometry owner to reserve stopping distance.
+Those values were updated by the original skill tick and remained at zero after
+that tick was bypassed. The failed packet stopping-margin telemetry is zero where
+the original reference reports nonzero values. This is a verified context defect;
+the complete causal recovery still requires a physical rerun.
+
+The adapter now measures only `expert.pinch_pose()`, invokes the native causal
+linear/angular difference helpers, and refreshes these fields before geometry and
+servo evaluation. It preserves the native quaternion snapshot/normalization order
+and advances position/orientation history once after the current servo call. It
+does not call the skill finalizer, which would also record target-state data.
+Each event logs `safety_robot_pose` and `safety_robot_twist_world`; the audit checks
+linear differences and shortest-arc world angular differences from consecutive
+measured poses. These are measured robot velocities, not derivatives of commanded
+goals or the separate task-acceleration feedforward.
+
+A small unchanged native CBF plane/palm fixture shows a zero stopping margin with
+stale zero velocity and a 27.5 mm margin with its specified measured velocity.
+The projected approach command correspondingly changes; these fixture numbers
+are not a tuning recommendation. Native motion helpers and the causal audit also
+pass a 209-sample recorded-robot-pose CPU fixture. Four new regressions bring the
+portable suite to 170 passes, including update ordering, history advancement,
+stale-context detection and invalid-pose rejection. Python 3.10 parsing and scene
+preflight pass. Original reports and limits remain unchanged; the same physical
+command above must still be rerun to determine final grasp performance.

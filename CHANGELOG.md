@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Restore measured robot motion in packet safety context
+
+- Jaw-context correction allows the full safe 209-frame packet rollout, but retention fails. First arm-command divergence is frame 156; recorded robot/object states remain exact through that frame.
+- Found another context omission: native terminal safety reads measured EE linear/angular velocities formerly refreshed by skill.step. Refresh them from robot-only pose history using native helpers, advance history once and audit the logged pose/twist sequence.
+- Four new regressions bring the portable suite to 170 passes. Unchanged native CBF CPU fixtures confirm stopping-margin dependence, native motion helpers pass a 209-pose fixture, and scene preflight passes. Corrected physical outcome remains pending; limits and target-state restrictions are unchanged.
+
 ## 2026-10-29 — Synchronize explicit jaw commands with safety geometry
 
 - Packet rollout reaches bilateral contact but aborts during lift: 174 completed intervals, first changed arm command at frame 151, with matching robot state/Jacobian/whole-arm halfspaces at that boundary.

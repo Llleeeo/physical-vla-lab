@@ -66,6 +66,14 @@ terminal geometry context in fully-open mode. That omission is fixed and audited
 166 CPU tests and scene preflight pass. The corrected full physical result is
 pending. See [the jaw-context diagnosis](../../results/summaries/2026-10-29-packet-jaw-context-diagnosis.json).
 
+With jaw context synchronized, the packet rollout safely completes 209 intervals
+and passes request alignment but loses final retention. The first command
+changes at frame 156, before any recorded robot/object state differs. Native
+terminal safety was still missing measured robot linear/angular velocity context
+normally provided by the skipped skill tick. That robot-only context is now
+refreshed, logged and causally audited; 170 CPU checks and scene preflight pass.
+The corrected physical grasp result is pending. See [the motion-context diagnosis](../../results/summaries/2026-10-29-packet-robot-motion-context-diagnosis.json).
+
 ## Earlier DynamicVLA integration: irregular egg-object task
 
 Task: `grasp_sliding_motion_on_flat_surface_1s1p_g9wvkk1`. Earlier shorthand called the object a ball; the target is an egg. This task remains a difficult development case.
