@@ -1,0 +1,47 @@
+{
+  "schema": "physical-vla-lab.native-capture-frame-error.v1",
+  "date": "2026-10-29",
+  "batch": "20261029_213626_774692",
+  "selected_episodes": [
+    "traj_00001",
+    "traj_00007",
+    "traj_00018"
+  ],
+  "teacher_execution_errors": 3,
+  "new_evaluable_physics_episodes": 0,
+  "surrogate_runs_executed": 0,
+  "grasp_failure_rate": null,
+  "existing_runs_rendered": 2,
+  "existing_rgb_videos_verified": 10,
+  "error": "KeyError: frame in CartesianTargetRecorder.segment_links -> reference_matches",
+  "cause": "Native segment has no frame key; record_segment provides explicit callback index but recorder forwarded the unframed segment to matching.",
+  "fix": "Pass a non-mutating framed copy; reject a conflicting explicit frame. Stop coordinator immediately on unsaved execution errors.",
+  "controller_commands_changed": false,
+  "physics_limits_changed": false,
+  "raw_logs_preserved": true,
+  "cpu_tests_passed": 227,
+  "existing_capture_fixture": {
+    "frames": 209,
+    "exact_reference_links": 194,
+    "input_not_mutated": true
+  },
+  "gpu_rerun_started": false,
+  "learned_policy_evaluated": false,
+  "interpretation": [
+    "These are software execution errors, not three failed grasps; no success-rate denominator can be formed.",
+    "The earlier 209-frame surrogate genuinely fails physical retention; this fix does not change that result.",
+    "CPU callback coverage was insufficient: previous tests supplied a frame that the native caller does not. Added the actual record_segment invocation regression.",
+    "After this execution fix, start a fresh bounded batch; do not resume the old completed-error stages or overwrite them."
+  ],
+  "evidence_sha256": {
+    "batch.json": "7c70f20a069b255068971a400d1f97a06a335c3e2ae3d54b2eff16a88acbc3c8",
+    "traj_00001_simulation.log": "44880f0a9208478fa51cc3680e83072e11c96dbe7991892a661e7ace3f0e1f94",
+    "traj_00007_simulation.log": "afcea4a7709aa6de7fb6fb15f2a931cddef9eb3ba3dcf71baebc6b1b7cc36fca",
+    "traj_00018_simulation.log": "18d41fd2bfe247e08dccecf546391b1b04fde4123323ba7ff684fc5e9bd1a457"
+  },
+  "implementation_sha256": {
+    "src/capstone_vla/cartesian_target_trace.py": "e9c566eec8eb56a97cc175951313a5c41867290ad8947cdef5982dcf50b08e0e",
+    "scripts/run_hgwind_contract_batch.py": "f03ec8da71c8fbc675f0a3d5130f578a64ea97dd42df13e599f96d4ff91378fc",
+    "scripts/run_hgwind_action_contract.py": "67b88938f52ad62e7707f0c570cd8819502442b21a434366d8d5a962fb0b4dab"
+  }
+}

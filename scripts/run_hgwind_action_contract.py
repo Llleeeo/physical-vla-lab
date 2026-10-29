@@ -50,12 +50,14 @@ def prepare(baseline):
         'cartesian_target_capture','packet_baseline_report']:
         path=prior['source'] if key=='source_reference' else prior[key]
         require(sha256(path)==prior[key+'_sha256'],'Baseline input changed: '+key)
-    # Only the optional trace hook changes in this integration. Other frozen
-    # geometry, servo, posture and effort implementations must match the parent.
+    # Optional recording hooks may be corrected without changing commands.
+    # Re-audit the parent raw links below; frozen geometry, servo, posture and
+    # effort implementations must still match the parent exactly.
     trace=ROOT/'src/capstone_vla/hgwind_expert_trace.py'
+    recorder=ROOT/'src/capstone_vla/cartesian_target_trace.py'
     for name,digest in prior['adapter_sha256'].items():
         path=Path(name) if Path(name).is_absolute() else ROOT/name
-        if path!=trace:
+        if path not in (trace,recorder):
             require(sha256(path)==digest,'Baseline dependency changed: '+str(path))
     source=Path(prior['source']);verify_files(source.parent,prior['source_files'])
     cfg=json.loads(Path(prior['controller_config']).read_text())
@@ -119,7 +121,7 @@ def prepare(baseline):
         action_contract_parent_requests_sha256=sha256(baseline/'packet_requests.json'),
         reference_fidelity='Expert-labelled 29D float32 upper-command surrogate with fixed gains/live-latched posture and always-on geometry callbacks. No model predictions, online skill or cached inner commands.',
         training_eligible=False)
-    for path in [trace,ROOT/'src/capstone_vla/ball_action_contract.py',
+    for path in [trace,recorder,ROOT/'src/capstone_vla/ball_action_contract.py',
         Path(__file__).resolve(),ROOT/'scripts/analyze_hgwind_effort_probe.py']:
         plan['adapter_sha256'][str(path)]=sha256(path)
     diagnostics=dict(frames=len(actions),action_shape=list(actions.shape),action_dtype=str(actions.dtype),

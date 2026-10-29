@@ -12,9 +12,11 @@ Before first contact at 135, EE difference from the passing reference is at most
 
 21 runtime dependency hashes and unchanged runtime encoder/decoder functions verify. 210 portable CPU checks pass; no additional simulation, model training or inference was launched for this analysis. Recorded expert upper commands replay without fresh target-conditioned decisions, so this exposed replay failure does not demonstrate that a learned reactive policy cannot succeed. Freeze the controller and run a bounded 3–5 distinct development-episode diagnostic before deciding label generation/training. Existing 40 processed 9D recordings still lack the complete upper labels.
 
-## Prepared paired diagnostic and video review
+## First bounded batch: execution errors, no new grasp evidence
 
-Three schema-supported local cases (attempts 60/144/345) are now fixed before new outcomes. The [coordinator](CONTRACT_VIDEO_BATCH.md) will run native teachers and eligible fixed-contract surrogates once each, render every saved success/failure plus both prior references, and produce a five-view manual-review index. 223 CPU checks and real case/render preflights pass; no GPU runs or new video completeness are claimed yet. The complete binary-schema support screen is retained; 11 intermediate-jaw cases are unsupported by this contract, not labelled poor demonstrations.
+Batch `20261029_213626_774692` renders both existing passing/failed references completely: five RGB views each. The three new teachers all stop on `KeyError: frame` inside the recording callback before any evaluable episode is saved. No surrogate is executed. These are **three execution errors and zero new evaluable grasps**, not a 0/3 grasp success rate. Preserve the existing genuine 209-frame physical-retention failure separately.
+
+The native segment dictionary has no recording frame; the recorder now uses its explicit callback index on a copy and rejects conflicting frame metadata. Added coverage calls the actual `record_segment` entry with an unframed segment, unlike earlier fixtures. All 194 reference links from the existing 209-frame native capture pass without modifying original inputs. 227 portable CPU checks pass. The coordinator now stops immediately on an unsaved execution error. Controller parameters/inputs and physical criteria are unchanged; no GPU rerun was launched during this fix. A fresh bounded batch is required, retaining the previous errors and their logs. See [source-hashed diagnosis](../../results/summaries/2026-10-29-native-capture-frame-fix.json).
 
 ## Wind-driven spherical-object cohort
 

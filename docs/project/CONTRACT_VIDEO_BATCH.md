@@ -1,6 +1,6 @@
 # Bounded paired diagnostics with videos for every saved outcome
 
-**Prepared and CPU verified; GPU batch results/videos pending.** The 29D action contract and fixed controller settings remain unchanged. This implements the bounded diagnostic following the first contact-retention failure, not a new parameter search or training run.
+**First batch: existing reference videos complete; new teacher captures hit a recording error. The callback fix is CPU verified; fresh paired physics results are pending.** The 29D action contract and fixed controller settings remain unchanged. This implements the bounded diagnostic following the first contact-retention failure, not a new parameter search or training run.
 
 ## Cases selected before new outcomes
 
@@ -22,7 +22,7 @@ The scope screen, selected identities, seeds and hashes are saved before simulat
 2. For each selected case, execute the unchanged native expert once with upper-command capture, then render its saved trajectory **regardless of success**.
 3. If that native teacher passes physical/initial-state checks, its captured commands align, and its posture/controller fields fit the frozen contract, prepare and execute the same 29D surrogate once. No historical sequence of component ablations is repeated. Render that saved outcome regardless of success.
 4. If teacher execution fails or labels are unsupported, retain its video and reason, skip the surrogate and do not replace the case with another successful outcome.
-5. Finish with an index of every run, independent grasp result, render state and five RGB MP4 paths. Missing reports do not prevent rendering an otherwise valid saved trajectory. A crash with no saved states is explicitly unrenderable; it is not silently omitted.
+5. Finish with an index of every run, independent grasp result, render state and five RGB MP4 paths. Missing reports do not prevent rendering an otherwise valid saved trajectory. A crash with no saved states is explicitly unrenderable; it is not silently omitted. The coordinator stops immediately on that execution error instead of spending GPU time on the remaining cases.
 
 Maximum: **6 new physics runs**, plus rendering **2 existing runs**. Maximum **8 result sets / 40 RGB videos**. The earlier success/failure collector filenames stay unchanged; independent engineering grasp status is displayed separately. All work is serial on the main machine. No remote worker, training, automatic successful-case replacement or controller tuning is performed.
 
@@ -68,6 +68,6 @@ Check interception, closure depth, contact/relative slip, lift/retention, arm ji
 
 ## Verification and rollback
 
-223 portable CPU checks pass, including failed-episode resolution without a report, ambiguous-path rejection, all five camera streams, truncated MP4/misaligned timestamp rejection, schema-aware deterministic selection, incompatible posture rejection and resume without repeated failed physics. All three actual case preflights and both existing render preflights pass. Direct preparation from the original verified teacher recreates the previous surrogate's 209×29 float32 action array exactly; it does not change the action contract.
+227 portable CPU checks pass, including failed-episode resolution without a report, ambiguous-path rejection, all five camera streams, truncated MP4/misaligned timestamp rejection, schema-aware deterministic selection, incompatible posture rejection and resume without repeated failed physics. All three actual case preflights and both existing render preflights pass. Direct preparation from the original verified teacher recreates the previous surrogate's 209×29 float32 action array exactly; it does not change the action contract.
 
-No GPU simulation or rendering was started during implementation. End-to-end execution of the new coordinator remains pending. Existing single-case baseline/contract/render commands remain available; reverting this orchestration milestone leaves raw data, prior reports, fixed controller parameters and original RoboPhys unchanged.
+The first user batch completed both reference renders, then three native captures stopped on a missing-frame recording callback before saving trajectories. This is not three grasp failures. The frame fix changes recording only; a new batch is required because completed-error physics stages are intentionally not repeated on resume. No GPU rerun was started during the fix. Existing single-case baseline/contract/render commands remain available; reverting this orchestration milestone leaves raw data, prior reports, fixed controller parameters and original RoboPhys unchanged.

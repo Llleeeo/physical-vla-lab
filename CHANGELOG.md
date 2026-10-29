@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Native capture callback frame error fixed
+
+- First bounded batch rendered both existing references (ten RGB videos), but all three native teacher launches hit a recorder `KeyError: frame` before saving evaluable episodes. They are execution errors, not failed grasps; no new surrogate or grasp-rate evidence exists. Preserve the logs.
+- Supply the explicit callback index on a non-mutating segment copy, reject conflicting frames, and add an actual `record_segment` callback regression. Preserve controller inputs. Stop the coordinator on unsaved execution errors instead of launching all remaining cases.
+- Four regressions bring portable CPU checks to 227 passes; all 194 reference links across the existing 209-frame capture verify without caller mutation. Single-case compatibility preflight passes. CPU checks do not establish physical recovery; fresh bounded execution remains pending, without overwriting completed-error stages.
+
 ## 2026-10-29 — Bounded paired batch with all-outcome videos prepared
 
 - Add a serial three-case teacher/29D-surrogate coordinator, automatic rendering of every saved success/failure and existing passing/failed references, unified five-view video index and protected human notes. Resume does not repeat completed failed physics; missing renderings can retry.

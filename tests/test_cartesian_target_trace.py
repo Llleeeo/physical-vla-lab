@@ -134,3 +134,36 @@ def test_full_reference_mismatch_and_nonfinite_cannot_create_a_link():
     assert not recorder.segment_links(0,row)['selected_cartesian_call_ids']
     assert not reference_content_equal([float('nan')],[float('nan')])
     assert not reference_content_equal({'unsupported_type':'nonfinite_float'},{'unsupported_type':'nonfinite_float'})
+
+
+def test_native_segment_without_frame_links_without_mutating_control_input():
+    expert=ToyExpert();recorder=CartesianTargetRecorder();recorder.begin_frame(expert,0)
+    expert.operational_space_pinch_action([0,0,0],[1,0,0,0])
+    segment=dict(goal_position=[0]*7,goal_velocity=[1]*7,
+        operational_space_reference=expert._pending_operational_space_reference)
+    links=recorder.segment_links(0,segment)
+    assert links['selected_cartesian_call_ids']==[0]
+    assert 'frame' not in segment
+
+
+def test_explicit_conflicting_frame_cannot_be_silently_overwritten():
+    expert=ToyExpert();recorder=CartesianTargetRecorder();recorder.begin_frame(expert,0)
+    with pytest.raises(ValueError,match='frame differs'):
+        recorder.segment_links(0,dict(frame=1))
+
+
+def test_actual_record_segment_callback_accepts_unframed_native_segment():
+    from capstone_vla import hgwind_expert_trace as trace
+    expert=ToyExpert();recorder=CartesianTargetRecorder();recorder.begin_frame(expert,0)
+    expert.operational_space_pinch_action([0,0,0],[1,0,0,0])
+    segment=dict(goal_position=[0]*7,goal_velocity=[1]*7,
+        operational_space_reference=expert._pending_operational_space_reference,
+        policy_joint_velocity_limit=None,duration_s=1/60,episode_time_s=0.)
+    saved=dict(trace._STATE)
+    try:
+        trace._STATE.clear();trace._STATE.update(rows=[],assistance=[],joints=[],cartesian_recorder=recorder)
+        trace.record_segment(0,segment,np.zeros(9),np.zeros(9),np.zeros(9),None,'robot',[],{})
+        assert trace._STATE['rows'][0]['selected_cartesian_call_ids']==[0]
+        assert trace._STATE['rows'][0]['frame']==0 and 'frame' not in segment
+    finally:
+        trace._STATE.clear();trace._STATE.update(saved)

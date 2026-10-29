@@ -151,3 +151,14 @@ def test_selection_uses_declared_schema_eligibility_before_spacing():
     data=rows()
     for row in data:row['gripper_schema_supported']=row['episode'] in ['traj_00001','traj_00007','traj_00018']
     assert [r['episode'] for r in select_cases(data)]==['traj_00001','traj_00007','traj_00018']
+
+
+def test_no_recording_blocks_additional_cases_instead_of_counting_grasp_failure(tmp_path,monkeypatch):
+    spec=importlib.util.spec_from_file_location('batch_stop_check',Path(__file__).resolve().parents[1]/'scripts/run_hgwind_contract_batch.py')
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    monkeypatch.setattr(module,'persist',lambda *a:None)
+    state={};record=dict(run='/tmp/execution-error',render_state='no_renderable_episode',exit_code=1)
+    assert module.stop_for_unsaved_execution_error(tmp_path,state,record,'teacher')
+    assert state['finished'] is False and state['blocked_by_execution_error']=='teacher'
+    assert 'grasp' not in record
+    assert not module.stop_for_unsaved_execution_error(tmp_path,{},dict(run='/tmp/saved',render_state='complete',grasp='fail'),'contract')

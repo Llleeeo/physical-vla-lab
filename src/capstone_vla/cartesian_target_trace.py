@@ -84,9 +84,14 @@ class CartesianTargetRecorder:
         if self.expert is not None:self.expert.operational_space_pinch_action=self.original
 
     def segment_links(self,index,segment):
+        # Native segments do not carry the recording frame. The explicit
+        # callback index supplies it; do not mutate the live control segment.
+        if 'frame' in segment and segment['frame']!=int(index):
+            raise ValueError('Segment frame differs from recorder callback index')
+        framed=dict(segment,frame=int(index))
         events=[x for x in self.events if x['frame']==int(index)]
-        matches=match_calls(events,segment)
-        full=reference_matches(events,segment);selected=full if len(full)==1 else []
+        matches=match_calls(events,framed)
+        full=reference_matches(events,framed);selected=full if len(full)==1 else []
         return {'cartesian_call_ids':[x['call_id'] for x in events],'matching_cartesian_call_ids':matches,
             'reference_matching_cartesian_call_ids':full,'selected_cartesian_call_ids':selected,
             'selection_rule':'unique_same_frame_arm_and_full_reference_content'}

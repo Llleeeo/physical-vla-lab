@@ -137,6 +137,17 @@ def physics_stage(out,state,record,cmd,label):
     record['state']='finished';persist(out,state)
 
 
+def stop_for_unsaved_execution_error(out,state,record,label):
+    """No saved episode is a software/execution failure, not grasp evidence."""
+    if record.get('run') and record.get('render_state')=='no_renderable_episode':
+        state.update(finished=False,blocked_by_execution_error=label,
+            error='Execution produced no evaluable recording; no grasp failure or success-rate evidence')
+        persist(out,state)
+        print('BATCH_BLOCKED '+label+' no_evaluable_recording; fix execution before more GPU cases',flush=True)
+        return True
+    return False
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--run',action='store_true')
@@ -178,6 +189,7 @@ def main():
             label=case['episode'];teacher=case['teacher'];contract=case['contract']
             physics_stage(out,state,teacher,teacher_command(case,True),label+'_teacher')
             render_record(out,state,teacher,label+'_teacher')
+            if stop_for_unsaved_execution_error(out,state,teacher,label+'_teacher'):return 2
             if not teacher.get('run'):
                 contract.update(state='skipped',render_state='not_run',error='Teacher did not save a run');persist(out,state);continue
             if contract.get('state')=='skipped':
@@ -193,6 +205,7 @@ def main():
                 '--teacher-run',teacher['run'],'--run']
             physics_stage(out,state,contract,cmd,label+'_contract')
             render_record(out,state,contract,label+'_contract')
+            if stop_for_unsaved_execution_error(out,state,contract,label+'_contract'):return 2
             verify_files(case['source'],case['source_files'])
         state['finished']=True
         records=state['existing']+[c[s] for c in state['cases'] for s in ['teacher','contract']]
