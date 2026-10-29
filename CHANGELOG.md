@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-29 — Worker-history rendering becomes optional
+
+- At the user’s request, default history runs now collect/analyze only and retain raw trajectories. Explicit `--render` opts into videos, including later `--finish --render`.
+- Report skipped rendering separately and allow analysis-complete diagnostics without videos. Ten focused history checks and actual scene preflight pass; no simulation or rendering was launched for this change.
+
 ## 2026-10-29 — Bounded original worker-history comparison prepared
 
 - Add one-worker attempts58/59/60 with original seed/profile/depth/reset and safety exits retained; no restart loop or success-target replacement. Pin all three original recordings and the prior fresh control.

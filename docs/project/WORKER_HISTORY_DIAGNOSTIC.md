@@ -21,13 +21,13 @@ Original failed/successful recordings are checksum pinned by attempt index. Each
 
 A fresh directory under `data/derived/hgwind_history_diagnostics/<timestamp>/` contains the plan, single-worker log, observed attempt order, individual attempt folders and final `report.json`. Physics outcomes and delivery completion are distinct. A partial prefix is explicitly incomplete; no episode is counted as tested when it did not run.
 
-All saved results receive five30Hz saved-state review videos; they are not formal training renders. `VIDEO_REVIEW.md` links the views. User review is pending. Render preparation uses copies, preserves raw collector files, and reports analysis/render errors independently.
+Rendering is skipped by default at the user’s request. Raw trajectories and analysis are retained; missing videos are marked skipped and do not block an otherwise complete diagnostic. To generate five30Hz saved-state review videos later, explicitly add `--render` to the delivery command below. These are not formal training renders; human visual review remains pending. Render preparation uses copies, preserves raw collector files, and reports analysis/render errors independently.
 
-If collection ended but rendering was interrupted, continue delivery only:
+To render a completed diagnostic later without recollecting:
 
 ```bash
 data/derived/hf_pilot_render_repo/.venv/bin/python \
-  scripts/run_hgwind_history_diagnostic.py --finish <HISTORY_OUTPUT-directory>
+  scripts/run_hgwind_history_diagnostic.py --finish <HISTORY_OUTPUT-directory> --render
 ```
 
 Interpret the three raw comparisons before drawing conclusions. If earlier attempts already differ from their originals, the original history was not fully reproduced. If the prefix matches and attempt60 recovers, that supports a process-history effect in this exposed sequence; it does not distinguish fan caches, force accumulators or other solver/reset state. A different grasp outcome alone is insufficient. The frozen29D policy contract and previous failures remain unchanged.

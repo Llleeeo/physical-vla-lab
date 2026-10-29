@@ -4,7 +4,7 @@ Snapshot: **2026-10-29, Asia/Hong_Kong**. These are development observations, no
 
 ## Worker-history experiment prepared; physical result pending
 
-The [new bounded command](WORKER_HISTORY_DIAGNOSTIC.md) executes original attempts58/59/60 in one native worker, then analyzes/renders every saved result. Original outcomes were failed720frames, failed363frames and successful319frames. An unchanged safety exit can truncate this sequence; no automatic worker restart is allowed. Compare startup physics and full arrays with originals and the previously measured fresh attempt60 before interpreting a grasp outcome.
+The [new bounded command](WORKER_HISTORY_DIAGNOSTIC.md) executes original attempts58/59/60 in one native worker, then analyzes every saved result. Rendering is now optional at the user’s request (`--render`); skipped video generation does not imply a failed diagnostic. Original outcomes were failed720frames, failed363frames and successful319frames. An unchanged safety exit can truncate this sequence; no automatic worker restart is allowed. Compare startup physics and full arrays with originals and the previously measured fresh attempt60 before interpreting a grasp outcome.
 
 251 CPU checks, actual scene/three-source preflight and native-entry assembly verification pass. No GPU sequence has been run by the agent and no history cause or physical improvement is claimed. See [preparation provenance](../../results/summaries/2026-10-29-worker-history-preparation.json).
 

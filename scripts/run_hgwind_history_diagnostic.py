@@ -103,13 +103,13 @@ def prepare(native_backtrace=False):
     return plan, command, lab
 
 
-def finish(out, code):
+def finish(out, code, render=False):
     from analyze_hgwind_effort_probe import analyze
     plan = json.loads((out/'plan.json').read_text())
     episodes = index_saved_episodes(plan['worker_output'], TASK_ID)
     result = dict(schema='physical-vla-lab.hgwind-history.v1', worker_exit=code,
         requested_attempts=ATTEMPTS, saved_attempts=sorted(episodes), cases=[], learned_policy_evaluated=False,
-        complete=False, physical_success=False, native_backtrace=str(out/'native_backtrace.log') if (out/'native_backtrace.log').exists() else None, interpretation='Incomplete history cannot answer the attempt60 history hypothesis.')
+        complete=False, physical_success=False, render_requested=render, native_backtrace=str(out/'native_backtrace.log') if (out/'native_backtrace.log').exists() else None, interpretation='Incomplete history cannot answer the attempt60 history hypothesis.')
     for index, episode in sorted(episodes.items()):
         case = plan['history_cases'][str(index)]; location = Path(case['output'])
         row = dict(attempt_index=index, original_episode=case['episode'], run=str(location), analysis_complete=False,render_complete=False)
@@ -133,15 +133,17 @@ def finish(out, code):
                 row['comparison_to_fresh'] = compare_motion(Path(fresh['probe_episode'])/'replay.hdf5',target/'replay.hdf5')
         except Exception as exc:
             row['analysis_error'] = repr(exc)
-        # Even a physical failure must receive a video. Analysis failure must
-        # not erase already saved states or skip other saved outcomes.
-        try:
-            rendered = subprocess.run([sys.executable,str(ROOT/'scripts/render_hgwind_effort_probe.py'),'--probe-run',str(location),'--run'],cwd=ROOT)
-            require(rendered.returncode == 0, 'Rendering failed; use --finish to retry delivery without recollection')
-            row['videos'] = inspect_review_videos(ROOT,location)
-            row['render_complete'] = True
-        except Exception as exc:
-            row['render_error'] = repr(exc)
+        row['render_status'] = 'skipped_by_request'
+        if render:
+            try:
+                rendered = subprocess.run([sys.executable,str(ROOT/'scripts/render_hgwind_effort_probe.py'),'--probe-run',str(location),'--run'],cwd=ROOT)
+                require(rendered.returncode == 0, 'Rendering failed; use --finish --render to retry delivery without recollection')
+                row['videos'] = inspect_review_videos(ROOT,location)
+                row['render_complete'] = True
+                row['render_status'] = 'complete'
+            except Exception as exc:
+                row['render_error'] = repr(exc)
+                row['render_status'] = 'failed'
         trace = location/'startup_force_calls.jsonl'
         if trace.exists():
             calls = [json.loads(line) for line in trace.read_text().splitlines()]
@@ -153,19 +155,20 @@ def finish(out, code):
     order_path=out/'attempt_order.jsonl'
     order=[json.loads(line)['attempt_index'] for line in order_path.read_text().splitlines()] if order_path.exists() else []
     result['observed_attempt_order']=order
-    result['complete'] = code == 0 and sorted(episodes)==ATTEMPTS and order==ATTEMPTS and all(x['analysis_complete'] and x['render_complete'] for x in result['cases'])
+    result['complete'] = code == 0 and sorted(episodes)==ATTEMPTS and order==ATTEMPTS and all(x['analysis_complete'] and (not render or x['render_complete']) for x in result['cases'])
     target = next((x for x in result['cases'] if x['attempt_index']==60),{})
     result['target_grasp_status'] = target.get('grasp', 'not_evaluated')
     result['physical_success'] = bool(target.get('analysis_complete') and target.get('grasp')=='pass' and target.get('runtime_safety') and target.get('initial_state_match'))
     if result['complete']:
         result['interpretation']='Compare original and fresh startup/native arrays before attributing any result to history; this remains a development expert experiment.'
     (out/'report.json').write_text(json.dumps(result,indent=2)+'\n')
-    lines=['# Worker-history video review','','Every saved attempt is retained; these are30Hz saved-state review videos.','']
+    lines=['# Worker-history video review','','Raw trajectories retained. Rendering is optional; skipped views have not been visually reviewed.','']
     for row in result['cases']:
         lines.append('## Attempt '+str(row['attempt_index'])+' — independent grasp '+row.get('grasp','unavailable'))
         lines.append('')
         for name,video in row.get('videos',{}).get('videos',{}).items(): lines.append('- ['+name+']('+video['path']+')')
-        if not row['render_complete']:lines.append('Video delivery incomplete: '+row.get('render_error','unknown'))
+        if row['render_status'] == 'skipped_by_request':lines.append('Rendering skipped by request; raw trajectory retained.')
+        elif not row['render_complete']:lines.append('Video delivery incomplete: '+row.get('render_error','unknown'))
         lines.append('')
     (out/'VIDEO_REVIEW.md').write_text('\n'.join(lines))
     print('HISTORY_DIAGNOSTIC_'+('COMPLETED' if result['complete'] else 'INCOMPLETE')+' report='+str(out/'report.json'),flush=True)
@@ -176,13 +179,16 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--run',action='store_true')
     parser.add_argument('--native-backtrace',action='store_true')
+    parser.add_argument('--render',action='store_true',help='Opt in to five-view review videos; default analyzes only')
     parser.add_argument('--finish',type=Path,help='Analyze/render a completed run without launching physics again')
     args=parser.parse_args()
     if args.finish:
         require(not args.run,'--finish never launches collection')
         out=args.finish.resolve();out.relative_to(ROOT/'data/derived/hgwind_history_diagnostics')
-        return finish(out,json.loads((out/'worker_exit.json').read_text())['exit_code'])
+        return finish(out,json.loads((out/'worker_exit.json').read_text())['exit_code'],render=args.render)
     plan,command,lab=prepare(args.native_backtrace)
+    plan['render_requested'] = args.render
+    print('RENDER_MODE '+('enabled' if args.render else 'skipped; raw trajectories retained'),flush=True)
     print('COMMAND '+shlex.join(command),flush=True)
     if not args.run:return 0
     out=Path(plan['output']);out.mkdir(parents=True,exist_ok=False)
@@ -211,7 +217,7 @@ def main():
     if code == 130:
         print('HISTORY_INTERRUPTED saved outputs retained; resume delivery with --finish '+str(out),flush=True)
         return 130
-    return finish(out,code)
+    return finish(out,code,render=args.render)
 
 
 if __name__=='__main__':raise SystemExit(main())

@@ -94,7 +94,8 @@ def test_patch_rejects_changed_boundary():
 
 
 @pytest.mark.parametrize('analysis_error',[False,True])
-def test_partial_history_renders_saved_failure_without_relaunching_physics(tmp_path,monkeypatch,analysis_error):
+@pytest.mark.parametrize('render',[False,True])
+def test_partial_history_optional_render_without_relaunching_physics(tmp_path,monkeypatch,analysis_error,render):
     import importlib.util
     import sys
     root=Path(__file__).resolve().parents[1]
@@ -117,10 +118,13 @@ def test_partial_history_renders_saved_failure_without_relaunching_physics(tmp_p
     commands=[]
     monkeypatch.setattr(runner.subprocess,'run',lambda command,**k:(commands.append(command) or SimpleNamespace(returncode=0)))
     monkeypatch.setattr(runner,'inspect_review_videos',lambda *a:{'videos':{}})
-    assert runner.finish(out,1)==2
+    assert runner.finish(out,1,render=render)==2
     report=json.loads((out/'report.json').read_text())
     assert report['saved_attempts']==[58] and report['complete'] is False
-    assert report['cases'][0]['render_complete'] is True
+    assert report['cases'][0]['render_complete'] is render
+    assert report['render_requested'] is render
     assert report['cases'][0]['analysis_complete'] is (not analysis_error)
-    assert len(commands)==1 and commands[0][1].endswith('render_hgwind_effort_probe.py')
+    assert len(commands)==int(render)
+    if render:assert commands[0][1].endswith('render_hgwind_effort_probe.py')
+    else:assert report['cases'][0]['render_status']=='skipped_by_request'
     assert (episode/'replay.hdf5').read_bytes()==b'fixture'
