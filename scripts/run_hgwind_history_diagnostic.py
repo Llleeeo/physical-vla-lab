@@ -23,9 +23,12 @@ from capstone_vla.contract_batch import inspect_review_videos
 from diagnose_hgwind_startup_history import LOG, worker_context
 FRESH = ROOT / 'data/derived/hgwind_effort_probes/20261029_225526_640181_joint_online-expert_native-expert_target-capture'
 ATTEMPTS = [58, 59, 60]
+HISTORY = ROOT / 'data/derived/hgwind_history_diagnostics/20261029_234931_549595'
 
 
-def prepare(native_backtrace=False, stage_load_barrier=False):
+def prepare(native_backtrace=False, stage_load_barrier=False, fresh_control=False):
+    require(not fresh_control or stage_load_barrier, 'Fresh control requires the matched stage-load barrier')
+    attempts = [60] if fresh_control else list(ATTEMPTS)
     plan = json.loads((FRESH / 'plan.json').read_text())
     require(plan['attempt_offset'] == 60 and plan['seed'] == 202610280, 'Fresh reference differs')
     require(json.loads((FRESH / 'report.json').read_text())['recorded_frames'] == 169, 'Fresh reference changed')
@@ -41,10 +44,10 @@ def prepare(native_backtrace=False, stage_load_barrier=False):
     require((lab / 'VERSION').read_text().strip() == '2.2.1' and ((lab / '_isaac_sim').resolve() / 'VERSION').read_text().startswith('4.5.0'), 'SDK changed')
     require(not os.environ.get('CONDA_PREFIX'), 'Run from the existing project interpreter outside Conda')
     stamp = datetime.now(ZoneInfo('Asia/Hong_Kong')).strftime('%Y%m%d_%H%M%S_%f')
-    out = ROOT / 'data/derived/hgwind_history_diagnostics' / stamp
+    out = ROOT / 'data/derived/hgwind_history_diagnostics' / (stamp + ('_fresh60' if fresh_control else ''))
     plan.pop('native_debugger', None)
-    plan.update(output=str(out), worker_output=str(out / 'worker_output'), attempt_offset=58,
-        history_attempts=ATTEMPTS, native_debugger_requested=native_backtrace, stage_load_barrier=stage_load_barrier,
+    plan.update(output=str(out), worker_output=str(out / 'worker_output'), attempt_offset=attempts[0], fresh_control=fresh_control,
+        history_attempts=attempts, native_debugger_requested=native_backtrace, stage_load_barrier=stage_load_barrier,
         fresh_reference=str(FRESH), fresh_plan_sha256=sha256(FRESH/'plan.json'), fresh_report_sha256=sha256(FRESH/'report.json'),
         original_worker_context=context, original_log_sha256=sha256(LOG),
         reference_fidelity='One frozen native worker, original attempts58/59/60, normal reset and safety exits; no source actions execute.')
@@ -57,18 +60,33 @@ def prepare(native_backtrace=False, stage_load_barrier=False):
     patched = assemble(plan)
     plan['patch_sha256'] = hashlib.sha256(patched.encode()).hexdigest()
     compile(patched, '<history-preflight>', 'exec')
+    if fresh_control:
+        matched_plan = json.loads((HISTORY/'plan.json').read_text())
+        matched_report = json.loads((HISTORY/'report.json').read_text())
+        require(matched_report['complete'] and matched_report['stage_load_barrier_verified'] and matched_report['target_grasp_status']=='pass' and all(row['comparison_to_original']['all_core_arrays_exact'] for row in matched_report['cases']), 'Matched history result is not verified')
+        require(plan['patch_sha256']==matched_plan['patch_sha256'], 'Fresh control changes the native collector assembly')
+        for name in ['task_sha256','physics_sha256','worker_sha256','controller_config_sha256','original_depth_bias_m','seed']:
+            require(plan[name]==matched_plan[name], 'Fresh/history dependency differs: '+name)
+        for name, expected_hash in matched_plan['adapter_sha256'].items():
+            if Path(name).name in ('hgwind_history.py','run_hgwind_history_diagnostic.py'):
+                continue  # Sequence selection/reporting only; assembled collector must still match above.
+            require(sha256(ROOT/name)==expected_hash, 'Matched-history runtime dependency changed: '+name)
+        plan['matched_history_reference'] = str(HISTORY)
+        plan['matched_history_plan_sha256'] = sha256(HISTORY/'plan.json')
+        plan['matched_history_report_sha256'] = sha256(HISTORY/'report.json')
+        plan['reference_fidelity'] = 'Fresh native worker, original attempt60 only, same verified stage-load barrier/collector as history58/59/60; no saved source actions execute.'
     # Resolve original failed as well as successful episodes by attempt identity.
     sources = {}
     for meta_path in Path(plan['source']).parent.parent.glob('*/meta.json'):
         meta = json.loads(meta_path.read_text())
         index = int(meta['attempt_index'])
-        if index in ATTEMPTS:
+        if index in attempts:
             require(index not in sources, 'Duplicate original attempt')
             sources[index] = (meta_path.parent, meta)
-    require(sorted(sources) == ATTEMPTS, 'Missing original attempt evidence')
+    require(sorted(sources) == attempts, 'Missing original attempt evidence')
     cases = {}
     baseline_meta = sources[60][1]
-    for index in ATTEMPTS:
+    for index in attempts:
         source, meta = sources[index]
         for key in ['base_seed','variation','grasp_mode','fix_joint','fixedforce','control_hz','object_paths','robot_limit_profile','sim','success_parameters']:
             require(meta[key] == baseline_meta[key], 'Original configuration changed across history: ' + key)
@@ -93,8 +111,8 @@ def prepare(native_backtrace=False, stage_load_barrier=False):
     from dataset.scene_signature import stage_physics_signature
     require(stage_physics_signature(Usd.Stage.Open(plan['task']))['sha256'] == plan['physics_sha256'], 'Physical scene changed')
     command = [str(lab/'isaaclab.sh'), '-p', str(ROOT/'scripts/sim/run_hgwind_history_worker.py'),
-        '--task', plan['task'], '--out_root', plan['worker_output'], '--episodes','3','--max_attempts','3',
-        '--target_successes','0','--seed','202610280','--attempt_offset','58','--variation','1.0','--control_hz','60',
+        '--task', plan['task'], '--out_root', plan['worker_output'], '--episodes',str(len(attempts)),'--max_attempts',str(len(attempts)),
+        '--target_successes','0','--seed','202610280','--attempt_offset',str(attempts[0]),'--variation','1.0','--control_hz','60',
         '--grasp_mode','physical','--arm_execution','inverse_dynamics','--catch-targeting-mode','auto',
         '--keep_failed','--no-code-snapshot','--run_id','hgwind_history_'+stamp,
         '--device','cuda:0','--headless','--no-visualization','--fast_exit_after_save',
@@ -102,16 +120,18 @@ def prepare(native_backtrace=False, stage_load_barrier=False):
         '--kit_args=--portable-root '+str(ROOT/'data/derived/.cache/isaacsim/linux')+' --/renderer/multiGpu/autoEnable=false --/renderer/multiGpu/enabled=false --/renderer/multiGpu/maxGpuCount=1 --/app/extensions/fsWatcherEnabled=false']
     if native_backtrace:
         require(shutil.which('gdb') is not None, 'Existing system GDB missing')
-    print('CPU_PREFLIGHT_OK attempts=58,59,60 one_worker=true max_attempts=3 originals=720,363,319 native_reset_and_safety=retained',flush=True)
+    print('CPU_PREFLIGHT_OK attempts='+','.join(map(str,attempts))+' one_worker=true max_attempts='+str(len(attempts))+' originals='+','.join(str(sources[i][1]['num_steps']) for i in attempts)+' native_reset_and_safety=retained',flush=True)
+    if fresh_control:print('MATCHED_STARTUP_CONTROL fresh60=true prior_attempts=0 collector_hash=exact history_reference=verified',flush=True)
     return plan, command, lab
 
 
 def finish(out, code, render=False):
     from analyze_hgwind_effort_probe import analyze
     plan = json.loads((out/'plan.json').read_text())
-    episodes = index_saved_episodes(plan['worker_output'], TASK_ID)
+    attempts = plan.get('history_attempts', ATTEMPTS)
+    episodes = index_saved_episodes(plan['worker_output'], TASK_ID, expected=attempts)
     result = dict(schema='physical-vla-lab.hgwind-history.v1', worker_exit=code,
-        requested_attempts=ATTEMPTS, saved_attempts=sorted(episodes), cases=[], learned_policy_evaluated=False,
+        requested_attempts=attempts, condition='fresh60_matched_startup' if plan.get('fresh_control') else 'history58_59_60', saved_attempts=sorted(episodes), cases=[], learned_policy_evaluated=False,
         complete=False, physical_success=False, render_requested=render, stage_load_barrier_requested=bool(plan.get('stage_load_barrier')), stage_load_barrier_evidence=json.loads((out/'stage_load_barrier.json').read_text()) if (out/'stage_load_barrier.json').exists() else None, native_backtrace=str(out/'native_backtrace.log') if (out/'native_backtrace.log').exists() else None, interpretation='Incomplete history cannot answer the attempt60 history hypothesis.')
     for index, episode in sorted(episodes.items()):
         case = plan['history_cases'][str(index)]; location = Path(case['output'])
@@ -134,6 +154,11 @@ def finish(out, code, render=False):
             if index == 60:
                 fresh = json.loads((FRESH/'report.json').read_text())
                 row['comparison_to_fresh'] = compare_motion(Path(fresh['probe_episode'])/'replay.hdf5',target/'replay.hdf5')
+                if plan.get('fresh_control'):
+                    reference = Path(plan['matched_history_reference'])
+                    require(sha256(reference/'report.json')==plan['matched_history_report_sha256'], 'Matched history report changed')
+                    matched = json.loads((reference/'attempt_00060/report.json').read_text())
+                    row['comparison_to_matched_history'] = compare_motion(Path(matched['probe_episode'])/'replay.hdf5',target/'replay.hdf5')
         except Exception as exc:
             row['analysis_error'] = repr(exc)
         row['render_status'] = 'skipped_by_request'
@@ -161,12 +186,15 @@ def finish(out, code, render=False):
     stage_evidence = result['stage_load_barrier_evidence'] or {}
     result['stage_load_barrier_verified'] = bool(stage_evidence.get('ready') is True and stage_evidence.get('held_script_instances') == 0 and stage_evidence.get('initial_timeline_time') == stage_evidence.get('final_timeline_time')) if plan.get('stage_load_barrier') else None
     startup_ok = not plan.get('stage_load_barrier') or result['stage_load_barrier_verified'] is True
-    result['complete'] = startup_ok and code == 0 and sorted(episodes)==ATTEMPTS and order==ATTEMPTS and all(x['analysis_complete'] and (not render or x['render_complete']) for x in result['cases'])
+    result['complete'] = startup_ok and code == 0 and sorted(episodes)==attempts and order==attempts and all(x['analysis_complete'] and (not render or x['render_complete']) for x in result['cases'])
     target = next((x for x in result['cases'] if x['attempt_index']==60),{})
     result['target_grasp_status'] = target.get('grasp', 'not_evaluated')
     result['physical_success'] = bool(startup_ok and target.get('analysis_complete') and target.get('grasp')=='pass' and target.get('runtime_safety') and target.get('initial_state_match'))
     if result['complete']:
-        result['interpretation']=('Startup attach sequencing changed under an opt-in workaround; this is a modified-startup history experiment. ' if plan.get('stage_load_barrier') else '')+'Compare original and fresh startup/native arrays before attributing any result to history; this remains a development expert experiment.'
+        if plan.get('fresh_control'):
+            result['interpretation']='Matched-startup fresh60 control: compare with history60 and the earlier fresh60; no learned policy is evaluated.'
+        else:
+            result['interpretation']=('Startup attach sequencing changed under an opt-in workaround; this is a modified-startup history experiment. ' if plan.get('stage_load_barrier') else '')+'Compare original and fresh startup/native arrays before attributing any result to history; this remains a development expert experiment.'
     (out/'report.json').write_text(json.dumps(result,indent=2)+'\n')
     lines=['# Worker-history video review','','Raw trajectories retained. Rendering is optional; skipped views have not been visually reviewed.','']
     for row in result['cases']:
@@ -185,6 +213,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--run',action='store_true')
     parser.add_argument('--native-backtrace',action='store_true')
+    parser.add_argument('--fresh-control',action='store_true',help='Run original attempt60 alone using the matched history startup barrier')
     parser.add_argument('--stage-load-barrier',action='store_true',help='Experimental stopped-timeline stage attach barrier before robot USD edits')
     parser.add_argument('--render',action='store_true',help='Opt in to five-view review videos; default analyzes only')
     parser.add_argument('--finish',type=Path,help='Analyze/render a completed run without launching physics again')
@@ -193,7 +222,7 @@ def main():
         require(not args.run,'--finish never launches collection')
         out=args.finish.resolve();out.relative_to(ROOT/'data/derived/hgwind_history_diagnostics')
         return finish(out,json.loads((out/'worker_exit.json').read_text())['exit_code'],render=args.render)
-    plan,command,lab=prepare(args.native_backtrace,args.stage_load_barrier)
+    plan,command,lab=prepare(args.native_backtrace,args.stage_load_barrier,args.fresh_control)
     plan['render_requested'] = args.render
     if args.stage_load_barrier:print('STARTUP_WORKAROUND stage_load_barrier=true efficacy=unverified physics_parameters_unchanged=true',flush=True)
     print('RENDER_MODE '+('enabled' if args.render else 'skipped; raw trajectories retained'),flush=True)
@@ -214,7 +243,7 @@ def main():
         try:
             for line in process.stdout:
                 log.write(line);log.flush()
-                if any(s in line for s in ['HISTORY_ATTEMPT','COLLECT ATTEMPT','SAFETY ABORT','Traceback','Error:','terminate called','what():','Aborted','CAPSTONE_NATIVE','DONE attempts','FATAL']):print(line.rstrip(),flush=True)
+                if any(s in line for s in ['HISTORY_ATTEMPT','COLLECT ATTEMPT','SAFETY ABORT','Traceback','Error:','terminate called','what():','Aborted','CAPSTONE_NATIVE','STAGE_LOAD_BARRIER','DONE attempts','FATAL']):print(line.rstrip(),flush=True)
             code=process.wait()
         except KeyboardInterrupt:
             os.killpg(process.pid,signal.SIGTERM)

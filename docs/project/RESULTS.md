@@ -2,6 +2,12 @@
 
 Snapshot: **2026-10-29, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Original worker history reproduced; matched-startup fresh control pending
+
+User run `20261029_234931_549595` executes original attempts58/59/60 in one process and reproduces failed720frames, failed363frames and successful319frames. Independent rereading verifies15 full-length action/observation arrays per episode exactly and the first7 native ball-velocity rows; all initial-state/safety checks pass. Attempt60 independently passes physical grasp evidence:2.4833s bilateral contact and at least60.349mm final lift. The two earlier failures were original failed demonstrations and reproduce as expected.
+
+This supports a startup/process-history explanation for the earlier fresh60 mismatch, but the stage-load barrier also changed startup scheduling. One matched-startup fresh60 control is prepared to distinguish those factors. Its native collector assembly matches the successful history, runtime dependencies are pinned, and263 CPU plus real scene/native-entry checks pass. That new simulator result is pending. No learned policy, formal training or render ran. The native crash did not recur once; no general crash fix or unique force/cache mechanism is established. [Verified hashes and limits](../../results/summaries/2026-10-30-worker-history-reproduction.json), [control command](WORKER_HISTORY_DIAGNOSTIC.md#observed-reproduction-and-one-matched-startup-control-30-october).
+
 ## History launch blocked by native client abort
 
 The user’s history launch `20261029_232920_958901` aborts during scene loading with no observed/saved attempt. GDB locates `std::system_error/Invalid argument` in `libomniclient.so` on `OC Tick`; matching-binary inspection identifies the failed mutex-lock path. The underlying resource/ownership failure is unknown. This is unavailable history evidence, not zero successful grasps out of three.

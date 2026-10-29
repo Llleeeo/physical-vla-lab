@@ -9,8 +9,12 @@ _SEEN = []
 
 def configure(plan):
     global _PLAN, _SEEN
-    if plan.get('history_attempts') != [58, 59, 60]:
-        raise ValueError('Only the declared original history58/59/60 is supported')
+    sequence = plan.get('history_attempts')
+    if sequence == [60]:
+        if plan.get('fresh_control') is not True or plan.get('stage_load_barrier') is not True:
+            raise ValueError('Fresh60 control requires explicit matched startup barrier')
+    elif sequence != [58, 59, 60] or plan.get('fresh_control'):
+        raise ValueError('Only original history58/59/60 or explicit fresh60 control is supported')
     _PLAN, _SEEN = plan, []
 
 
@@ -37,7 +41,7 @@ def begin_attempt(index):
     _SEEN.append(index)
     with (Path(_PLAN['output']) / 'attempt_order.jsonl').open('a') as handle:
         handle.write(json.dumps({'attempt_index': index, 'ordinal': len(_SEEN)}) + '\n')
-    print('HISTORY_ATTEMPT index=%d ordinal=%d/3' % (index, len(_SEEN)), flush=True)
+    print('HISTORY_ATTEMPT index=%d ordinal=%d/%d' % (index, len(_SEEN), len(expected)), flush=True)
 
 
 def patch_history_collector(source, stage_load_barrier=None):
@@ -72,16 +76,19 @@ def assemble(plan):
     return patch_capture_collector(patch_history_collector(patch_collector(source), bool(plan.get('stage_load_barrier'))))
 
 
-def index_saved_episodes(worker_output, task_id):
+def index_saved_episodes(worker_output, task_id, expected=(58, 59, 60)):
+    expected = list(expected)
+    if expected not in ([58, 59, 60], [60]):
+        raise ValueError('Unsupported declared attempt sequence')
     found = {}
     for replay in Path(worker_output).glob('1s1p/' + task_id + '/*/replay.hdf5'):
         meta = json.loads((replay.parent / 'meta.json').read_text())
         index = int(meta['attempt_index'])
-        if index not in (58, 59, 60) or index in found:
+        if index not in expected or index in found:
             raise ValueError('Unexpected or duplicate saved attempt')
         found[index] = replay.parent
     # Partial runs are evidence, but must be a prefix of the declared order.
-    if sorted(found) != [58, 59, 60][:len(found)]:
+    if sorted(found) != expected[:len(found)]:
         raise ValueError('Saved history has a missing earlier attempt')
     return dict(sorted(found.items()))
 

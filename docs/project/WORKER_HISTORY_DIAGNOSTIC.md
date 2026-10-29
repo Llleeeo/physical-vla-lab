@@ -2,6 +2,34 @@
 
 The original attempts58,59,60 occurred in one worker. Their saved lengths are720,363,319 control frames; the first two failed grasping without a safety abort and the third succeeded. A fresh-worker attempt60 instead differs in ball velocity after the first physical step and eventually aborts on motion feasibility. This experiment tests whether reproducing the original within-worker history changes that mismatch. It does not identify a unique reset/cache/force mechanism or evaluate a learned policy.
 
+## Observed reproduction and one matched-startup control (30 October)
+
+User run `20261029_234931_549595` completes all three requested attempts in one process. A separate CPU reread verifies original file hashes and repeats the full comparison:
+
+| Attempt | Original recording | New result | Control frames | Exact full-length action/observation arrays |
+|---|---|---|---|---|
+|58|failed_00057|fail|720|15/15|
+|59|failed_00058|fail|363|15/15|
+|60|traj_00001|pass|319|15/15|
+
+The first seven native ball-velocity rows also match each original exactly. Attempt60 maintains bilateral contact for2.4833s and at least60.349mm final lift, passing independent engineering grasp checks with no assistance. All three initial-state and runtime-safety checks pass. These selected outcomes are a reproduction check, not a collection success-rate estimate or learned-policy evaluation. [Hashed verified results](../../results/summaries/2026-10-30-worker-history-reproduction.json).
+
+The stage barrier completes two Kit updates in24.545s with zero timeline advancement and no script instances. No native crash recurs in this launch; general crash avoidance remains unproven. Recorded force calls before control-frame recording are4/3/3 for attempts58/59/60, versus4 in the earlier fresh60 control; equal clocks/call counts do not establish force accumulation or its causal effect.
+
+Because both worker history and stage-attach scheduling differ from the earlier fresh control, run **one** fresh60 using exactly the same guarded startup and native collector assembly as this successful history launch:
+
+```bash
+cd /home/robophys/Capstone_Project_Yuan_Haoming
+
+data/derived/hf_pilot_render_repo/.venv/bin/python \
+  scripts/run_hgwind_history_diagnostic.py \
+  --fresh-control --stage-load-barrier --native-backtrace --run
+```
+
+`--fresh-control` is explicit, requires the barrier and the verified history reference, and selects only attempt60 with one attempt allowed. It neither substitutes a new seed nor runs attempts58/59. Preflight checks exact native collector assembly and pinned scene/runtime dependencies against the history launch. Reports compare the new result to its original, the old fresh60 and history60. Rendering remains skipped. This control is CPU validated (263 portable checks,20 focused history checks, real scene and actual native-entry assembly); simulator execution is pending.
+
+If it matches the earlier fresh failure while the history prefix matches the originals, that strengthens evidence for a within-worker state/history effect. If it instead reproduces the original success, guarded startup may explain some previous discrepancy; do not attribute the result solely to history. Partial or different results require inspecting their raw startup arrays before a mechanism claim. Omit `--fresh-control` for the existing three-attempt diagnostic.
+
 ## Current blocker and optional startup workaround
 
 The user run `20261029_232920_958901` aborts after `open_stage()` returns, before attempt58 starts. GDB locates the exception in `libomniclient.so`, on its `OC Tick` thread. Disassembly of the matching installed library places the throw after a failed `pthread_mutex_lock`, on an internal callback path. The mutex/request ownership and triggering file remain unknown; this does not establish a disk, network, physics or controller cause. No history or grasp outcome was evaluated.

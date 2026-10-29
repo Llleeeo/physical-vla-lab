@@ -1,0 +1,186 @@
+{
+  "schema": "physical-vla-lab.worker-history-reproduction.v1",
+  "date": "2026-10-30",
+  "run_id": "20261029_234931_549595",
+  "execution_complete": true,
+  "observed_sequence": [
+    58,
+    59,
+    60
+  ],
+  "source_outcomes_reproduced": true,
+  "total_saved": 3,
+  "physical_pass": 1,
+  "physical_fail": 2,
+  "sampling_scope": "Prespecified original worker prefix; not an unbiased success-rate estimate",
+  "cases": [
+    {
+      "attempt_index": 58,
+      "original_episode": "failed_00057",
+      "frames": 720,
+      "grasp": "fail",
+      "runtime_safety": true,
+      "initial_state_match": true,
+      "full_core_arrays_exact": 15,
+      "native_startup_rows_exact": 7,
+      "bilateral_duration_s": 0.09999999999999964,
+      "minimum_final_lift_m": 1.862645149230957e-09,
+      "force_observations": {
+        "calls": 10,
+        "pre_recording_calls": 4,
+        "zero_configured_dt_calls": 0,
+        "sha256": "4fbfe07c7f6dd5e2f9de71b7a941c59e4d92a1adbe62c4e622e65e558dcd4c93"
+      },
+      "source_hashes": {
+        "plan.json": "751efa3d24f3686d044edda3447531738126c86cf0b4554d77b3b3845441e430",
+        "report.json": "51cd38178e1e62ee1d63521d8e86dbcf121ffd1fdc9299cd6fac94a2bd0db919",
+        "cartesian_target_inputs.json": "7342e44cc32b019bfdcf1e40b20150ab311216e8487f67ed3d57dff06ff8f7d1"
+      },
+      "raw_sha256": {
+        "meta.json": "82a59582d5e0ec753b26bf097fc4c2dc4f00679fe8756fd7b3173a1c9228e35b",
+        "replay.hdf5": "4c8c7f46811894d70d28344ef3eb1fe094ef2141d0d0a2d13a53d8b650efc2ab",
+        "trajectory.hdf5": "19db5f42add93384ace4e0c7a888c928853d2adf036a9873300eaecb0b758498"
+      }
+    },
+    {
+      "attempt_index": 59,
+      "original_episode": "failed_00058",
+      "frames": 363,
+      "grasp": "fail",
+      "runtime_safety": true,
+      "initial_state_match": true,
+      "full_core_arrays_exact": 15,
+      "native_startup_rows_exact": 7,
+      "bilateral_duration_s": 0.7666666666666639,
+      "minimum_final_lift_m": -1.30385160446167e-08,
+      "force_observations": {
+        "calls": 9,
+        "pre_recording_calls": 3,
+        "zero_configured_dt_calls": 0,
+        "sha256": "3c4fe5e87de1b4b5ae226bb42356f5ef86adce3594711469292103487a22637e"
+      },
+      "source_hashes": {
+        "plan.json": "98f0c2906788d7db9f47be46537a8de71a3170b8bc5559b93c055475ab3885e3",
+        "report.json": "3d2cd64f847831cc49083cc1bf59ba6fe8ba0faf0d72565b9a0b0602472ec2f6",
+        "cartesian_target_inputs.json": "caf7259eac1abb1446534b58020b56aae9bdebdfac8928a18b4cbbde96afef51"
+      },
+      "raw_sha256": {
+        "meta.json": "d7b69296d1cdb159261cab04650f4284de1b55059ac5ea312e281796af341058",
+        "replay.hdf5": "682b709bb9b66cd770a334debb936aaa7dce3aa73a697fda01adeac96c02f960",
+        "trajectory.hdf5": "fd8d3580b0f7a150d3f58e704d9337399f9fd1ba012d18d243fc97243bc8f56c"
+      }
+    },
+    {
+      "attempt_index": 60,
+      "original_episode": "traj_00001",
+      "frames": 319,
+      "grasp": "pass",
+      "runtime_safety": true,
+      "initial_state_match": true,
+      "full_core_arrays_exact": 15,
+      "native_startup_rows_exact": 7,
+      "bilateral_duration_s": 2.4833333333333245,
+      "minimum_final_lift_m": 0.06034884974360466,
+      "force_observations": {
+        "calls": 9,
+        "pre_recording_calls": 3,
+        "zero_configured_dt_calls": 0,
+        "sha256": "64647e3419e23681c7465c2b5e6764f94479f353d37ba6e7702100d2212bfa11"
+      },
+      "source_hashes": {
+        "plan.json": "cfd5f447856883bd66af75929c00163d50e8783974d0b0a20bc86d2aed9e5b5f",
+        "report.json": "88b52955f5179ed01064b2ab39241d37abf8b52c9dfde7a7ab9f58958d390648",
+        "cartesian_target_inputs.json": "c2f351b9804727634e0307a45956c822d4ca73b3b7b686bdcc45a3e605eb50f2"
+      },
+      "raw_sha256": {
+        "meta.json": "e05ad72523d007e13179ca7716a069e99a18b70a2dcb58dc19090f749fd60da5",
+        "replay.hdf5": "4ebc51e4f27bc15c6b4dbbe3bc81826303c19f4d29570d764bd8dd13d09aab93",
+        "trajectory.hdf5": "aad43bab89d379c30d40975ad2e032a6a8387fd8df2c2f4d78e725ec24a5d868"
+      }
+    }
+  ],
+  "stage_attach": {
+    "schema": "physical-vla-lab.stage-load-barrier.v1",
+    "ready": true,
+    "updates": 2,
+    "deferred_apply_calls": 0,
+    "initial_timeline_time": 0.0,
+    "final_timeline_time": 0.0,
+    "remaining": 0,
+    "workaround_efficacy": "unverified",
+    "timeline_advanced": false,
+    "held_script_instances": 0,
+    "phase": "stage_loaded_before_robot_edits",
+    "elapsed_s": 24.545328655280173
+  },
+  "comparison_to_earlier_fresh": {
+    "core_array_exact": {
+      "actions": false,
+      "timestamp": false,
+      "is_first": false,
+      "is_last": false,
+      "is_terminal": false,
+      "obs/ee_pos": false,
+      "obs/ee_quat": false,
+      "obs/ee_vel": false,
+      "obs/finger_segment_world": false,
+      "obs/joint_pos": false,
+      "obs/joint_vel": false,
+      "obs/object_ang_vel": false,
+      "obs/object_pos": false,
+      "obs/object_quat": false,
+      "obs/object_vel": false
+    },
+    "all_core_arrays_exact": false,
+    "compared_native_rows": 7,
+    "first_native_velocity_difference": 1,
+    "first_step_ball_velocity_delta_m_s": [
+      -0.004831869155168533,
+      2.0226920138810556e-10,
+      0.00015138834714889526
+    ]
+  },
+  "verified_findings": [
+    "The three selected original outcomes and 15 full-length action/observation arrays per episode reproduce exactly.",
+    "First seven recorded native ball-velocity rows match their originals; this is not a comparison of every native simulator dataset.",
+    "Attempt60 passes independent physical grasp checks after attempts58 and59 in one worker.",
+    "The native startup abort did not recur in this launch; one run does not establish a general crash fix."
+  ],
+  "interpretation": "Evidence supports a worker-history/startup-condition effect. This run also changed stage-attach scheduling relative to the earlier fresh control; a matched-startup fresh60 control is required to distinguish those factors.",
+  "unproven": [
+    "Specific force/cache/reset/solver mechanism",
+    "Standalone fresh-start repeatability",
+    "Learned-policy performance",
+    "Held-out physical generalization",
+    "Official full benchmark certification"
+  ],
+  "next_control": {
+    "fresh_attempt": 60,
+    "maximum_attempts": 1,
+    "prior_attempts": 0,
+    "same_stage_barrier": true,
+    "condition": "prepared_not_executed",
+    "render": false,
+    "gate": "Native collector assembly and other frozen runtime dependencies must match this history reference.",
+    "command": "scripts/run_hgwind_history_diagnostic.py --fresh-control --stage-load-barrier --native-backtrace --run"
+  },
+  "validation": {
+    "cpu_tests": 263,
+    "focused_history_tests": 20,
+    "actual_scene_preflight": true,
+    "actual_native_entry_assembly_verified": true,
+    "new_gpu_run_by_agent": false
+  },
+  "source_hashes": {
+    "plan.json": "a353d7d6ab70cfeab8b51c4745d615e180d4b89ff79e276212430239574f138f",
+    "report.json": "12bc24b89ead3ef34d052462fdb64b977aba503c68f5e6cfa007238dc3c58e2e",
+    "simulation.log": "66dba28e645ae02e242822d65ac68a6046e6001c576ba6e0e340302fa2e1ad12",
+    "stage_load_barrier.json": "362dd813bf79022cce5705e798f451b9fd0746094662d3fe92a14721102aba44",
+    "attempt_order.jsonl": "eaa9ffe93e928489ab98fb60047d4c9f4bb7c53172d19e6e567a765bdd3be8d6"
+  },
+  "implementation_hashes": {
+    "src/capstone_vla/hgwind_history.py": "1224b758a33c59a2749c2c88b813583b80680d75931e8cec7559be05c1abbbb5",
+    "scripts/run_hgwind_history_diagnostic.py": "eb83dce9e16565ee2a80e3f1e9f5b511183aaa1b0bb213d293ea90a09bd28ab7",
+    "tests/test_hgwind_history.py": "96407d129bda74f0bd9b0422467da2e8692c829023fd685d5c2786f93e46c0e6"
+  }
+}

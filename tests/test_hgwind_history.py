@@ -190,3 +190,63 @@ def _inspect_loaded_scripts(_st0, robot_script_removed, allow_no_scripts):
     patched=patch_scene_load_barrier(source)
     assert patched.index('    CAPSTONE_WAIT_STAGE_LOAD(')<patched.index('    _strip_robot_script(')
     with pytest.raises(ValueError,match='boundary'):patch_scene_load_barrier('pass')
+
+
+
+def test_fresh_control_requires_explicit_startup_match_and_no_prior_attempts(tmp_path, monkeypatch):
+    monkeypatch.setattr(history,'_PLAN',None);monkeypatch.setattr(history,'_SEEN',[])
+    monkeypatch.setattr(force,'_ACTIVE',None);monkeypatch.setattr(trace,'_STATE',{})
+    case=dict(output=str(tmp_path/'attempt60'),trace_cartesian_targets=False)
+    plan=dict(history_attempts=[60],history_cases={'60':case},output=str(tmp_path))
+    with pytest.raises(ValueError,match='matched'):history.configure(plan)
+    plan.update(fresh_control=True,stage_load_barrier=True)
+    history.configure(plan)
+    with pytest.raises(ValueError,match='order'):history.begin_attempt(58)
+    assert not (tmp_path/'attempt60').exists()
+    history.begin_attempt(60)
+    assert json.loads((tmp_path/'attempt_order.jsonl').read_text())=={'attempt_index':60,'ordinal':1}
+    assert trace._STATE['plan']['output']==case['output']
+    with pytest.raises(ValueError,match='order'):history.begin_attempt(60)
+
+
+def test_fresh_index_does_not_silently_accept_history_prefix(tmp_path):
+    episode=put_episode(tmp_path,60,'traj_00000')
+    assert history.index_saved_episodes(tmp_path,'task',expected=[60])=={60:episode}
+    with pytest.raises(ValueError,match='earlier'):history.index_saved_episodes(tmp_path,'task')
+    put_episode(tmp_path,58,'failed_00000')
+    with pytest.raises(ValueError,match='Unexpected'):history.index_saved_episodes(tmp_path,'task',expected=[60])
+
+
+def test_fresh_finish_compares_both_controls_without_relaunch(tmp_path,monkeypatch):
+    import hashlib,importlib.util
+    root=Path(__file__).resolve().parents[1];monkeypatch.syspath_prepend(str(root/'scripts'))
+    spec=importlib.util.spec_from_file_location('fresh_runner_test',root/'scripts/run_hgwind_history_diagnostic.py')
+    runner=importlib.util.module_from_spec(spec);spec.loader.exec_module(runner)
+    import analyze_hgwind_effort_probe as analyzer
+    out=tmp_path/'fresh';worker=out/'worker_output';case=out/'attempt_00060'
+    episode=worker/'1s1p'/runner.TASK_ID/'failed_00000';episode.mkdir(parents=True)
+    meta={'attempt_index':60,'episode_seed':123,'trajectory_variation':{'base_seed':42}}
+    (episode/'meta.json').write_text(json.dumps(meta))
+    for name in ['replay.hdf5','trajectory.hdf5']:(episode/name).write_bytes(b'fixture')
+    history_ref=tmp_path/'matched';(history_ref/'attempt_00060').mkdir(parents=True)
+    (history_ref/'report.json').write_text('{}')
+    (history_ref/'attempt_00060/report.json').write_text(json.dumps({'probe_episode':str(tmp_path/'history60')}))
+    old_fresh=tmp_path/'old_fresh';old_fresh.mkdir();(old_fresh/'report.json').write_text(json.dumps({'probe_episode':str(tmp_path/'old60')}))
+    monkeypatch.setattr(runner,'FRESH',old_fresh)
+    case_plan=dict(output=str(case),source=str(episode/'replay.hdf5'),source_files=[],episode='traj_00001',expected_episode_seed=123,expected_variation=meta['trajectory_variation'])
+    plan=dict(worker_output=str(worker),history_attempts=[60],fresh_control=True,stage_load_barrier=True,history_cases={'60':case_plan},matched_history_reference=str(history_ref),matched_history_report_sha256=hashlib.sha256(b'{}').hexdigest())
+    (out/'plan.json').write_text(json.dumps(plan))
+    (out/'attempt_order.jsonl').write_text(json.dumps({'attempt_index':60}))
+    (out/'stage_load_barrier.json').write_text(json.dumps({'ready':True,'held_script_instances':0,'initial_timeline_time':0.,'final_timeline_time':0.}))
+    monkeypatch.setattr(analyzer,'analyze',lambda _:{'independent_grasp_evidence':{'status':'fail'},'initial_state_match':True,'runtime_safety_passed':False})
+    comparisons=[]
+    monkeypatch.setattr(runner,'compare_motion',lambda *a:(comparisons.append(a) or {'all_core_arrays_exact':False}))
+    monkeypatch.setattr(runner.subprocess,'run',lambda *a,**k:pytest.fail('no simulator or renderer should launch'))
+    assert runner.finish(out,0)==0
+    report=json.loads((out/'report.json').read_text())
+    assert report['requested_attempts']==[60] and report['complete'] is True
+    assert report['condition']=='fresh60_matched_startup' and report['physical_success'] is False
+    assert report['target_grasp_status']=='fail' and report['stage_load_barrier_verified'] is True
+    assert len(comparisons)==3
+    assert comparisons[-1][0]==tmp_path/'history60/replay.hdf5'
+    assert report['cases'][0]['render_status']=='skipped_by_request'

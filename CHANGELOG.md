@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-30 — Original three-attempt history reproduces exactly
+
+- Verify user run58/59/60: failed720frames, failed363frames, successful319frames;15 full action/observation arrays per episode and first7 native startup ball-velocity rows match originals exactly. Target60 passes independent grasp/initial-state/safety checks with2.483s contact and60.349mm lift. No learned policy ran.
+- Startup barrier completes without timeline advancement; no native crash recurs once, which is not a general crash fix. History and startup scheduling remain confounded against the earlier fresh failure.
+- Prepare explicit one-attempt `--fresh-control --stage-load-barrier`, pinning this successful history and identical collector/runtime dependencies. Keep no-render default.263 portable CPU checks and real scene/native-entry checks pass; matched-control GPU result pending.
+
 ## 2026-10-29 — Scene-load crash localized; bounded workaround prepared
 
 - Capture the history launch abort before any attempt: Omniverse Client `OC Tick`, failed mutex-lock throw in its internal callback path. Specific cause remains unknown; no grasp or history result exists. A100-cycle CPU-only local client check passes but does not exercise Kit.
