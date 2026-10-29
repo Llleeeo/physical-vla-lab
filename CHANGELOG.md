@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 — Bounded contract batch produces one passing pair
+
+- Verify all three native regenerations and the sole eligible 29D surrogate; traj_00018 teacher reproduces all15 core arrays exactly and surrogate passes269 intervals/807updates,1.767s bilateral contact and57.277mm retained lift.
+- Two teachers safety-abort on velocity/acceleration/jerk feasibility after early frame3 source divergence; their surrogates are skipped, not failed. Preserve earlier retention failure; no VLA evaluation or broad reliability claim.
+- All four new saved outcomes have five decoded review videos each; existing references add ten. Record source hashes and next investigation; no control changes or new GPU jobs during analysis.
+
 ## 2026-10-29 — Native capture callback frame error fixed
 
 - First bounded batch rendered both existing references (ten RGB videos), but all three native teacher launches hit a recorder `KeyError: frame` before saving evaluable episodes. They are execution errors, not failed grasps; no new surrogate or grasp-rate evidence exists. Preserve the logs.

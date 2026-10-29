@@ -2,6 +2,22 @@
 
 Snapshot: **2026-10-29, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Bounded batch completed: one passing surrogate, two teacher safety aborts
+
+Batch `20261029_215343_401088` finishes without the earlier recording error. The four new saved runs have five verified RGB videos each (20 new videos); both existing references add ten videos. All are saved-state review renderings, not new physics, formal training pixels or completed human review.
+
+| Development case | Native expert regeneration | Frozen 29D surrogate |
+|---|---|---|
+| local/traj_00001 | Safety abort after 168 completed intervals; no sustained lift | Skipped because teacher fails |
+| local/traj_00007 | Safety abort after 176 completed intervals; no sustained lift | Skipped because teacher fails |
+| local/traj_00018 | Pass; 269 intervals, all 15 core arrays exactly reproduce source | Pass; 269 intervals / 807 physics/OSC updates, decoded-action/live-state/safety checks pass |
+
+For traj_00018 the surrogate retains bilateral contact for 1.767 s, at least 57.277 mm final lift and 0.006 mm relative-position jitter; teacher lift is 59.468 mm. No grasp assistance or learned policy is used. This adds one compatible development case while preserving the earlier traj_00000 retention failure. It does not establish broad reliability or training readiness.
+
+The two teacher aborts report hard next-step velocity/position bounds conflicting with acceleration/jerk. Both match source initial states exactly but first depart by more than 0.01 mm at frame 3, before contact. Seeds, sampled variations, robot-start/inertial metadata, simulator settings, task plan and finger material match. Collision-LOD settings/fingerprint match (session-layer paths differ); physical-limit differences are online results. Root cause of early expert divergence remains unresolved. Their missing surrogates cannot be counted as failed surrogate grasps. Neither 1/3 nor 1/1 is a supported generalization or learned-policy success-rate claim.
+
+**Next decision:** keep the frozen controller, inspect teacher early-reference divergence and human videos before more collection or training. Do not loosen safety limits or tune friction to explain failures that occur before the surrogate is run. See [source-hashed results](../../results/summaries/2026-10-29-bounded-contract-batch-result.json).
+
 ## Integrated action contract — interface verified, physical retention fails
 
 User run `20261029_210114_208078` completes 209 intervals and 627 physics/OSC updates, with exactly matching initial robot/object states, native safety passed, no grasp assistance, decoded 29D commands verified, live posture matched to raw robot states and collision callbacks always enabled. The combined physical gate is **false**: bilateral contact spans 137–162 (0.433 s), final retained lift is approximately zero and final relative-position jitter is 55.786 mm. The preserved fixed-gain/latched-posture reference retains 1.2 s bilateral contact, about 72.595 mm lift and 0.160 mm jitter.
@@ -16,7 +32,7 @@ Before first contact at 135, EE difference from the passing reference is at most
 
 Batch `20261029_213626_774692` renders both existing passing/failed references completely: five RGB views each. The three new teachers all stop on `KeyError: frame` inside the recording callback before any evaluable episode is saved. No surrogate is executed. These are **three execution errors and zero new evaluable grasps**, not a 0/3 grasp success rate. Preserve the existing genuine 209-frame physical-retention failure separately.
 
-The native segment dictionary has no recording frame; the recorder now uses its explicit callback index on a copy and rejects conflicting frame metadata. Added coverage calls the actual `record_segment` entry with an unframed segment, unlike earlier fixtures. All 194 reference links from the existing 209-frame native capture pass without modifying original inputs. 227 portable CPU checks pass. The coordinator now stops immediately on an unsaved execution error. Controller parameters/inputs and physical criteria are unchanged; no GPU rerun was launched during this fix. A fresh bounded batch is required, retaining the previous errors and their logs. See [source-hashed diagnosis](../../results/summaries/2026-10-29-native-capture-frame-fix.json).
+The native segment dictionary has no recording frame; the recorder now uses its explicit callback index on a copy and rejects conflicting frame metadata. Added coverage calls the actual `record_segment` entry with an unframed segment, unlike earlier fixtures. All 194 reference links from the existing 209-frame native capture pass without modifying original inputs. 227 portable CPU checks pass. The coordinator now stops immediately on an unsaved execution error. Controller parameters/inputs and physical criteria are unchanged; no GPU rerun was launched during this fix. That fresh batch is now completed above; retain the previous execution errors and their logs. See [source-hashed diagnosis](../../results/summaries/2026-10-29-native-capture-frame-fix.json).
 
 ## Wind-driven spherical-object cohort
 

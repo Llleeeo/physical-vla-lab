@@ -2,6 +2,8 @@
 
 ## Decision and purpose
 
+**Latest bounded diagnostic:** the frozen 29D surrogate passes a second exposed case, `local/traj_00018` (269 intervals, 1.767 s bilateral contact, at least 57.277 mm lift). The first case's retention failure remains. Two other selected native teachers safety-abort before surrogate tests; their source-reproduction blocker is unresolved. See [results](RESULTS.md). This is not learned-policy evaluation or broad validation.
+
 **First physical run completed: interface checks pass, final grasp retention fails.** Freeze the passing fixed-9/8 gain and live-initialized latched-posture baseline. Stop successive parameter-removal probes. Test a complete model-sized command interface once, then validate 3–5 distinct development episodes before cohort conversion/training. If it fails, report the integrated blocker and reconsider the interface rather than starting an open-ended deletion campaign.
 
 The present command is an **expert-labelled action surrogate**, not DynamicVLA inference. It answers whether commands can pass through the proposed float32 data representation and decoded controller interface while retaining a physical grasp. It does not establish learned success, generalization or real-time performance.

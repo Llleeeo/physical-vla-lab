@@ -1,6 +1,6 @@
 # Bounded paired diagnostics with videos for every saved outcome
 
-**First batch: existing reference videos complete; new teacher captures hit a recording error. The callback fix is CPU verified; fresh paired physics results are pending.** The 29D action contract and fixed controller settings remain unchanged. This implements the bounded diagnostic following the first contact-retention failure, not a new parameter search or training run.
+**Fresh batch completed:** `traj_00018` native teacher and 29D surrogate pass; the other two native teachers abort on motion feasibility and their surrogates are skipped. Four new saved results have 20 verified review videos; both existing references add ten. See [results](RESULTS.md) and the [source-hashed summary](../../results/summaries/2026-10-29-bounded-contract-batch-result.json). Earlier missing-frame recording errors and the first surrogate retention failure remain preserved. No learned policy was evaluated; human review and early teacher-divergence diagnosis remain pending.
 
 ## Cases selected before new outcomes
 
@@ -71,3 +71,7 @@ Check interception, closure depth, contact/relative slip, lift/retention, arm ji
 227 portable CPU checks pass, including failed-episode resolution without a report, ambiguous-path rejection, all five camera streams, truncated MP4/misaligned timestamp rejection, schema-aware deterministic selection, incompatible posture rejection and resume without repeated failed physics. All three actual case preflights and both existing render preflights pass. Direct preparation from the original verified teacher recreates the previous surrogate's 209×29 float32 action array exactly; it does not change the action contract.
 
 The first user batch completed both reference renders, then three native captures stopped on a missing-frame recording callback before saving trajectories. This is not three grasp failures. The frame fix changes recording only; a new batch is required because completed-error physics stages are intentionally not repeated on resume. No GPU rerun was started during the fix. Existing single-case baseline/contract/render commands remain available; reverting this orchestration milestone leaves raw data, prior reports, fixed controller parameters and original RoboPhys unchanged.
+
+## Observed completed batch
+
+Batch `20261029_215343_401088` is finished with all saved runs rendered. The execution after the recording fix produced evaluable states, including both teacher safety aborts. Three selected teachers yielded only one eligible surrogate pair. Do not replace the skipped cases or count them as failed surrogate runs; no aggregate reliability claim follows. Before another GPU batch, inspect the original-versus-fresh teacher divergence at frame 3 in cases 1 and 7 and complete video review.
