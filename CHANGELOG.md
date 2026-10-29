@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-30 — Passive gripper-drive pair prepared
+
+- Add opt-in native/USD drive snapshots at reset, initialization and closure, plus before/after original force-configuration calls. Preserve original arguments/results/exceptions; no simulator setter or extra physics update added. Missing/nonfinite readings remain errors.
+- One bounded coordinator runs history58/59/60 then fresh60+the existing force omission, serially without rendering or retries. Require unchanged known motion and valid observations; stop before the second job if the first cannot establish the baseline.300 portable CPU checks, SDK Python3.10 parsing and real scene/entry preflight pass. Physical properties/effects are not yet measured.
+
 ## 2026-10-30 — Setup force control removes initial ball mismatch
 
 - User-run omission verified: exactly one suppressed submission, three remaining native setup force calls. Ball pose and linear/angular velocity match successful history exactly for native rows0..500; first difference moves to row501 at2.7833s. A specific startup-force contribution is supported for this case; no general reset fix or accumulation mechanism is established.

@@ -2,6 +2,10 @@
 
 Snapshot: **2026-10-30, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Passive drive observation prepared; measurement pending
+
+The [gripper-drive pair](GRIPPER_DRIVE_DIAGNOSTIC.md) now records actual native gains/limits/targets and authored USD/mimic properties under the two known conditions.300 CPU checks, actual scene/collector/entry isolation and SDK Python3.10 parsing pass. No new simulator result or gain difference is claimed.
+
 ## Observed result: startup ball mismatch removed, finger response differs
 
 User run `20261030_005620_189348_fresh60_omit1` verifies exactly one pinned omission and three remaining native setup force returns. No native startup abort occurs in this launch. Independent full-prefix rereading finds ball native transform and linear/angular velocity **exactly equal to successful history for rows0..500**; row501 first differs at2.7833334s. This is evidence that the specific force submission contributed to the earlier startup mismatch in this case. It does not establish an internal accumulation mechanism or a general reset correction.

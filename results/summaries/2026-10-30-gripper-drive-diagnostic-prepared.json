@@ -1,0 +1,63 @@
+{
+  "schema": "physical-vla-lab.gripper-drive-preparation.v1",
+  "date": "2026-10-30",
+  "purpose": "Observe actual finger drive/reset differences after startup-ball mismatch was removed",
+  "implemented": true,
+  "physical_measurement_pending": true,
+  "gpu_launched_by_agent": false,
+  "rendering": false,
+  "training": false,
+  "learned_policy_evaluated": false,
+  "maximum_attempts": 4,
+  "conditions": [
+    "one native worker attempts58/59/60 with observer",
+    "one fresh60+single-setup-force-omission worker with observer"
+  ],
+  "fields": [
+    "USD drive/mimic properties before reset",
+    "live stiffness/damping",
+    "native force and speed ceilings",
+    "actual position/velocity targets and measured motion",
+    "before/after original gripper force-configuration calls"
+  ],
+  "scope": "Read-only observer plus existing intentional force omission in fresh condition. All original commands and exceptions retained; no native setter or extra physics update added.",
+  "validity": "Require exact history motion reproduction, valid target drive observations, exact match to prior omission motion and verified force omission. Stop before fresh worker if history/drive evidence is invalid.",
+  "limitations": [
+    "No actual gain difference measured yet",
+    "Getter observations may affect scheduling; array comparisons explicitly check observed noninterference",
+    "Missing/nonfinite readbacks are invalid evidence, not zero gain",
+    "Equal observed gains do not exclude hidden solver/mimic state"
+  ],
+  "validation": {
+    "portable_cpu_checks": 300,
+    "sdk_python310_parse": "four files passed",
+    "paired_scene_preflight": "passed",
+    "actual_entry_isolation": {
+      "collector_assembly_unchanged": true,
+      "observation_entry_only_when_enabled": true,
+      "case_plans_include_observer": true,
+      "attempts": [
+        [
+          58,
+          59,
+          60
+        ],
+        [
+          60
+        ]
+      ]
+    }
+  },
+  "rollback": "Do not enable --trace-gripper-drives; new modules/worker/coordinator can be reverted without editing native or raw sources",
+  "source_hashes": {
+    "src/capstone_vla/gripper_drive_trace.py": "46266090c589f2de016a9cf09e3a26964defb110d64b78132b54b3c9be9712fc",
+    "scripts/sim/run_hgwind_gripper_probe_worker.py": "f12f12fb3c413ccab4c705f1dad1cbc3a67ba2dd55802dd3eed2266d558fcab1",
+    "scripts/run_hgwind_gripper_diagnostic.py": "b3dba42e8ac3a8c91c9ff282e7ddb9518bf500b2b258afec07050d683ac48ee8",
+    "scripts/run_hgwind_history_diagnostic.py": "e91632e19be8be2b6e8a6062779d1c1b140ab003029cae5f8f988ad90aa54c9b",
+    "tests/test_gripper_drive_trace.py": "3d4bbf143c306d57c73a5498c867035585c15e407ceff40f6afd56146c8f3cd9"
+  },
+  "preflight_hashes": {
+    "capstone_gripper_pair_preflight_final.log": "fa26d4e5dc3b704fdf8162e9264aaa57cc231468357ec06837dcc9c484573b0c",
+    "capstone_gripper_entry_isolation.jsonl": "34f8ed6dd19055c96c1b6a63fb30838205d85c00d8a320653beb28c077f20709"
+  }
+}

@@ -14,6 +14,8 @@ The [Linux watch-resource shortage](docs/project/NATIVE_STARTUP_RESOURCES.md) ha
 
 The [single wind-force intervention](docs/project/SETUP_FORCE_CONTROL.md#observed-result-startup-ball-mismatch-removed-finger-response-differs) now restores exact ball velocity/pose through native rows0..500, but grasp still fails. Recorded close targets match; actual fingers close more slowly and first contact is about89ms later. Next inspect actual gripper drive/reset state. This is modified-force expert evidence, with no learned-policy success or general reset fix.
 
+A [passive gripper-drive pair](docs/project/GRIPPER_DRIVE_DIAGNOSTIC.md) is prepared to record actual reset/closure gains, caps and targets.300 CPU checks and scene/entry preflight pass; simulator measurements are pending.
+
 | Workstream | Verified progress | Remaining work |
 |---|---|---|
 | Franka action interface | Recorded-tool FK verified across all 40 ball episodes; explicit Cartesian request execution grasps successfully on one exposed seed without online task/skill decisions | Live policy action contract and learned dynamic grasping |

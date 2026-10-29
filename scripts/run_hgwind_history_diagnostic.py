@@ -26,7 +26,7 @@ ATTEMPTS = [58, 59, 60]
 HISTORY = ROOT / 'data/derived/hgwind_history_diagnostics/20261029_234931_549595'
 
 
-def prepare(native_backtrace=False, stage_load_barrier=False, fresh_control=False, omit_setup_force_once=False):
+def prepare(native_backtrace=False, stage_load_barrier=False, fresh_control=False, omit_setup_force_once=False, trace_gripper_drives=False):
     require(not fresh_control or stage_load_barrier, 'Fresh control requires the matched stage-load barrier')
     require(not omit_setup_force_once or (fresh_control and stage_load_barrier), 'Omission requires matched-startup fresh60')
     attempts = [60] if fresh_control else list(ATTEMPTS)
@@ -86,6 +86,11 @@ def prepare(native_backtrace=False, stage_load_barrier=False, fresh_control=Fals
         for path in [ROOT/'src/capstone_vla/setup_force_control.py', worker_entry]:
             plan['adapter_sha256'][str(path)] = sha256(path)
         plan['reference_fidelity'] = 'Matched fresh60 with one explicitly omitted pre-recording wind force call; modified forcing history, no training/VLA claim.'
+    if trace_gripper_drives:
+        plan['trace_gripper_drives'] = True
+        worker_entry = ROOT/'scripts/sim/run_hgwind_gripper_probe_worker.py'
+        for path in [ROOT/'src/capstone_vla/gripper_drive_trace.py',worker_entry]:
+            plan['adapter_sha256'][str(path)] = sha256(path)
     # Resolve original failed as well as successful episodes by attempt identity.
     sources = {}
     for meta_path in Path(plan['source']).parent.parent.glob('*/meta.json'):
@@ -191,6 +196,9 @@ def finish(out, code, render=False):
                 omitted_calls=sum(x['status']=='omitted_by_setup_force_control' for x in calls),
                 pre_recording_returned_calls=sum(x['frame'] is None and x['status']=='returned' for x in calls),
                 returned_native_calls=sum(x['status']=='returned' for x in calls),sha256=sha256(trace))
+        if plan.get('trace_gripper_drives'):
+            from capstone_vla.gripper_drive_trace import trace_status
+            row['gripper_drive_observation'] = trace_status(location/'gripper_drive_trace.jsonl')
         row['raw_source_sha256'] = {name:sha256(episode/name) for name in ['meta.json','replay.hdf5','trajectory.hdf5']}
         result['cases'].append(row)
         (out/'report.json').write_text(json.dumps(result,indent=2)+'\n')
@@ -240,6 +248,11 @@ def finish(out, code, render=False):
             first_step_history_velocity_delta_m_s=matched.get('first_step_ball_velocity_delta_m_s'),
             all_history_core_arrays_exact=matched.get('all_core_arrays_exact'),
             pre_recording_native_calls=target.get('force_trace', {}).get('pre_recording_returned_calls'))), flush=True)
+    if plan.get('trace_gripper_drives'):
+        result['gripper_observation_available'] = bool(result['cases']) and all(
+            row.get('gripper_drive_observation',{}).get('verified') for row in result['cases'])
+        result['passive_observer_noninterference_verified'] = bool(result['comparison_evaluable']) and all(
+            row.get('comparison_to_original',{}).get('all_core_arrays_exact') for row in result['cases']) if not plan.get('fresh_control') else None
     (out/'report.json').write_text(json.dumps(result,indent=2)+'\n')
     lines=['# Worker-history video review','','Raw trajectories retained. Rendering is optional; skipped views have not been visually reviewed.','']
     for row in result['cases']:
@@ -264,6 +277,7 @@ def main():
     parser.add_argument('--fresh-control',action='store_true',help='Run original attempt60 alone using the matched history startup barrier')
     parser.add_argument('--stage-load-barrier',action='store_true',help='Experimental stopped-timeline stage attach barrier before robot USD edits')
     parser.add_argument('--omit-setup-force-once',action='store_true',help='Experimental: omit the pinned second pre-recording wind call in fresh60 only')
+    parser.add_argument('--trace-gripper-drives',action='store_true',help='Passive native/USD finger-drive observations; no setters or extra simulation steps')
     parser.add_argument('--render',action='store_true',help='Opt in to five-view review videos; default analyzes only')
     parser.add_argument('--finish',type=Path,help='Analyze/render a completed run without launching physics again')
     args=parser.parse_args()
@@ -271,10 +285,11 @@ def main():
         require(not args.run,'--finish never launches collection')
         out=args.finish.resolve();out.relative_to(ROOT/'data/derived/hgwind_history_diagnostics')
         return finish(out,json.loads((out/'worker_exit.json').read_text())['exit_code'],render=args.render)
-    plan,command,lab=prepare(args.native_backtrace,args.stage_load_barrier,args.fresh_control,args.omit_setup_force_once)
+    plan,command,lab=prepare(args.native_backtrace,args.stage_load_barrier,args.fresh_control,args.omit_setup_force_once,args.trace_gripper_drives)
     plan['render_requested'] = args.render
     if args.stage_load_barrier:print('STARTUP_WORKAROUND stage_load_barrier=true efficacy=unverified physics_parameters_unchanged=true',flush=True)
     if args.omit_setup_force_once:print('SETUP_FORCE_CONTROL omit_event=1 modified_forcing_history=true efficacy=unverified',flush=True)
+    if args.trace_gripper_drives:print('GRIPPER_TRACE requested=true setters=false',flush=True)
     print('RENDER_MODE '+('enabled' if args.render else 'skipped; raw trajectories retained'),flush=True)
     print('COMMAND '+shlex.join(command),flush=True)
     if not args.run:return 0
@@ -293,7 +308,7 @@ def main():
         try:
             for line in process.stdout:
                 log.write(line);log.flush()
-                if any(s in line for s in ['HISTORY_ATTEMPT','COLLECT ATTEMPT','SAFETY ABORT','Traceback','Error:','terminate called','what():','Aborted','CAPSTONE_NATIVE','STAGE_LOAD_BARRIER','SETUP_FORCE_CONTROL','DONE attempts','FATAL']):print(line.rstrip(),flush=True)
+                if any(s in line for s in ['HISTORY_ATTEMPT','COLLECT ATTEMPT','SAFETY ABORT','Traceback','Error:','terminate called','what():','Aborted','CAPSTONE_NATIVE','STAGE_LOAD_BARRIER','SETUP_FORCE_CONTROL','GRIPPER_TRACE','DONE attempts','FATAL']):print(line.rstrip(),flush=True)
             code=process.wait()
         except KeyboardInterrupt:
             os.killpg(process.pid,signal.SIGTERM)
