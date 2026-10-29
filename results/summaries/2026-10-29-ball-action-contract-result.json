@@ -1,0 +1,149 @@
+{
+  "schema": "physical-vla-lab.ball-action-contract-result.v1",
+  "date": "2026-10-29",
+  "status": "interface_checks_pass_grasp_retention_fails",
+  "run": "20261029_210114_208078",
+  "task": "grasp_wind_driven_motion_1s1p_hgprgew",
+  "distinct_exposed_initial_conditions": 1,
+  "frames": 209,
+  "physics_updates": 627,
+  "osc_updates": 627,
+  "initial_state_match": true,
+  "runtime_safety_passed": true,
+  "action_dim": 29,
+  "state_dim": 30,
+  "action_decode_motor_boundary_verified": true,
+  "raw_strict_packet_equality": false,
+  "normalization_aware_execution_verified": true,
+  "maximum_cross_environment_quaternion_roundoff_abs": 2.220446049250313e-16,
+  "native_postcall_axis_roundoff_frames": 6,
+  "normalized_vector_only_atol": 1e-14,
+  "all_other_fields_compared_exactly": true,
+  "independent_grasp": "fail",
+  "measured_grasp": {
+    "frames": 209,
+    "sample_hz": 60.00000000000021,
+    "bilateral_frames": 26,
+    "longest_bilateral_duration_s": 0.4333333333333318,
+    "first_contact_frame": 135,
+    "first_bilateral_frame": 137,
+    "minimum_final_lift_from_first_bilateral_m": 5.736947059631348e-07,
+    "final_relative_position_jitter_m": 0.055786479987913175,
+    "object_speed_before_first_contact_m_s": 0.22630296647548676,
+    "object_angular_speed_before_first_contact_rad_s": null,
+    "final_relative_spin_p95_rad_s": null
+  },
+  "baseline_measured_grasp": {
+    "frames": 209,
+    "sample_hz": 60.00000000000021,
+    "bilateral_frames": 72,
+    "longest_bilateral_duration_s": 1.1999999999999957,
+    "first_contact_frame": 135,
+    "first_bilateral_frame": 137,
+    "minimum_final_lift_from_first_bilateral_m": 0.07259464263916016,
+    "final_relative_position_jitter_m": 0.00015950519947229244,
+    "object_speed_before_first_contact_m_s": 0.22630296647548676,
+    "object_angular_speed_before_first_contact_rad_s": null,
+    "final_relative_spin_p95_rad_s": null
+  },
+  "phase_comparison": {
+    "first_contact_frame": 135,
+    "first_bilateral_frame": 137,
+    "maximum_precontact_ee_difference_mm": 0.002169641898944974,
+    "first_ee_difference_above_0_01mm_frame": 139,
+    "first_object_position_difference_frame": 136,
+    "first_callback_activation_difference_frame": 173,
+    "ee_difference_mm_by_frame": {
+      "134": 0.0014943568967282772,
+      "135": 0.002316974801942706,
+      "137": 0.0014702442567795515,
+      "140": 0.02490025945007801,
+      "150": 3.6527059078216553,
+      "160": 14.665160179138184,
+      "162": 19.396656036376953,
+      "173": 49.888755798339844,
+      "208": 0.46636590361595154
+    },
+    "contact_impulse_comparison": [
+      {
+        "frame": 135,
+        "new_L": 0.0,
+        "new_R": 0.01756940923638164,
+        "baseline_L": 0.0,
+        "baseline_R": 0.017806821030931227
+      },
+      {
+        "frame": 136,
+        "new_L": 0.0,
+        "new_R": 0.048289418523562014,
+        "baseline_L": 0.0,
+        "baseline_R": 0.048163758567947815
+      },
+      {
+        "frame": 137,
+        "new_L": 0.36531544849956843,
+        "new_R": 0.2673605917202509,
+        "baseline_L": 0.36335969730220474,
+        "baseline_R": 0.2669628090400323
+      },
+      {
+        "frame": 138,
+        "new_L": 0.6296797481032913,
+        "new_R": 0.9656327952701189,
+        "baseline_L": 0.6287166721003471,
+        "baseline_R": 0.964874342323929
+      },
+      {
+        "frame": 139,
+        "new_L": 1.2292655969458397,
+        "new_R": 0.6264925150501499,
+        "baseline_L": 1.225809582158413,
+        "baseline_R": 0.6241717713782086
+      },
+      {
+        "frame": 140,
+        "new_L": 0.8442554066046466,
+        "new_R": 1.5043237837038537,
+        "baseline_L": 0.8602400196409995,
+        "baseline_R": 1.52144872689066
+      },
+      {
+        "frame": 141,
+        "new_L": 1.1488257798438046,
+        "new_R": 0.48876738386173474,
+        "baseline_L": 1.2693070094786014,
+        "baseline_R": 0.5692997559466626
+      },
+      {
+        "frame": 142,
+        "new_L": 0.5319102688934627,
+        "new_R": 1.1353231570702416,
+        "baseline_L": 0.7539257870062408,
+        "baseline_R": 1.4703246580008873
+      }
+    ]
+  },
+  "runtime_dependencies_verified": 21,
+  "runtime_encode_decode_unchanged_by_verifier_fix": true,
+  "cpu_tests_passed": 210,
+  "additional_simulations_started": false,
+  "learned_policy_evaluated": false,
+  "source_replay_sha256": "e1b54faae644b64f8148b0fe0397d74287f06d7c48fa97ee34a054339a72e3d3",
+  "runtime_plan_sha256": "7c8e73170f626a9eb3f91889190fa6be7a823a07a2aadb0fa81f5de1841d81d2",
+  "runtime_action_vectors_sha256": "f47fab73d95557b3b51e7f90119397cc6c27714eec589a3052575633457d4a5a",
+  "baseline_report_sha256": "9c57c3f0af75275e9052f125852525407dfbf89dae6378594b42edc769786bc0",
+  "completed_report_sha256": "9b9df1d55414240649643621a5bca92ed06156ccef078a68479c4528bc6c98d9",
+  "interpretation": [
+    "Report failure had two numeric exact-equality issues: cross-environment quaternion normalization and native in-place axis normalization. Verification now permits only 1e-14 absolute roundoff in those normalized vectors; raw exact audit is retained.",
+    "Physical retention genuinely fails; fixing the report does not make this grasp successful.",
+    "Departure grows immediately after contact, before the callback activation difference at frame 173; late callback activation cannot explain the earlier onset.",
+    "Float32 conversion, normalization and quaternion-sign representation form a combined change; their individual causal contributions are not isolated.",
+    "Recorded expert upper commands replay open loop with robot feedback, not renewed target-conditioned expert/VLA decisions. Contact sensitivity of one exposed replay does not establish that a learned reactive policy cannot succeed."
+  ],
+  "next": "Freeze controller and action representation. Use a bounded 3-5 distinct development-episode comparison to diagnose scope, with all outcomes retained; no formal training or additional one-parameter tuning yet.",
+  "limitations": [
+    "One exposed case; no success-rate/generalization inference.",
+    "No new model training/inference or GPU run during this analysis.",
+    "No change to physical success criteria, raw labels, traces, scenes or manufacturer limits."
+  ]
+}

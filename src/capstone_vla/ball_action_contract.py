@@ -190,6 +190,60 @@ def model_configuration(pretrained):
     return result
 
 
+NORMALIZED_VECTOR_ATOL = 1.e-14
+NORMALIZED_FIELDS = ('target_quaternion', 'orientation_axis_world')
+
+
+def native_inputs_match(actual, expected):
+    """Permit CPU/Isaac normalization roundoff only, never general action drift.
+
+    The runtime and audit NumPy/BLAS builds can differ by a few double-precision
+    ULPs in unit vectors. Position, v/a, settings, callbacks and masks stay exact.
+    This compares decoded inputs, not source float64 versus model float32 labels.
+    """
+    if not isinstance(actual,dict) or not isinstance(expected,dict) or set(actual)!=set(expected):
+        return False
+    for key in actual:
+        a,b = actual[key],expected[key]
+        if key in NORMALIZED_FIELDS and a is not None and b is not None:
+            try:
+                a,b=np.asarray(a,float),np.asarray(b,float)
+                width=4 if key=='target_quaternion' else 3
+                if (a.shape!=(width,) or b.shape!=(width,) or not np.isfinite(a).all()
+                        or not np.isfinite(b).all()
+                        or not np.allclose(a,b,atol=NORMALIZED_VECTOR_ATOL,rtol=0.)):
+                    return False
+            except (TypeError,ValueError):
+                return False
+        elif a!=b:
+            return False
+    return True
+
+
+def decoded_packets_match(actual, expected):
+    if len(actual)!=len(expected):
+        return False
+    return all(set(a)==set(b) and native_inputs_match(a['inputs'],b['inputs'])
+        and all(a[k]==b[k] for k in a if k!='inputs') for a,b in zip(actual,expected))
+
+
+def normalization_audit_copy(payload, packets):
+    """Copy for audit only: native axis projection normalizes its input in place.
+
+    Preserve raw artifacts and raw strict audit. Reject all other input changes;
+    the normal packet auditor still checks frame links, jaws, posture and timing.
+    """
+    result=copy.deepcopy(payload)
+    require(len(result['calls'])<=len(packets), 'Unexpected native call count')
+    for event,packet in zip(result['calls'],packets):
+        expected=dict(packet['inputs'],**packet['safety_callbacks'])
+        require(native_inputs_match(event['inputs'],expected),
+            'Native inputs differ beyond normalization roundoff')
+        for key in NORMALIZED_FIELDS:
+            event['inputs'][key]=copy.deepcopy(expected[key])
+    return result
+
+
 def audit_contract(payload, actions):
     """Inspect actual motor-boundary inputs, not only the offline codec output."""
     from .posture_anchor import audit_latched_posture
@@ -197,10 +251,16 @@ def audit_contract(payload, actions):
     initialization = payload.get('posture_initialization')
     expected = decode_stream(actions, initialization['anchor_rad']) if initialization else []
     exact = len(events) == len(expected) and all(
-        e['frame'] == p['frame'] and e['inputs'] == dict(p['inputs'], **p['safety_callbacks'])
+        e['frame'] == p['frame'] and native_inputs_match(e['inputs'],dict(p['inputs'], **p['safety_callbacks']))
         and e['gripper_closed'] is p['gripper_closed'] for e,p in zip(events,expected))
     return dict(schema=SCHEMA, action_dim=ACTION_DIM, state_dim=STATE_DIM,
         decoded_actions_match_motor_boundary=exact,
+        normalized_vector_absolute_tolerance=NORMALIZED_VECTOR_ATOL,
+        all_other_fields_compared_exactly=True,
+        maximum_normalization_roundoff_abs=max([0.]+[
+            float(np.max(np.abs(np.asarray(e['inputs'][key],float)-p['inputs'][key])))
+            for e,p in zip(events,expected) for key in NORMALIZED_FIELDS
+            if e['inputs'].get(key) is not None and p['inputs'].get(key) is not None]),
         fixed_collision_callbacks_always_enabled=bool(events) and all(
             all(e['inputs'].get(k) == decode_action(actions[0],0)['safety_callbacks'][k]
                 for k in CALLBACKS) for e in events),

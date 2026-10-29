@@ -163,3 +163,56 @@ def test_motor_boundary_audit_rejects_hidden_settings_and_disabled_callback():
     assert not audit_contract(payload,actions)['decoded_actions_match_motor_boundary']
     events[1]['inputs']['cartesian_velocity_projector']=None
     assert not audit_contract(payload,actions)['fixed_collision_callbacks_always_enabled']
+
+
+def test_cross_environment_unit_vector_roundoff_only():
+    from capstone_vla.ball_action_contract import native_inputs_match
+    expected=sample()['inputs'];actual=copy.deepcopy(expected)
+    actual['target_quaternion'][0]+=2.e-16
+    assert actual!=expected and native_inputs_match(actual,expected)
+    actual['orientation_axis_world']=[0.,0.,1.]
+    expected['orientation_axis_world']=[0.,0.,1.+2.e-16]
+    assert native_inputs_match(actual,expected)
+    actual['target_position'][0]+=2.e-16
+    assert not native_inputs_match(actual,expected)
+
+
+def test_roundoff_comparison_rejects_meaningful_rotation_nan_null_and_callback_drift():
+    from capstone_vla.ball_action_contract import native_inputs_match
+    expected=sample()['inputs']
+    for value in [[1.+1.e-12,0.,0.,0.],[float('nan'),0.,0.,0.],None,[1.,0.,0.]]:
+        actual=copy.deepcopy(expected);actual['target_quaternion']=value
+        assert not native_inputs_match(actual,expected)
+    expected=dict(expected,cartesian_velocity_projector={'enabled':True})
+    actual=copy.deepcopy(expected);actual['cartesian_velocity_projector']=None
+    assert not native_inputs_match(actual,expected)
+
+
+def test_packet_roundoff_does_not_allow_gripper_phase_or_constant_changes():
+    from capstone_vla.ball_action_contract import decoded_packets_match
+    packet=sample();actual=copy.deepcopy(packet)
+    actual['inputs']['target_quaternion'][0]+=2.e-16
+    assert decoded_packets_match([actual],[packet])
+    for name,value in [('gripper_closed',True),('terminal_cartesian_hold',True),('frame',1)]:
+        changed=copy.deepcopy(actual);changed[name]=value
+        assert not decoded_packets_match([changed],[packet])
+    actual['inputs']['position_gain']+=2.e-15
+    assert not decoded_packets_match([actual],[packet])
+
+
+def test_native_inplace_normalization_audit_copy_preserves_raw_records():
+    from capstone_vla.ball_action_contract import normalization_audit_copy
+    packet=sample();packet['inputs']['orientation_axis_world']=[0.,0.,1.]
+    original=dict(calls=[dict(inputs=dict(packet['inputs'],**packet['safety_callbacks']))])
+    original['calls'][0]['inputs']['orientation_axis_world']=[0.,0.,1.+2.e-16]
+    before=copy.deepcopy(original)
+    audited=normalization_audit_copy(original,[packet])
+    assert original==before and audited!=original
+    assert audited['calls'][0]['inputs']['orientation_axis_world']==[0.,0.,1.]
+
+
+def test_native_normalization_audit_copy_cannot_hide_velocity_or_callback_change():
+    from capstone_vla.ball_action_contract import normalization_audit_copy
+    packet=sample();original=dict(calls=[dict(inputs=dict(packet['inputs'],**packet['safety_callbacks']))])
+    original['calls'][0]['inputs']['target_linear_velocity']=[1.e-16,0.,0.]
+    with pytest.raises(ValueError):normalization_audit_copy(original,[packet])

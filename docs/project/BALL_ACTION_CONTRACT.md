@@ -2,7 +2,7 @@
 
 ## Decision and purpose
 
-**Prepared, physical result pending.** Freeze the passing fixed-9/8 gain and live-initialized latched-posture baseline. Stop successive parameter-removal probes. Test a complete model-sized command interface once, then validate 3–5 distinct development episodes before cohort conversion/training. If it fails, report the integrated blocker and reconsider the interface rather than starting an open-ended deletion campaign.
+**First physical run completed: interface checks pass, final grasp retention fails.** Freeze the passing fixed-9/8 gain and live-initialized latched-posture baseline. Stop successive parameter-removal probes. Test a complete model-sized command interface once, then validate 3–5 distinct development episodes before cohort conversion/training. If it fails, report the integrated blocker and reconsider the interface rather than starting an open-ended deletion campaign.
 
 The present command is an **expert-labelled action surrogate**, not DynamicVLA inference. It answers whether commands can pass through the proposed float32 data representation and decoded controller interface while retaining a physical grasp. It does not establish learned success, generalization or real-time performance.
 
@@ -75,9 +75,17 @@ data/derived/hf_pilot_render_repo/.venv/bin/python \
 
 Expected duration is similar to previous one-episode effort probes; startup determines much of the wall time. Output is a new timestamped `data/derived/hgwind_action_contract_v1/` directory containing `actions.npy`, `contract.json`, `model_config.json`, `plan.json`, traces and `report.json`. No source files are overwritten.
 
-The integrated gate requires complete 209 intervals, initial-state matching, 627 physics and OSC updates, unchanged safety/limits, exact action-to-motor-boundary decoding, raw robot-state/posture consistency, always-enabled collision callbacks, no auxiliary grasp, and independent contact/lift/retention passing. Inspect **`BALL_ACTION_CONTRACT_PASSED True`** and **`INDEPENDENT_GRASP pass`** together. Collector/FSM success labels remain unmodified and are not this engineering result.
+The integrated gate requires complete 209 intervals, initial-state matching, 627 physics and OSC updates, unchanged safety/limits, verified action-to-motor-boundary decoding, raw robot-state/posture consistency, always-enabled collision callbacks, no auxiliary grasp, and independent contact/lift/retention passing. Inspect **`BALL_ACTION_CONTRACT_PASSED True`** and **`INDEPENDENT_GRASP pass`** together. Collector/FSM success labels remain unmodified and are not this engineering result.
 
 On pass: freeze this contract and test 3–5 distinct development episodes; then prepare labelled cohort conversion, episode splits and a real 29D model smoke. On failure: inspect this integrated failure against the preserved passing baseline and state the blocker before further controller changes. Do not move directly to training or claim the benchmark/policy has failed.
+
+## First physical result and analysis correction
+
+The first integrated run completes 209 intervals / 627 physics and OSC updates safely. Decoded actions, live robot posture and always-on collision callbacks verify, but final grasp retention fails: bilateral contact 0.433 s, final lift approximately zero, relative-position jitter 55.786 mm. The original passing baseline remains intact. No rerun is needed to obtain the corrected [result report](RESULTS.md).
+
+Two analysis issues required narrowly scoped numeric handling. CPU and simulator unit-quaternion normalization differ by at most 2.22e-16 in three frames; native `kinematic_servo._orientation_projection` also normalizes its axis input in place in six post-call records. Only these normalized-vector fields allow **1e-14 absolute tolerance, zero relative tolerance**. All other request fields, nulls, modes and callbacks remain exact. The raw exact packet audit stays false and is reported separately; an in-memory analysis copy permits only those proven normalization ULPs, without modifying raw traces or physical commands. Regression checks reject meaningful angular differences, any velocity/position/gain drift, callback changes and nonfinite inputs.
+
+Contact-stage departure begins before the callback activation difference at 173. The comparison does not isolate float32, normalization and sign choices; do not label one of them the proven physical root cause. Freeze this configuration and use 3–5 distinct **development** episodes for a bounded sensitivity diagnostic. This revises the earlier plan to expand only after one passing integrated case: the small batch is now diagnostic, not a training-ready certificate. Report all outcomes, then decide whether the interface is broadly usable or needs reconsideration. Do not resume unlimited micro-ablations.
 
 ## CPU verification
 

@@ -155,16 +155,33 @@ def analyze(output):
             from capstone_vla.ball_action_contract import decode_stream
             require(sha256(plan['action_vectors'])==plan['action_vectors_sha256'],'Action vector labels changed')
             packets=decode_stream(np.load(plan['action_vectors'],allow_pickle=False),expected_anchor)
-        require(json.loads((output/'packet_requests.json').read_text())==packets,'Executed packet stream differs from expected decoded inputs')
+        actual_packets=json.loads((output/'packet_requests.json').read_text())
+        if plan.get('action_contract'):
+            from capstone_vla.ball_action_contract import decoded_packets_match
+            require(decoded_packets_match(actual_packets,packets),
+                'Executed packet stream differs from decoded inputs beyond normalization roundoff')
+            # Retain simulator packets; audit native post-call normalization
+            # separately below without changing the original saved artifacts.
+            packets=actual_packets
+        else:
+            require(actual_packets==packets,'Executed packet stream differs from source')
         payload=json.loads((output/'cartesian_packet_execution.json').read_text())
         segments=json.loads((output/'original_expert_control_references.json').read_text())
         require(payload.get('packet_gain_profile','recorded')==plan.get('packet_gain_profile','recorded'),'Executed gain profile differs from plan')
         require(payload.get('packet_posture_profile','recorded')==plan.get('packet_posture_profile','recorded'),'Executed posture profile differs from plan')
         packet_audit=audit_packets(payload,packets,segments,n)
+        execution_verified=packet_audit['packet_execution_verified']
+        if plan.get('action_contract'):
+            from capstone_vla.ball_action_contract import normalization_audit_copy, NORMALIZED_VECTOR_ATOL
+            normalized_audit=audit_packets(normalization_audit_copy(payload,packets),packets,segments,n)
+            execution_verified=normalized_audit['packet_execution_verified']
+            packet_audit['packet_execution_verified_with_normalization_roundoff']=execution_verified
+            packet_audit['normalized_vector_absolute_tolerance']=NORMALIZED_VECTOR_ATOL
+            packet_audit['raw_exact_input_audit_preserved']=True
         report['packet_controller_audit']=packet_audit
         report['full_source_length_completed']=full
         report['expert_early_success']=False
-        report['packet_controller_probe_passed']=bool(packet_audit['packet_execution_verified'] and full and branch_verified
+        report['packet_controller_probe_passed']=bool(execution_verified and full and branch_verified
             and cadence_ok and completed_segments==n and initial_match and meta['runtime_safety']['passed']
             and grasp and grasp['status']=='pass')
         report['limits']=['Recorded numeric pose/motion/controller-settings/gripper stream remains the request source; not VLA predictions.',
@@ -219,6 +236,8 @@ def analyze(output):
             raw_q[0],np.asarray(payload['posture_initialization']['initial_joint_position_rad'])))
         contract_audit['robot_context_matches_raw_recording']=robot_context_matches
         report['ball_action_contract_audit']=contract_audit
+        report['analysis_fingerprints']={str(Path(__file__).relative_to(ROOT)):sha256(Path(__file__)),
+            'src/capstone_vla/ball_action_contract.py':sha256(ROOT/'src/capstone_vla/ball_action_contract.py')}
         report['ball_action_contract_passed']=bool(report['packet_controller_probe_passed']
             and all(contract_audit[k] for k in ['decoded_actions_match_motor_boundary',
                 'fixed_collision_callbacks_always_enabled','live_posture_verified',

@@ -2,11 +2,15 @@
 
 Snapshot: **2026-10-29, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
-## Prepared integrated action contract — physical result pending
+## Integrated action contract — interface verified, physical retention fails
 
-The [ball action contract](BALL_ACTION_CONTRACT.md) freezes the successful gains/posture configuration and replaces iterative field deletion with one complete 29D float32 command gate. All varying upper-command fields are explicit; fixed settings remain in the controller, and the 30D proprioceptive schema includes the latched robot posture. Unlike the earlier packet reference, collision callbacks stay enabled for all 209 ticks. This is an integrated change, not a source-exact or one-factor replay.
+User run `20261029_210114_208078` completes 209 intervals and 627 physics/OSC updates, with exactly matching initial robot/object states, native safety passed, no grasp assistance, decoded 29D commands verified, live posture matched to raw robot states and collision callbacks always enabled. The combined physical gate is **false**: bilateral contact spans 137–162 (0.433 s), final retained lift is approximately zero and final relative-position jitter is 55.786 mm. The preserved fixed-gain/latched-posture reference retains 1.2 s bilateral contact, about 72.595 mm lift and 0.160 mm jitter.
 
-205 portable CPU checks pass. The real 209-frame preflight preserves gripper events, null semantics and solver modes; maximum position roundtrip error is 0.000237 mm. Pinned upstream configuration and official checkpoint projection shapes support the proposed widths without changing the 32D heads. No new model was instantiated, trained or run. Physical grasp validation is pending; existing ball HDF5 does not supply all new labels. Validate this gate and then 3–5 distinct development episodes before deciding label generation and cohort conversion.
+The initial report crashed on three quaternion differences up to 2.22e-16 between CPU and simulator normalization. Native `_orientation_projection` also normalizes its input axis in place, producing six post-call trace differences. The corrected **analysis-only** verifier allows 1e-14 absolute roundoff exclusively on quaternion/axis fields; every other input remains exact. Raw artifacts and the strict raw equality result remain unchanged. The normalization-aware execution audit passes; physical retention still fails. See [contract](BALL_ACTION_CONTRACT.md) and [hashed result](../../results/summaries/2026-10-29-ball-action-contract-result.json).
+
+Before first contact at 135, EE difference from the passing reference is at most 0.00217 mm. Object positions first diverge at 136, and EE displacement exceeds 0.01 mm at 139, reaching about 3.65 mm at 150. The callback activation difference starts only at 173. This excludes late callback activation as the explanation for the earlier onset; it does not identify a unique cause among float32 conversion, normalization, sign representation and subsequent contact dynamics. Native robot posture-source modes match throughout.
+
+21 runtime dependency hashes and unchanged runtime encoder/decoder functions verify. 210 portable CPU checks pass; no additional simulation, model training or inference was launched for this analysis. Recorded expert upper commands replay without fresh target-conditioned decisions, so this exposed replay failure does not demonstrate that a learned reactive policy cannot succeed. Freeze the controller and run a bounded 3–5 distinct development-episode diagnostic before deciding label generation/training. Existing 40 processed 9D recordings still lack the complete upper labels.
 
 ## Wind-driven spherical-object cohort
 

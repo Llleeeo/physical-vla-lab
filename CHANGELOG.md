@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-29 — Integrated interface verified; grasp retention fails
+
+- User run completes 209 intervals / 627 physics and OSC updates with matching initial state, native safety and verified 29D command/live-posture boundary. Independent grasp retention fails: 0.433 s bilateral contact, no final retained lift, 55.786 mm relative-position jitter. Preserve the earlier passing baseline.
+- Fix analysis-only exact-equality failures: three cross-environment quaternion-normalization differences and six native in-place orientation-axis normalizations, at double-precision roundoff. Allow only 1e-14 absolute tolerance on these two normalized fields; other inputs remain exact. Keep the raw strict audit and artifacts; no controller/runtime command changes or GPU rerun.
+- Verify 21 recorded runtime dependencies and unchanged encoder/decoder functions. Before first contact, maximum EE difference from the passing baseline is 0.00217 mm; object states first differ at 136 and EE departure exceeds 0.01 mm at 139. Callback activation differs only from 173, so it cannot explain the earlier divergence onset. Individual float32/normalization/sign effects are not isolated.
+- Five regressions bring portable CPU checks to 210 passes. Freeze settings; use a bounded 3–5 distinct development-episode diagnostic, retain all outcomes, and reassess open-loop contact sensitivity before formal training. No learned-policy/generalization failure claim.
+
 ## 2026-10-29 — Complete ball action-contract gate prepared
 
 - Stop successive one-field deletions; freeze passing fixed gains/live-latched posture and prepare one integrated float32 command-interface check. Explicit 29D actions carry pose, independent velocity/acceleration references, null masks, controller modes and binary jaws; 30D robot-state schema exposes the robot posture anchor.
