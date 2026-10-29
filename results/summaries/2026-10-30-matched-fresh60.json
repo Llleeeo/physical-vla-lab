@@ -1,0 +1,196 @@
+{
+  "schema": "physical-vla-lab.matched-fresh60.v1",
+  "date": "2026-10-30",
+  "run_id": "20261030_003531_182273_fresh60",
+  "condition": "fresh60 with same guarded startup and native assembly as history58/59/60",
+  "startup_passed": true,
+  "native_abort_observed": false,
+  "native_crash_general_fix_established": false,
+  "comparison_evaluable": true,
+  "execution_complete": false,
+  "worker_exit": 1,
+  "recorded_frames": 169,
+  "completed_intervals": 168,
+  "grasp": "fail",
+  "runtime_safety_passed": false,
+  "initial_state_match": true,
+  "abort": {
+    "joint_offset": 4,
+    "joint_human_number": 5,
+    "speed_rad_s": 2.6393,
+    "limit_rad_s": 2.61,
+    "reason": "Braking required by velocity bound conflicts with acceleration/jerk constraints"
+  },
+  "comparisons": {
+    "new_fresh_vs_old_fresh": {
+      "core_array_exact": {
+        "actions": true,
+        "timestamp": true,
+        "is_first": true,
+        "is_last": true,
+        "is_terminal": true,
+        "obs/ee_pos": true,
+        "obs/ee_quat": true,
+        "obs/ee_vel": true,
+        "obs/finger_segment_world": true,
+        "obs/joint_pos": true,
+        "obs/joint_vel": true,
+        "obs/object_ang_vel": true,
+        "obs/object_pos": true,
+        "obs/object_quat": true,
+        "obs/object_vel": true
+      },
+      "all_core_arrays_exact": true,
+      "compared_native_rows": 7,
+      "first_native_velocity_difference": null,
+      "first_step_ball_velocity_delta_m_s": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "history_vs_original": {
+      "core_array_exact": {
+        "actions": true,
+        "timestamp": true,
+        "is_first": true,
+        "is_last": true,
+        "is_terminal": true,
+        "obs/ee_pos": true,
+        "obs/ee_quat": true,
+        "obs/ee_vel": true,
+        "obs/finger_segment_world": true,
+        "obs/joint_pos": true,
+        "obs/joint_vel": true,
+        "obs/object_ang_vel": true,
+        "obs/object_pos": true,
+        "obs/object_quat": true,
+        "obs/object_vel": true
+      },
+      "all_core_arrays_exact": true,
+      "compared_native_rows": 7,
+      "first_native_velocity_difference": null,
+      "first_step_ball_velocity_delta_m_s": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "new_fresh_vs_history": {
+      "core_array_exact": {
+        "actions": false,
+        "timestamp": false,
+        "is_first": false,
+        "is_last": false,
+        "is_terminal": false,
+        "obs/ee_pos": false,
+        "obs/ee_quat": false,
+        "obs/ee_vel": false,
+        "obs/finger_segment_world": false,
+        "obs/joint_pos": false,
+        "obs/joint_vel": false,
+        "obs/object_ang_vel": false,
+        "obs/object_pos": false,
+        "obs/object_quat": false,
+        "obs/object_vel": false
+      },
+      "all_core_arrays_exact": false,
+      "compared_native_rows": 7,
+      "first_native_velocity_difference": 1,
+      "first_step_ball_velocity_delta_m_s": [
+        0.004831869155168533,
+        -2.0226920138810556e-10,
+        -0.00015138834714889526
+      ]
+    },
+    "explicit_15_array_exact_new_vs_old_fresh": {
+      "actions": true,
+      "timestamp": true,
+      "is_first": true,
+      "is_last": true,
+      "is_terminal": true,
+      "obs/ee_pos": true,
+      "obs/ee_quat": true,
+      "obs/ee_vel": true,
+      "obs/finger_segment_world": true,
+      "obs/joint_pos": true,
+      "obs/joint_vel": true,
+      "obs/object_ang_vel": true,
+      "obs/object_pos": true,
+      "obs/object_quat": true,
+      "obs/object_vel": true
+    },
+    "source_plan_inotify": {
+      "schema": "physical-vla-lab.inotify-preflight.v1",
+      "requested": 512,
+      "allocated": 512,
+      "passed": true,
+      "errno": null,
+      "phase": "complete",
+      "scope": "Admission probe only; not an Isaac stability guarantee",
+      "max_user_watches": 65536,
+      "max_user_instances": 128
+    },
+    "native_abort_observed_this_run": false,
+    "stage_guard_verified": true,
+    "force_calls": {
+      "fresh": {
+        "total": 10,
+        "pre_recording": 4,
+        "pre_force_x": [
+          0.6705899834632874,
+          0.6705899834632874,
+          1.6681649684906006,
+          1.6681649684906006
+        ]
+      },
+      "history": {
+        "total": 9,
+        "pre_recording": 3,
+        "pre_force_x": [
+          0.6705899834632874,
+          1.6681649684906006,
+          1.6681649684906006
+        ]
+      }
+    },
+    "scope": "Observed matched startup/history contrast; no unique force/solver/cache mechanism established, no VLA evaluated.",
+    "source_hashes": {
+      "new_report": "afaccf664b5a4a644246e7aca474a2838222720f7cd607b31d46c778391440fb",
+      "new_plan": "4835671722cebdc446a120040701ddcf76188b36c8483232210d987ee890754b",
+      "new_simulation_log": "14144b8bbd9d4bab66362e9567dd68ca64813c922c7c409d2c902dd2ca9dd27f",
+      "new_raw_replay": "b8618530fb863c638c686e2e60448ccd9bd16657db279e3ffa6d48e220806302",
+      "history_report": "12bc24b89ead3ef34d052462fdb64b977aba503c68f5e6cfa007238dc3c58e2e",
+      "history_raw_replay": "4ebc51e4f27bc15c6b4dbbe3bc81826303c19f4d29570d764bd8dd13d09aab93",
+      "old_fresh_raw_replay": "1292e4799a0b4f6c86ca783db468f64fe7389e02e9a6e376a47f1f706a3721b4",
+      "original_raw_replay": "6cfb3d8f57b5886954b2ef4fac35632a593e19572a14c83c1dbe3a5851d1982b"
+    }
+  },
+  "history_reference": {
+    "run_id": "20261029_234931_549595",
+    "target_frames": 319,
+    "grasp": "pass",
+    "all_15_core_arrays_match_original": true
+  },
+  "interpretation": "The changed scene-load barrier alone does not recover original attempt60. Observed worker history/reset differences affect the initial physical evolution in this controlled development comparison. A unique force/cache/solver mechanism is not established.",
+  "next_proposal": "Inspect episode initialization and isolate the extra pre-recording wind call in a bounded single-factor comparison; retain control, physics and safety limits. No repeat or GPU job started by agent.",
+  "learned_policy_evaluated": false,
+  "held_out_evaluation": false,
+  "render_requested": false,
+  "validation": {
+    "focused_history_tests": 23,
+    "runtime_collector_changed": false
+  },
+  "source_hashes": {
+    "plan.json": "4835671722cebdc446a120040701ddcf76188b36c8483232210d987ee890754b",
+    "report.json": "6cadcacb643ee9787e8eb4456c86f28094ef0704597b91373c4cab966cfd5eed",
+    "report_before_evaluable_status_fix.json": "afaccf664b5a4a644246e7aca474a2838222720f7cd607b31d46c778391440fb",
+    "simulation.log": "14144b8bbd9d4bab66362e9567dd68ca64813c922c7c409d2c902dd2ca9dd27f",
+    "stage_load_barrier.json": "9bb1235bbaa67c90973e0b59fde66c40bad7bc93b9372d2e793d71d6cd157e92",
+    "independent_matched_audit.json": "3ee6b80675c1126a07631efbacfbb77116348e1b6613c236d29086621b987bac"
+  },
+  "implementation_hashes": {
+    "scripts/run_hgwind_history_diagnostic.py": "a15cb762c3a29c977dc0751aab4535f4a020eb94150769fd80b708df9b08fbd8",
+    "tests/test_hgwind_history.py": "808af36180cb9ce556c58de9234a9b49bf6488c92b5d04e7a4ec751778f7cae1"
+  }
+}

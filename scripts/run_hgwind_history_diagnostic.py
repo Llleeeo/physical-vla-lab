@@ -192,6 +192,22 @@ def finish(out, code, render=False):
     target = next((x for x in result['cases'] if x['attempt_index']==60),{})
     result['target_grasp_status'] = target.get('grasp', 'not_evaluated')
     result['physical_success'] = bool(startup_ok and target.get('analysis_complete') and target.get('grasp')=='pass' and target.get('runtime_safety') and target.get('initial_state_match'))
+    # A saved safety-aborted fresh control still measures the first-step/history
+    # contrast. Keep process completion and grasp success as separate outcomes.
+    comparisons = ['comparison_to_original', 'comparison_to_fresh']
+    if plan.get('fresh_control'):
+        comparisons.append('comparison_to_matched_history')
+    result['comparison_evaluable'] = bool(
+        startup_ok and sorted(episodes) == attempts and order == attempts
+        and all(x.get('analysis_complete') and x.get('initial_state_match')
+                for x in result['cases'])
+        and all(target.get(key, {}).get('compared_native_rows', 0) >= 2
+                for key in comparisons))
+    if result['comparison_evaluable'] and not result['complete']:
+        result['interpretation'] = (
+            'Saved startup/history comparison is evaluable despite worker failure. '
+            'The execution is incomplete and physical outcome remains separately reported; '
+            'do not discard the matched first-step evidence or infer a unique mechanism.')
     if result['complete']:
         if plan.get('fresh_control'):
             result['interpretation']='Matched-startup fresh60 control: compare with history60 and the earlier fresh60; no learned policy is evaluated.'
@@ -207,6 +223,9 @@ def finish(out, code, render=False):
         elif not row['render_complete']:lines.append('Video delivery incomplete: '+row.get('render_error','unknown'))
         lines.append('')
     (out/'VIDEO_REVIEW.md').write_text('\n'.join(lines))
+    print('HISTORY_COMPARISON evaluable='+str(result['comparison_evaluable']).lower()
+        +' execution_complete='+str(result['complete']).lower()
+        +' grasp='+result['target_grasp_status'],flush=True)
     print('HISTORY_DIAGNOSTIC_'+('COMPLETED' if result['complete'] else 'INCOMPLETE')+' report='+str(out/'report.json'),flush=True)
     return 0 if result['complete'] else 2
 

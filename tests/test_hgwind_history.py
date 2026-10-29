@@ -217,7 +217,8 @@ def test_fresh_index_does_not_silently_accept_history_prefix(tmp_path):
     with pytest.raises(ValueError,match='Unexpected'):history.index_saved_episodes(tmp_path,'task',expected=[60])
 
 
-def test_fresh_finish_compares_both_controls_without_relaunch(tmp_path,monkeypatch):
+@pytest.mark.parametrize('worker_code,barrier_ready,analysis_error', [(0, True, False), (1, True, False), (1, False, False), (1, True, True)])
+def test_fresh_finish_compares_both_controls_without_relaunch(tmp_path,monkeypatch,worker_code,barrier_ready,analysis_error):
     import hashlib,importlib.util
     root=Path(__file__).resolve().parents[1];monkeypatch.syspath_prepend(str(root/'scripts'))
     spec=importlib.util.spec_from_file_location('fresh_runner_test',root/'scripts/run_hgwind_history_diagnostic.py')
@@ -237,16 +238,24 @@ def test_fresh_finish_compares_both_controls_without_relaunch(tmp_path,monkeypat
     plan=dict(worker_output=str(worker),history_attempts=[60],fresh_control=True,stage_load_barrier=True,history_cases={'60':case_plan},matched_history_reference=str(history_ref),matched_history_report_sha256=hashlib.sha256(b'{}').hexdigest())
     (out/'plan.json').write_text(json.dumps(plan))
     (out/'attempt_order.jsonl').write_text(json.dumps({'attempt_index':60}))
-    (out/'stage_load_barrier.json').write_text(json.dumps({'ready':True,'held_script_instances':0,'initial_timeline_time':0.,'final_timeline_time':0.}))
-    monkeypatch.setattr(analyzer,'analyze',lambda _:{'independent_grasp_evidence':{'status':'fail'},'initial_state_match':True,'runtime_safety_passed':False})
+    (out/'stage_load_barrier.json').write_text(json.dumps({'ready':barrier_ready,'held_script_instances':0,'initial_timeline_time':0.,'final_timeline_time':0.}))
+    def analyze(_):
+        if analysis_error:raise ValueError('unreadable comparison evidence')
+        return {'independent_grasp_evidence':{'status':'fail'},'initial_state_match':True,'runtime_safety_passed':False}
+    monkeypatch.setattr(analyzer,'analyze',analyze)
     comparisons=[]
-    monkeypatch.setattr(runner,'compare_motion',lambda *a:(comparisons.append(a) or {'all_core_arrays_exact':False}))
+    monkeypatch.setattr(runner,'compare_motion',lambda *a:(comparisons.append(a) or {'all_core_arrays_exact':False,'compared_native_rows':7}))
     monkeypatch.setattr(runner.subprocess,'run',lambda *a,**k:pytest.fail('no simulator or renderer should launch'))
-    assert runner.finish(out,0)==0
+    complete = worker_code == 0 and barrier_ready and not analysis_error
+    assert runner.finish(out,worker_code)==(0 if complete else 2)
     report=json.loads((out/'report.json').read_text())
-    assert report['requested_attempts']==[60] and report['complete'] is True
+    assert report['requested_attempts']==[60] and report['complete'] is complete
     assert report['condition']=='fresh60_matched_startup' and report['physical_success'] is False
-    assert report['target_grasp_status']=='fail' and report['stage_load_barrier_verified'] is True
-    assert len(comparisons)==3
-    assert comparisons[-1][0]==tmp_path/'history60/replay.hdf5'
+    assert report['target_grasp_status']==('not_evaluated' if analysis_error else 'fail')
+    assert report['stage_load_barrier_verified'] is barrier_ready
+    assert report['comparison_evaluable'] is (barrier_ready and not analysis_error)
+    if worker_code == 1 and barrier_ready and not analysis_error:
+        assert 'evaluable despite worker failure' in report['interpretation']
+    assert len(comparisons)==(0 if analysis_error else 3)
+    if not analysis_error:assert comparisons[-1][0]==tmp_path/'history60/replay.hdf5'
     assert report['cases'][0]['render_status']=='skipped_by_request'

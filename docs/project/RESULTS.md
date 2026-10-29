@@ -2,6 +2,16 @@
 
 Snapshot: **2026-10-30, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Matched fresh60 result: history contrast persists
+
+The user run `20261030_003531_182273_fresh60` passes the watcher admission probe and stage-load barrier, then records 169 frames / 168 completed control intervals. No native startup abort occurs in this launch; this is not a general stability guarantee. The independent engineering grasp check fails: bilateral contact lasts 0.4667 s without sustained lift. Joint offset 4 (the fifth arm joint) reaches 2.6393 rad/s against a 2.61 limit, and required braking conflicts with acceleration/jerk bounds. Safety stops the worker with exit 1; limits are retained.
+
+Independent raw HDF5 rereading confirms all 15 core arrays exactly match the previous fresh60 failure. The same guarded-startup history58/59/60 reference instead reproduces all original arrays and successful attempt60 (319 frames). First native ball velocity diverges at row 1: fresh minus history is approximately (0.004831869, 0, -0.000151388) m/s. Initial recorded state matches. Thus the scene-load barrier alone does not explain recovery; worker history/reset has an observed effect on initial physical evolution in this bounded comparison. No unique hidden solver/force/cache mechanism has been isolated.
+
+Fresh startup records four pre-recording wind calls versus three for history60. The extra observed call has x-force 0.67059 N. Equal clock readings and API call counts do not establish an extra applied impulse. Next proposed work is a bounded episode-initialization investigation of this difference, with controller and safety limits frozen. No new simulation or rendering was launched by the agent.
+
+The analysis now reports `comparison_evaluable=true` separately from `complete=false`, `worker_exit=1` and grasp failure. A saved safety abort remains valid startup-comparison evidence; it is not successful execution. The old report is preserved locally. 23 focused CPU regressions pass, including aborted, failed-startup and malformed-evidence cases. [Source-hashed summary](../../results/summaries/2026-10-30-matched-fresh60.json).
+
 ## Matched fresh control unavailable; startup resource shortage measured
 
 Fresh60 run `20261030_000853_155886_fresh60` repeats the same Omniverse Client mutex abort during the first guarded update, before any attempt. The loading barrier has not reliably fixed startup. No new grasp result exists; the earlier exact three-episode history reproduction stands.

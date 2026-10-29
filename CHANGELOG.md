@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-30 — Matched fresh control measures a history/reset contrast
+
+- Fresh60 starts without native abort, then stops safely at 169 recorded frames. All 15 core arrays match the prior fresh failure; guarded history60 instead matches original successful319-frame recording. Ball velocity differs at the first native physics step despite matching initial recorded state. No unique force/cache mechanism or general crash fix is established.
+- Separate evaluable comparison evidence from worker completion and physical grasp success. Preserve original report and worker exit1; no simulator/controller/physics changes. 23 focused CPU regressions pass. No new simulation or rendering by agent.
+
 ## 2026-10-30 — Watch resources recover after editor reload
 
 - Verify the old large watcher exits, summed watch references fall to 581, and the independent allocation probe passes 512/512. CPU-only USD load opens the task normally with zero watch errors.

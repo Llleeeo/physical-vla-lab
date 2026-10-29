@@ -25,3 +25,7 @@ data/derived/hf_pilot_render_repo/.venv/bin/python \
 ```
 
 No `--run` means no simulation is launched. This check now passes `INOTIFY_PREFLIGHT`, `CPU_PREFLIGHT_OK` and the exact collector/history gate. The next step is the same matched-control command with `--run`; keep rendering disabled. A successful CPU load does not establish native simulator stability. The previous history reproduction remains valid. New startup warnings and comparison results must be retained. [Hashed observations](../../results/summaries/2026-10-30-inotify-resource-shortage.json).
+
+## Full retest observed
+
+User run `20261030_003531_182273_fresh60` passes resource and stage-load gates and reaches 169 recorded control frames without native client abort. It then stops on motion safety, reproducing the old fresh failure exactly; see [matched-control result](WORKER_HISTORY_DIAGNOSTIC.md#matched-fresh60-result-history-contrast-persists). Resource recovery is verified, but one launch does not establish a general native-crash fix or unique causal mechanism.
