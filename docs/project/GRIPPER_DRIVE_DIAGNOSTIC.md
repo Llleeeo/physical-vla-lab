@@ -82,3 +82,13 @@ One attempt, no rendering/retries; typical recent runs suggest about1–2minutes
 Inspect `GRIPPER_GAIN_CONTROL verified=... grasp=...`. Verification means the gain intervention was actually observed; it does not imply successful grasp. An early failure can still establish intervention validity if native readbacks/persistence are available. If it succeeds, deterministic initialization and mimic-consistent modeling still require a separate decision before training eligibility or new collection.
 
 Preparation:314 portable CPU checks, SDK Python3.10 parsing, actual scene/hash preflight, exact unchanged collector assembly, default-entry isolation and per-case dependency pins. Physical efficacy pending. Original RoboPhys, frozen bundles and raw data were preserved. Roll back by omitting `--restore-gripper-gains`; the new module/worker and opt-in runner branch can be reverted independently of earlier diagnostics.
+
+## Gain-reapplication result 30 October
+
+The user-run fresh60 control now passes: `GRIPPER_GAIN_CONTROL verified=true grasp=pass`; both force/gain audits verify. It completes319intervals and957physics callbacks with no safety abort. Independent grasp evidence gives2.483s bilateral contact and at least60.349mm final lift, without assistance.
+
+The saved report is independently checked against original raw data: all15 complete core arrays, plus all958 native ball transform/velocity samples match exactly. Recomputed contact/lift checks equal the reported checks. The omission-only190frame failure remains preserved. Conditional on the existing omission, the measured gain reapplication restores original expert motion for this exposed case.
+
+This is not a learned VLA result, a held-out reliability estimate, or certification of both active finger drives alongside mimic coupling. The native internal overwrite cause remains inferred. Before any29D surrogate run, explicitly port the verified initialization into its entry point: copied configuration fields alone do not execute hooks. No further GPU work or rendering was launched for this analysis.
+
+[Result and provenance](../../results/summaries/2026-10-30-gripper-gain-reapplication-result.json).

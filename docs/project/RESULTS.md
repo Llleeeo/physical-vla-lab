@@ -2,6 +2,18 @@
 
 Snapshot: **2026-10-30, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Fresh expert grasp restored after measured gain reapplication
+
+User run `20261030_022121_219398_fresh60_omit1_gains` completes319control intervals/957native callbacks safely. The single setup-force omission and post-setup finger-gain reapplication both verify; gains persist at the recorded checks. Independent grasp passes:2.483s continuous bilateral contact, at least60.349mm final lift,0.321mm relative-position jitter and no grasp assistance.
+
+A separate read-only recomputation verifies the saved raw hashes, original source/dependency hashes, all15 full core arrays, and **all958 native ball transform/velocity rows** against original successful attempt60. These match exactly. Contact/lift evidence is recomputed directly from HDF5 and equals the saved report. This is stronger than equal initial conditions or a visual impression.
+
+The previous omission-only fresh60 control fails after190frames; adding the measured warm gain reapplication restores original success under the retained omission. This supports a causal contribution from the measured gain mismatch in this exposed case. It does not identify the exact internal native overwrite mechanism, establish a cohort success rate, certify dual active gains with mimic coupling, or evaluate a learned policy. Official benchmark success remains unverified; independent engineering criteria pass. Modified-force provenance and training exclusion remain explicit.
+
+**Next:** carry these initialization conditions explicitly into the frozen29D surrogate, then test this same exposed episode without online skill decisions. The existing `--teacher-run` preparation can inherit diagnostic fields into its plan, but its standard packet entry does not install the history/force/gain hooks. Do not assume those fields execute or run an unmatched comparison. Avoid more collection/training until this interface check is meaningful.
+
+[Source-hashed measured result](../../results/summaries/2026-10-30-gripper-gain-reapplication-result.json). No new GPU/render run or runtime code change by agent in this result milestone.
+
 ## Observed native gripper initialization mismatch
 
 The passive drive pair completes with `comparison_ready=true`. Independent rechecks confirm15 original core arrays for all three history episodes, and15 exact arrays against the previous fresh-omission failure. Target history60 succeeds; fresh60+omit1 still aborts at190recorded frames. The observer did not change these known arrays.

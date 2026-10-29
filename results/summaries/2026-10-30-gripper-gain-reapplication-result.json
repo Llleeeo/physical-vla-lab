@@ -1,0 +1,142 @@
+{
+  "schema": "physical-vla-lab.gripper-gain-result.v1",
+  "date": "2026-10-30",
+  "run_id": "20261030_022121_219398_fresh60_omit1_gains",
+  "condition": "fresh60_omit1_post_usd_gripper_gain_reapplication",
+  "completed": true,
+  "worker_exit": 0,
+  "recorded_frames": 319,
+  "completed_intervals": 319,
+  "physics_callbacks": 957,
+  "original_core_arrays_exact": {
+    "actions": true,
+    "timestamp": true,
+    "is_first": true,
+    "is_last": true,
+    "is_terminal": true,
+    "obs/ee_pos": true,
+    "obs/ee_quat": true,
+    "obs/ee_vel": true,
+    "obs/finger_segment_world": true,
+    "obs/joint_pos": true,
+    "obs/joint_vel": true,
+    "obs/object_ang_vel": true,
+    "obs/object_pos": true,
+    "obs/object_quat": true,
+    "obs/object_vel": true
+  },
+  "native_ball_comparison": {
+    "get_transforms": {
+      "rows": 958,
+      "all_target_rows_exact": true
+    },
+    "get_velocities": {
+      "rows": 958,
+      "all_target_rows_exact": true
+    }
+  },
+  "setup_force_intervention": {
+    "requested": true,
+    "verified": true,
+    "reason": "single_omission_verified",
+    "audit_sha256": "e9e98505c769550e1bc5f86bedcdacdd4f36200fdc1da225f9f47cadfb58f1f1",
+    "modified_forcing_history": true,
+    "native_forcing_is_unmodified": false,
+    "training_eligible": false
+  },
+  "gripper_gain_intervention": {
+    "verified": true,
+    "applied": 1,
+    "checked_frames": [
+      1,
+      150,
+      153,
+      154,
+      155,
+      156,
+      160,
+      166,
+      167,
+      170,
+      173
+    ],
+    "error": null,
+    "reason": "native_reapplication_measured",
+    "close_observed": true,
+    "first_close_frame": 154,
+    "mimic_coupling_retained": true,
+    "training_eligible": false,
+    "production_fix_verified": false
+  },
+  "independent_grasp": {
+    "schema": "capstone_grasp_evidence_v1",
+    "status": "pass",
+    "official_benchmark_success": null,
+    "criteria": {
+      "minimum_bilateral_duration_s": 0.25,
+      "final_hold_duration_s": 0.25,
+      "minimum_lift_m": 0.05,
+      "maximum_relative_position_jitter_m": 0.02,
+      "minimum_precontact_speed_m_s": 0.05,
+      "motion_requirement": "linear",
+      "minimum_precontact_angular_speed_rad_s": 0.1,
+      "maximum_final_relative_spin_rad_s": 0.5,
+      "require_lift": true
+    },
+    "checks": {
+      "continuous_bilateral_contact": true,
+      "final_bilateral_hold": true,
+      "sustained_lift": true,
+      "relative_position_retention": true,
+      "bilateral_nonzero_impulses": true,
+      "object_moving_before_first_contact": true,
+      "no_grasp_assistance": true
+    },
+    "measurements": {
+      "frames": 319,
+      "sample_hz": 60.00000000000021,
+      "bilateral_frames": 149,
+      "longest_bilateral_duration_s": 2.4833333333333245,
+      "first_contact_frame": 166,
+      "first_bilateral_frame": 170,
+      "minimum_final_lift_from_first_bilateral_m": 0.06034884974360466,
+      "final_relative_position_jitter_m": 0.00032081374038223705,
+      "object_speed_before_first_contact_m_s": 0.16611747443675995,
+      "object_angular_speed_before_first_contact_rad_s": null,
+      "final_relative_spin_p95_rad_s": null
+    },
+    "scope": "independent engineering check on recorded states; not full geometry/physics-generalization certification"
+  },
+  "upper_capture_verified": true,
+  "upper_call_count": 304,
+  "interpretation": "Given the existing single setup-force omission, one post-setup native finger-gain reapplication restores this exposed fresh60 episode to exact original full core motion and full native ball state. Supports a causal contribution of the observed gain mismatch for this case. Native internal overwrite mechanism and general production initialization are not established.",
+  "next": "Carry verified initialization explicitly into the frozen29D surrogate path, then recheck the same exposed episode without online skill decisions. Do not silently inherit inactive hooks in a plan.",
+  "limitations": [
+    "One exposed seed/episode, not a cohort success rate or held-out generalization.",
+    "Both measured warm finger gains remain active with original mimic coupling; no production gripper-model certification.",
+    "Two intentional startup changes relative to unmodified fresh baseline; omission alone failed and omission plus gain reapplication succeeds.",
+    "No learned policy, model training, real-robot execution or official benchmark success verification."
+  ],
+  "training_eligible": false,
+  "learned_policy_evaluated": false,
+  "rendering_requested": false,
+  "new_gpu_by_agent": false,
+  "source_hashes": {
+    "data/derived/hgwind_history_diagnostics/20261030_022121_219398_fresh60_omit1_gains/plan.json": "235a3bd16045fa26bb825b5d97abf29cedbf847eb2f054fc42c905fabf86e6d3",
+    "data/derived/hgwind_history_diagnostics/20261030_022121_219398_fresh60_omit1_gains/report.json": "7b8a9b7c67260f86a13583692fe769cb0f1bb728bf8a1037e40bf335219f8889",
+    "data/derived/hgwind_history_diagnostics/20261030_022121_219398_fresh60_omit1_gains/gripper_gain_control.json": "f8d3e8484bdd3dc6b7b5545fd64c5ff8b646844b16586f88a4e6e18ea7288e8a",
+    "data/derived/hgwind_history_diagnostics/20261030_022121_219398_fresh60_omit1_gains/setup_force_control_audit.json": "e9e98505c769550e1bc5f86bedcdacdd4f36200fdc1da225f9f47cadfb58f1f1",
+    "data/derived/hgwind_history_diagnostics/20261030_022121_219398_fresh60_omit1_gains/simulation.log": "58ff5a1dd31546eb182562dd0e1fecdcb6f5226cca7ec89a4f30658f9dc7a781",
+    "data/derived/hgwind_history_diagnostics/20261030_022121_219398_fresh60_omit1_gains/attempt_00060/plan.json": "c4e616e1810077e5c1be0b8e71326eb25c1c1be201d7e51442c106e46ab0b337",
+    "data/derived/hgwind_history_diagnostics/20261030_022121_219398_fresh60_omit1_gains/attempt_00060/report.json": "12cdc9c205874916871f1071f7bd162dc7eb36b66d51b576704472ca3deeb58d",
+    "data/derived/hgwind_history_diagnostics/20261030_022121_219398_fresh60_omit1_gains/attempt_00060/gripper_drive_trace.jsonl": "13f4447385538c81e949a1b9c9b0cc287c9513623041da3c4cd2172fb6df0090",
+    "data/derived/hgwind_history_diagnostics/20261030_022121_219398_fresh60_omit1_gains/attempt_00060/startup_force_calls.jsonl": "0faad327dc47d65057dc3c46bbe789cedd08f40541ae7e60b0a6044402d5eb45",
+    "data/derived/hgwind_history_diagnostics/20261030_022121_219398_fresh60_omit1_gains/attempt_00060/cartesian_target_inputs.json": "c2f351b9804727634e0307a45956c822d4ca73b3b7b686bdcc45a3e605eb50f2",
+    "data/derived/hgwind_history_diagnostics/20261030_022121_219398_fresh60_omit1_gains/attempt_00060/command_diagnostics.npz": "c2ea697b7429b54f927fb81b9150fbcb7bfcb2b846a26d7ff42169caae54c4c9",
+    "data/derived/hgwind_history_diagnostics/20261030_022121_219398_fresh60_omit1_gains/attempt_00060/worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/traj_00000/meta.json": "ad8a19079360386ae6d9a21bf16fb2aaaca495d49528f558303161b6ca2a2401",
+    "data/derived/hgwind_history_diagnostics/20261030_022121_219398_fresh60_omit1_gains/attempt_00060/worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/traj_00000/replay.hdf5": "546f01e610d76df1486f207a48aeeda1dd2ed020c4297313eea5150108275308",
+    "data/collected/hgwind_overnight_20261027_230043/local/Trajectory/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/traj_00001/replay.hdf5": "6cfb3d8f57b5886954b2ef4fac35632a593e19572a14c83c1dbe3a5851d1982b"
+  },
+  "verification_analysis_sha256": "39a64dbfade93ce21e4b706d11d56ba58d7f981bd5f349c579a761eb8a50216e",
+  "verification_script_sha256": "793715d9d2c2e29e55389f0f77d38666cadec387be88381c7d486d3f91e4d21a"
+}

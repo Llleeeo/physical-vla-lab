@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-30 — Fresh expert grasp restored exactly
+
+- User run with verified setup-force omission plus one post-setup native finger-gain reapplication completes319 intervals/957 physics callbacks safely and passes independent grasp. Independently recomputed all15 core arrays and all958 native ball transform/velocity rows match original success exactly; bilateral contact2.483s, final lift at least60.349mm, no assistance.
+- This supports a causal contribution of the measured gain mismatch in one exposed case. No general initialization fix, production mimic certification, learned-policy result or official benchmark success claim. Next carry initialization explicitly into29D surrogate execution; existing standard packet entry does not install these diagnostic hooks. Analysis/docs only; no new GPU/render by agent.
+
 ## 2026-10-30 — Actual gripper gain mismatch measured
 
 - Verify passive pair and recheck all original history/fresh control arrays. First episode reports requested10500/140 gains but native readback remains10000/1000 and0/0; later history episodes retain10500/140 on both fingers. Closure caps match70N/0.05m/s. No corrected grasp result yet.
