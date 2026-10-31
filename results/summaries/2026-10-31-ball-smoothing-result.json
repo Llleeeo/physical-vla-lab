@@ -1,0 +1,167 @@
+{
+  "scope": "Single exposed fixed-model command diagnostic; no live inference or held-out evaluation",
+  "alpha": 0.25,
+  "cases": {
+    "raw": {
+      "completed_frames": 269,
+      "physics_callbacks": 807,
+      "runtime_safety_passed": true,
+      "command_to_measured_pinch_error_mm": {
+        "mean": 78.64896549249944,
+        "p95": 309.945673749923
+      },
+      "gripper_transition_frames": [
+        108,
+        109,
+        112,
+        120,
+        123,
+        124,
+        126
+      ],
+      "finger_contact_frames": {
+        "left": [],
+        "right": [
+          120,
+          122,
+          123,
+          126
+        ]
+      },
+      "independent_grasp": {
+        "schema": "capstone_grasp_evidence_v1",
+        "status": "fail",
+        "official_benchmark_success": null,
+        "criteria": {
+          "minimum_bilateral_duration_s": 0.25,
+          "final_hold_duration_s": 0.25,
+          "minimum_lift_m": 0.05,
+          "maximum_relative_position_jitter_m": 0.02,
+          "minimum_precontact_speed_m_s": 0.05,
+          "motion_requirement": "linear",
+          "minimum_precontact_angular_speed_rad_s": 0.1,
+          "maximum_final_relative_spin_rad_s": 0.5,
+          "require_lift": true
+        },
+        "checks": {
+          "continuous_bilateral_contact": false,
+          "final_bilateral_hold": false,
+          "sustained_lift": false,
+          "relative_position_retention": true,
+          "bilateral_nonzero_impulses": false,
+          "object_moving_before_first_contact": true,
+          "no_grasp_assistance": true
+        },
+        "measurements": {
+          "frames": 269,
+          "sample_hz": 60.00000000000021,
+          "bilateral_frames": 0,
+          "longest_bilateral_duration_s": 0.0,
+          "first_contact_frame": 120,
+          "first_bilateral_frame": null,
+          "minimum_final_lift_from_first_bilateral_m": null,
+          "final_relative_position_jitter_m": 0.01262256825111255,
+          "object_speed_before_first_contact_m_s": 0.16698041558265686,
+          "object_angular_speed_before_first_contact_rad_s": null,
+          "final_relative_spin_p95_rad_s": null
+        },
+        "scope": "independent engineering check on recorded states; not full geometry/physics-generalization certification"
+      }
+    },
+    "smooth": {
+      "completed_frames": 269,
+      "physics_callbacks": 807,
+      "runtime_safety_passed": true,
+      "command_to_measured_pinch_error_mm": {
+        "mean": 70.68631499085764,
+        "p95": 296.64761033859827
+      },
+      "gripper_transition_frames": [
+        108,
+        109,
+        112,
+        120,
+        123,
+        124,
+        126
+      ],
+      "finger_contact_frames": {
+        "left": [],
+        "right": [
+          97
+        ]
+      },
+      "independent_grasp": {
+        "schema": "capstone_grasp_evidence_v1",
+        "status": "fail",
+        "official_benchmark_success": null,
+        "criteria": {
+          "minimum_bilateral_duration_s": 0.25,
+          "final_hold_duration_s": 0.25,
+          "minimum_lift_m": 0.05,
+          "maximum_relative_position_jitter_m": 0.02,
+          "minimum_precontact_speed_m_s": 0.05,
+          "motion_requirement": "linear",
+          "minimum_precontact_angular_speed_rad_s": 0.1,
+          "maximum_final_relative_spin_rad_s": 0.5,
+          "require_lift": true
+        },
+        "checks": {
+          "continuous_bilateral_contact": false,
+          "final_bilateral_hold": false,
+          "sustained_lift": false,
+          "relative_position_retention": true,
+          "bilateral_nonzero_impulses": false,
+          "object_moving_before_first_contact": true,
+          "no_grasp_assistance": true
+        },
+        "measurements": {
+          "frames": 269,
+          "sample_hz": 60.00000000000021,
+          "bilateral_frames": 0,
+          "longest_bilateral_duration_s": 0.0,
+          "first_contact_frame": 97,
+          "first_bilateral_frame": null,
+          "minimum_final_lift_from_first_bilateral_m": null,
+          "final_relative_position_jitter_m": 0.012805280039911307,
+          "object_speed_before_first_contact_m_s": 0.1680244505405426,
+          "object_angular_speed_before_first_contact_rad_s": null,
+          "final_relative_spin_p95_rad_s": null
+        },
+        "scope": "independent engineering check on recorded states; not full geometry/physics-generalization certification"
+      }
+    }
+  },
+  "pair_initial_max_abs_differences": {
+    "joint_pos": 0.0,
+    "joint_vel": 0.0,
+    "object_pos": 0.0,
+    "object_quat": 0.0,
+    "object_vel": 0.0,
+    "object_ang_vel": 0.0
+  },
+  "raw_vs_original_first120_max_abs_differences": {
+    "joint_pos": 0.0,
+    "joint_vel": 0.0,
+    "object_pos": 0.0,
+    "object_quat": 0.0,
+    "object_vel": 0.0,
+    "object_ang_vel": 0.0
+  },
+  "original_prefix_reproduced": true,
+  "comparison_evaluable": true,
+  "conclusion": "XYZ-only smoothing did not repair grasp and advanced first finger contact by23 frames (0.3833s). Do not promote alpha0.25. This does not establish that every smoothing method fails or isolate the remaining cause.",
+  "limitations": "Initial equality does not prove full simulator determinism. If raw prefix differs from original, do not claim reproduction of the original failure. Position-only smoothing leaves velocity/acceleration feedforward and gripper unchanged; failure cannot rule out their contributions.",
+  "next_step": "Inspect pre-impact position, orientation and feedforward requests together against the successful training demonstration before selecting another bounded intervention. No new GPU job prepared or launched.",
+  "source_sha256": {
+    "data/derived/hgwind_smoothing_checks/20261031_142217_528773/comparison.json": "b8b66a61bcb91f7d68f09cd827a00189fd64c5ef83ac885968bd99b8ee3e27b3",
+    "data/derived/hgwind_smoothing_checks/20261031_142217_528773/manifest.json": "60315a5c5e2b3d74417b232f0155477106c9956b85f797a1bd7b72e1a883b5e3",
+    "data/derived/hgwind_smoothing_checks/20261031_142217_528773/recorded_actions.npz": "74ad7c8df18a24c9de85f47e4c67da75b0d9f058358109ea0f0fea6e14b33aa7",
+    "data/derived/hgwind_smoothing_checks/20261031_142217_528773/raw/report.json": "295901d1ddccafffbd8b193e1ad70830adb0fb83e36d7d1d8d2164906d24b7f9",
+    "data/derived/hgwind_smoothing_checks/20261031_142217_528773/raw/run_config.json": "2f0afd1796efa5ee7e1aee9e924d45be6751866e151111f7eba2fd2dea0b6e8e",
+    "data/derived/hgwind_smoothing_checks/20261031_142217_528773/raw/video_review/manifest.json": "394e7a107b7acd36f838a36df51676f42a2ac23daf6cab7173bd6d2829b02e19",
+    "data/derived/hgwind_smoothing_checks/20261031_142217_528773/smooth/report.json": "724954a6ce0883bd1078e48074d7d2e2780ec336394c62622fb76536f0b48da7",
+    "data/derived/hgwind_smoothing_checks/20261031_142217_528773/smooth/run_config.json": "6270192a9183bd54553f80107983cf3cdfef7e7111a5e5cf0eaecb84f6e094b9",
+    "data/derived/hgwind_smoothing_checks/20261031_142217_528773/smooth/video_review/manifest.json": "80f1ab92148e29eff1e84318fdafe33effd334fc2034be4ca4e3c58bc1dcf15a"
+  }
+}

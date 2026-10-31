@@ -1,5 +1,14 @@
 # Results and limitations
 
+## 31 October 2026 — Position smoothing advances premature contact
+
+The user-run pair `20261031_142217_528773` completed both269-interval/807-callback episodes with unchanged native safety checks. Both fail independent grasp verification and have zero bilateral contact. Raw commands first contact the ball with the right finger at frame120 (2.000s); XYZ-smoothed commands first contact at97 (1.617s), 23frames/0.383s earlier. Jaw commands are identical, with seven transitions; both first contacts precede a requested sustained closure. The alpha0.25 position filter is not promoted.
+
+All six compared initial state arrays are identical between cases. Raw execution reproduces the original first120frames exactly in joint position/velocity and object position/quaternion/linear/angular velocity. This makes the fixed-stream comparison more interpretable than the earlier live height intervention. It remains one exposed command-reexecution case, not live-policy evaluation or a success-rate study. Position filtering changes timing/path while velocity and acceleration feedforward remain unchanged; these observations do not isolate which remaining prediction error causes collision or rule out every smoothing method.
+
+Source-hashed evidence: `results/summaries/2026-10-31-ball-smoothing-result.json`. Both slow-motion MP4 files contain269 checked frames. Next inspect pre-impact position, orientation and feedforward against the successful demonstration before choosing another intervention; default runtime and training remain unchanged.
+
+
 ## 31 October 2026 — Early contact and fixed-command smoothing diagnostic
 
 The recorded-height intervention completed 269 intervals / 807 physics callbacks without a safety abort, but failed grasp verification. First right-finger contact occurred at frame120, before the height intervention138..179. No bilateral contact occurred. Its initial state/camera poses matched the previous refined run, but initial RGB and first model output differed. Consequently this comparison cannot attribute the changed contact outcome to height substitution. See `results/summaries/2026-10-31-ball-height-diagnostic-result.json`.

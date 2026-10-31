@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Smoothing comparison completed, no grasp improvement
+
+- Verify both269-frame episodes, native safety, contact evidence and269-frame videos against saved hashes.
+- Confirm exact paired initial states and raw reproduction of the original first120frames.
+- Record earlier contact under XYZ smoothing (97 versus120), zero bilateral contact in either case, and reject default adoption. No runtime or training change.
+
 ## 2026-10-31 — Fixed-model command smoothing diagnostic prepared
 
 - Record failed height intervention and pre-intervention RGB/action confound; no causal height claim.

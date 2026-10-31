@@ -1,5 +1,9 @@
 # Research roadmap
 
+## Latest outcome — 31 October 2026, smoothing rejected
+
+The fixed-command pair completed; XYZ smoothing caused earlier single-finger contact (97 versus120) and no grasp. Do not promote alpha0.25. Inspect pre-impact position/orientation/feedforward together before selecting another intervention. Initial states match and raw first120frames reproduce the source exactly. Earlier pending-experiment entries below are historical.
+
 ## Latest decision — 31 October 2026, command continuity
 
 Height intervention failed and was confounded by differences before intervention. Prioritize the [fixed-command smoothing diagnostic](BALL_SMOOTHING_DIAGNOSTIC.md): raw versus XYZ-only causal filter, identical saved model responses and native limits. Physical result pending. Check lag as well as premature contact; do not assume smoother goals guarantee successful or responsive grasp. The historical priority text below describes preceding experiments.
