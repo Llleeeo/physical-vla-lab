@@ -2,6 +2,22 @@
 
 Snapshot: **2026-10-31, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Input sensitivity result and optional render-protocol control
+
+All 32 predictions completed, and the all-live 20-action chunks match saved execution responses exactly at eight anchors. Across their first four actions, image-only replacement changes predicted target position by 19.28 mm on average (max 43.31 mm); state-only replacement changes it by 6.30 mm (max 11.96 mm). These are input sensitivities, not additive causal failure contributions. At frame 0 states match exactly; replacing only images changes the first target by 18.50 mm. At later anchors the hybrid inputs can be inconsistent. Even teacher images/state retain first target errors 403.28 mm at 0,143.85 mm at 8 and95.27 mm at 40, so image consistency alone is not an established cure.
+
+**Reporting correction:** one field ending `_mm` in the original input-probe report accidentally contained metres. The original report and prediction arrays are retained. `verified_input_metrics.json` recomputes the correct units directly from those arrays, and the diagnostic now multiplies by 1000. Existing first-target-error metrics were already correct. A 3-4-5 mm regression checks conversion. [Verified summary](../../results/summaries/2026-10-31-ball-input-sensitivity.json).
+
+Code inspection finds an additional concrete mismatch: the formal recorder resets DLAA history around each four-subframe capture; the original live helper renders once before capture and does not reset that history. The opt-in `formal-temporal` boundary removes the extra prerender, brackets capture with the same history-reset key, and applies only the two renderer intensity clamps saved with this training scene. It does not treat probe ISO as exposure, load saved images, change model weights, use object state, alter scene physics or relax safety. It leaves the native timeline running while requiring zero simulation-time advancement. Camera images are still measured live. Exact appearance matching and improved grasp remain unverified; this combines the formal capture boundary components, not a reset-only causal ablation.
+
+```bash
+data/derived/hf_pilot_render_repo/.venv/bin/python \
+  scripts/run_hgwind_closed_loop.py --run --frames 8 \
+  --camera-protocol formal-temporal
+```
+
+The original `legacy` mode remains the default and rollback option. Eight frames test the new capture boundary and matched initial-frame input/output differences, not grasp. Tests: 23 focused CPU checks pass, including zero-time/reset cleanup, invalid calibration rejection and corrected units; the actual scene/model-input CPU preflight passes without CUDA. GPU runtime result pending.
+
 ## Full live ball rollout: integration passes, grasp fails
 
 The user-run eight-frame integration and subsequent full 269-frame rollout both pass the live-chain audit. The full run completes 807 physics callbacks with matching initial conditions and unchanged native safety checks. **The learned grasp fails**: zero bilateral-contact frames, no retained lift. This is one exposed training case, synchronous simulation, not held-out or real-time evaluation.

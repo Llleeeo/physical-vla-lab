@@ -18,6 +18,10 @@ DEFAULT = ROOT/'data/derived/hgwind_traj18_development_20261031/training_runs/20
 FRAMES = [0, 8, 20, 40, 60, 80, 100, 104]
 
 
+def position_change_mm(a, b):
+    return np.linalg.norm(np.asarray(a)-np.asarray(b), axis=-1)*1000.
+
+
 def transitions(values):
     return (np.flatnonzero(np.diff(np.asarray(values) >= .5))+1).tolist()
 
@@ -143,7 +147,7 @@ def model_probe(run, cfg, meta, arrays, out):
             base = samples['teacher_images_teacher_state']
             for row in rows[-4:]:
                 a = samples[row['condition']]
-                row['first_four_target_position_difference_from_teacher_input_mm'] = np.linalg.norm(a[:4,:3]-base[:4,:3],axis=1).tolist()
+                row['first_four_target_position_difference_from_teacher_input_mm'] = position_change_mm(a[:4,:3],base[:4,:3]).tolist()
             print(f'INPUT_PROBE frame={frame} conditions=4 saved_live_response=matched', flush=True)
     np.savez(out/'input_probe_chunks.npz', chunks=np.stack(predictions), frames=np.repeat(FRAMES,4))
     return dict(conditions=4, anchors=FRAMES, rows=rows,
@@ -152,10 +156,49 @@ def model_probe(run, cfg, meta, arrays, out):
         checkpoint_hashes=cfg['checkpoint_hashes'])
 
 
+
+def summarize_saved_probe(directory):
+    """Recompute units from immutable chunks without rerunning model inference."""
+    directory=Path(directory).resolve();run=directory.parents[1]
+    report=json.loads((directory/'report.json').read_text())
+    cfg=json.loads((run/'run_config.json').read_text())
+    assert report['model_probe_executed'] and report['input_probe']['anchors']==FRAMES
+    with np.load(directory/'input_probe_chunks.npz',allow_pickle=False) as saved:
+        chunks=saved['chunks'].copy();np.testing.assert_array_equal(saved['frames'],np.repeat(FRAMES,4))
+    assert chunks.shape==(32,20,29) and np.isfinite(chunks).all()
+    values=chunks.reshape(8,4,20,29);conditions=['teacher_images_teacher_state','live_images_teacher_state','teacher_images_live_state','live_images_live_state']
+    rows=[]
+    for i,frame in enumerate(FRAMES):
+        with np.load(run/'ipc'/f'response_{frame:06d}.npz') as saved:
+            np.testing.assert_allclose(values[i,3],saved['absolute'],rtol=1e-4,atol=1e-5)
+        for j,condition in enumerate(conditions):
+            old=report['input_probe']['rows'][4*i+j]
+            assert old['frame']==frame and old['condition']==condition
+            row=dict(old)
+            row['first_four_target_position_difference_from_teacher_input_mm']=position_change_mm(values[i,j,:4,:3],values[i,0,:4,:3]).tolist()
+            rows.append(row)
+    def stats(j):
+        changes=position_change_mm(values[:,j,:4,:3],values[:,0,:4,:3])
+        return dict(mean_mm=float(changes.mean()),max_mm=float(changes.max()),count=int(changes.size))
+    result=dict(schema='physical-vla-lab.ball-input-probe-verified.v1',anchors=FRAMES,rows=rows,
+        image_only_change=stats(1),state_only_change=stats(2),combined_change=stats(3),
+        saved_live_responses_matched=True,grasp_success=False,heldout_evaluation=False,
+        units_correction='Original report difference field named mm contained metres; recomputed here from saved arrays in millimetres. Original report retained. Other target-error fields were already mm.',
+        limits=report['limits'],source_sha256={str(path):sha256(path) for path in [directory/'report.json',directory/'input_probe_chunks.npz',run/'run_config.json',Path(__file__)]})
+    (directory/'verified_input_metrics.json').write_text(json.dumps(result,indent=2,allow_nan=False)+'\n')
+    print('SAVED_INPUT_METRICS_VERIFIED '+json.dumps({k:result[k] for k in ['image_only_change','state_only_change','combined_change']}),flush=True)
+    return result
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--live-run',type=Path,default=DEFAULT);p.add_argument('--run',action='store_true',help='Run GPU input sensitivity inference; no simulation/training')
-    a=p.parse_args();run=a.live_run.resolve()
+    p.add_argument('--summarize-probe',type=Path,help='Recompute a completed probe from saved arrays on CPU')
+    a=p.parse_args()
+    if a.summarize_probe:
+        if a.run:p.error('--summarize-probe cannot launch inference')
+        summarize_saved_probe(a.summarize_probe);return
+    run=a.live_run.resolve()
     result, plot, cfg, meta, arrays=inspect(run)
     out=run/'failure_diagnostics'/datetime.now(ZoneInfo('Asia/Hong_Kong')).strftime('%Y%m%d_%H%M%S_%f')
     out.mkdir(parents=True,exist_ok=False)

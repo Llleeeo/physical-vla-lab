@@ -29,10 +29,19 @@ class LiveExecutor(PacketStreamExecutor):
         from camera.config import config_digest
         require(config_digest()==self.config['camera_config_digest'], 'Live/training camera profile mismatch')
         self.camera=LiveRGB(stage,sim,robot,publish_gui_physics_state)
+        protocol=self.config.get('camera_protocol','legacy')
+        require(protocol in ('legacy','formal-temporal'), 'Unknown camera protocol')
+        if protocol=='formal-temporal':
+            import carb
+            from .ball_camera_protocol import formal_capture,validated_clamps
+            calibration=self.config['camera_render_calibration']
+            validated_clamps(calibration)
+            self.camera.render_boundary=lambda rep,quality: formal_capture(rep,quality,carb.settings.get_settings(),calibration)
         self.archive=h5py.File(self.root/'live_observations.hdf5','x')
         self.archive.attrs.update(schema='physical-vla-lab.ball-live-observations.v1',
             timing='pre-action RGB/state; synchronous pause during inference',complete=False,
-            camera_records_json=json.dumps(self.camera.records),camera_pose_order_json=json.dumps(self.camera_order))
+            camera_records_json=json.dumps(self.camera.records),camera_pose_order_json=json.dumps(self.camera_order),
+            camera_protocol=protocol,camera_render_calibration_json=json.dumps(self.config.get('camera_render_calibration')))
         for name in CAMERAS:
             self.archive.create_dataset(name,shape=(0,480,640,3),maxshape=(None,480,640,3),
                 dtype='u1',compression='gzip',compression_opts=1,chunks=(1,480,640,3))

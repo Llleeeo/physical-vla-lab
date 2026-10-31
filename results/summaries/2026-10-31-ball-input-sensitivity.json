@@ -1,0 +1,127 @@
+{
+  "schema": "physical-vla-lab.ball-input-probe-verified.v1",
+  "anchors": [
+    0,
+    8,
+    20,
+    40,
+    60,
+    80,
+    100,
+    104
+  ],
+  "image_only_change": {
+    "mean_mm": 19.277082443237305,
+    "max_mm": 43.31272888183594,
+    "count": 32
+  },
+  "state_only_change": {
+    "mean_mm": 6.2984161376953125,
+    "max_mm": 11.955842018127441,
+    "count": 32
+  },
+  "combined_change": {
+    "mean_mm": 24.42243003845215,
+    "max_mm": 51.728309631347656,
+    "count": 32
+  },
+  "saved_live_responses_matched": true,
+  "grasp_success": false,
+  "heldout_evaluation": false,
+  "units_correction": "Original report difference field named mm contained metres; recomputed here from saved arrays in millimetres. Original report retained. Other target-error fields were already mm.",
+  "limits": "Same-time expert comparisons after diverging states are descriptive, not oracle corrective actions. Hybrid image/state inputs are sensitivity probes and may be inconsistent; no causal success claim.",
+  "first_target_errors_mm": [
+    {
+      "frame": 0,
+      "condition": "teacher_images_teacher_state",
+      "first_target_position_difference_from_teacher_mm": 403.279572725296
+    },
+    {
+      "frame": 0,
+      "condition": "live_images_live_state",
+      "first_target_position_difference_from_teacher_mm": 409.2218279838562
+    },
+    {
+      "frame": 8,
+      "condition": "teacher_images_teacher_state",
+      "first_target_position_difference_from_teacher_mm": 143.8509225845337
+    },
+    {
+      "frame": 8,
+      "condition": "live_images_live_state",
+      "first_target_position_difference_from_teacher_mm": 146.24066650867462
+    },
+    {
+      "frame": 20,
+      "condition": "teacher_images_teacher_state",
+      "first_target_position_difference_from_teacher_mm": 200.79053938388824
+    },
+    {
+      "frame": 20,
+      "condition": "live_images_live_state",
+      "first_target_position_difference_from_teacher_mm": 182.4449896812439
+    },
+    {
+      "frame": 40,
+      "condition": "teacher_images_teacher_state",
+      "first_target_position_difference_from_teacher_mm": 95.26779502630234
+    },
+    {
+      "frame": 40,
+      "condition": "live_images_live_state",
+      "first_target_position_difference_from_teacher_mm": 112.30228841304779
+    },
+    {
+      "frame": 60,
+      "condition": "teacher_images_teacher_state",
+      "first_target_position_difference_from_teacher_mm": 29.467113316059113
+    },
+    {
+      "frame": 60,
+      "condition": "live_images_live_state",
+      "first_target_position_difference_from_teacher_mm": 30.968815088272095
+    },
+    {
+      "frame": 80,
+      "condition": "teacher_images_teacher_state",
+      "first_target_position_difference_from_teacher_mm": 65.69185853004456
+    },
+    {
+      "frame": 80,
+      "condition": "live_images_live_state",
+      "first_target_position_difference_from_teacher_mm": 105.76214641332626
+    },
+    {
+      "frame": 100,
+      "condition": "teacher_images_teacher_state",
+      "first_target_position_difference_from_teacher_mm": 45.03995552659035
+    },
+    {
+      "frame": 100,
+      "condition": "live_images_live_state",
+      "first_target_position_difference_from_teacher_mm": 66.13603979349136
+    },
+    {
+      "frame": 104,
+      "condition": "teacher_images_teacher_state",
+      "first_target_position_difference_from_teacher_mm": 8.419930934906006
+    },
+    {
+      "frame": 104,
+      "condition": "live_images_live_state",
+      "first_target_position_difference_from_teacher_mm": 25.385979562997818
+    }
+  ],
+  "evidence_sha256": {
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_121355_529372/closed_loop_runs/20261031_125333_149097/failure_diagnostics/20261031_130917_641130/report.json": "500d17bdea0adc9bbeb1a9a9ad13c58188d3d6fea895564f2ed2d15a0f285301",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_121355_529372/closed_loop_runs/20261031_125333_149097/failure_diagnostics/20261031_130917_641130/input_probe_chunks.npz": "1d0c6f42ec5a11d4bebd7792b53ad6fd8899afd914a0e4fbeb2354a40c0f9294",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_121355_529372/closed_loop_runs/20261031_125333_149097/failure_diagnostics/20261031_130917_641130/verified_input_metrics.json": "06a1abd9dfc69f58862b7254ae2481b252ac724b1fc1899c0d99b0040f5291ee"
+  },
+  "next_experiment": {
+    "camera_protocol": "formal-temporal",
+    "default": "legacy",
+    "physical_test_pending": true,
+    "training_and_control_unchanged": true,
+    "cpu_checks": 23
+  }
+}

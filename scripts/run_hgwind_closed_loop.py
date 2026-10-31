@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Bounded live ball policy; default CPU preflight, --run launches simulation."""
 import argparse
+import h5py
 from datetime import datetime
 import hashlib
 import json
@@ -25,7 +26,7 @@ TEACHER=ROOT/'data/derived/hgwind_effort_probes/20261029_220130_402255_joint_onl
 SURROGATE=ROOT/'data/derived/hgwind_action_contract_v1/20261029_220618_809794_traj_00018'
 
 
-def prepare(run,frames,prefix):
+def prepare(run,frames,prefix,camera_protocol="legacy"):
     require(2<=frames<=269 and prefix in (1,4),'Frames must be2..269, prefix1 or4')
     prior,_,_,_,lab=prepare_teacher(TEACHER)
     passed=json.loads((SURROGATE/'report.json').read_text())
@@ -51,6 +52,15 @@ def prepare(run,frames,prefix):
         pretrained_weights=str(ROOT/'data/models/dynamicvla_dom'/record['pretrained']['revision']/'model.safetensors'),
         checkpoint_hashes={str(p):sha256(p) for p in [checkpoint/'model.safetensors',checkpoint/'config.json',checkpoint/'capstone_normalization.json']},
         patch_sha256=hashlib.sha256(patch_collector(Path(prior['worker']).read_text()).encode()).hexdigest())
+    require(camera_protocol in ('legacy','formal-temporal'), 'Unknown camera protocol')
+    cfg['camera_protocol']=camera_protocol
+    if camera_protocol=='formal-temporal':
+        from capstone_vla.ball_camera_protocol import validated_clamps
+        with h5py.File(meta['images'],'r') as image:
+            calibration=json.loads(image.attrs['firefly_clamp_json'])
+            validated_clamps(calibration)
+        cfg['camera_render_calibration']=calibration
+        cfg['camera_render_calibration_source']=meta['images']
     # Freeze all native Python/config dependencies, without hashing binary assets again.
     manifest=Path(prior['bundle_manifest']);bundle=manifest.parent
     native=[]
@@ -60,7 +70,7 @@ def prepare(run,frames,prefix):
             require(sha256(p)==row['sha256'],'Frozen worker dependency changed: '+row['path']);native.append(p)
     names=['scripts/run_hgwind_closed_loop.py','scripts/hgwind_policy_server.py','scripts/analyze_hgwind_closed_loop.py',
            'scripts/sim/run_hgwind_policy_worker.py','src/capstone_vla/ball_live_protocol.py',
-           'src/capstone_vla/ball_live_runtime.py','src/capstone_vla/ball_action_contract.py',
+           'src/capstone_vla/ball_live_runtime.py','src/capstone_vla/ball_action_contract.py','src/capstone_vla/ball_camera_protocol.py',
            'src/capstone_vla/cartesian_packets.py','src/capstone_vla/posture_anchor.py',
            'src/capstone_vla/hgwind_expert_trace.py','src/capstone_vla/hgwind_development_data.py',
            'src/capstone_vla/closed_loop.py','src/capstone_vla/live_policy_protocol.py',
@@ -98,13 +108,15 @@ def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--run',action='store_true');p.add_argument('--frames',type=int,default=8)
     p.add_argument('--prefix',type=int,choices=[1,4],default=4);p.add_argument('--run-dir',type=Path,default=DEFAULT_RUN)
     p.add_argument('--check-load',action='store_true',help='Also strictly reload model on CPU during preflight')
-    a=p.parse_args();cfg,lab,repo=prepare(a.run_dir.resolve(),a.frames,a.prefix)
+    p.add_argument('--camera-protocol',choices=['legacy','formal-temporal'],default='legacy')
+    a=p.parse_args();cfg,lab,repo=prepare(a.run_dir.resolve(),a.frames,a.prefix,a.camera_protocol)
     env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1',HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1')
     model_check=[str(ROOT/'.venv_dynamicvla/bin/python'),str(ROOT/'scripts/hgwind_policy_server.py'),'--preflight',str(a.run_dir.resolve())]
     if a.check_load:model_check.append('--check-load')
     subprocess.run(model_check,cwd=ROOT,env=env,check=True)
     cmd=command(cfg,lab)
     print(f'CPU_PREFLIGHT_OK source=local/traj_00018 frames={a.frames} prefix={a.prefix} absolute29=true state30=true live_RGB=true source_actions=false',flush=True)
+    print('CAMERA_PROTOCOL '+a.camera_protocol+' physics_and_model_unchanged=true',flush=True)
     print('SIMULATION_MODE synchronous_pause_during_inference; engineering_check_only; real_time=false',flush=True)
     print('COMMAND '+shlex.join(cmd),flush=True)
     if not a.run:print('GPU_NOT_STARTED; add --run');return

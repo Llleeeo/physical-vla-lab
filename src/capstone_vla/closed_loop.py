@@ -50,8 +50,12 @@ class LiveRGB:
   before=float(self.sim.current_time)
   with freeze_render_script_dispatch(ScriptManager.get_instance()):
    self.publish()
-   self.sim.render()
-   self.rep.orchestrator.step(delta_time=0.0,pause_timeline=False,rt_subframes=max(1,int(self.render_quality.get('temporal_subframes') or 1)))
+   boundary=getattr(self,'render_boundary',None)
+   if boundary is not None:
+    boundary(self.rep,self.render_quality)
+   else:
+    self.sim.render()
+    self.rep.orchestrator.step(delta_time=0.0,pause_timeline=False,rt_subframes=max(1,int(self.render_quality.get('temporal_subframes') or 1)))
   after=float(self.sim.current_time)
   if abs(after-before)>1e-9:raise RuntimeError('camera rendering advanced physics time')
   from pxr import UsdGeom

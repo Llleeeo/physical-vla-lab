@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Input sensitivity measured; formal render control prepared
+
+- Reproduce all saved live chunks at eight anchors; image-only target changes average 19.28 mm versus 6.30 mm for state-only changes. These are sensitivity probes, not success estimates.
+- Correct a metres-to-millimetres report field from saved arrays, preserving original evidence; add a unit regression.
+- Add optional formal temporal-history reset/clamp boundary, keeping legacy capture as default. 23 focused CPU checks and actual scene/model-input preflight pass. Eight-frame physical test pending; no training or safety changes.
+
 ## 2026-10-31 — Full learned rollout and contact diagnosis
 
 - Verify 269 control intervals/807 physics callbacks without expert actions or safety abort; independent grasp fails with zero bilateral frames.
