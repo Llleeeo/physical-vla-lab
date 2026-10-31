@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Precision training completed; no checkpoint promoted
+
+- Recompute all saved prediction metrics and four rejected selections; verify selected weights equal the parent exactly.
+- Record modest position/continuity improvement and the remaining screening failures. No new physics or success claim.
+- Record two-noise sensitivity and propose a bounded fixed-observation inference diagnosis; candidate predictions are retained, rejected weights are not.
+
 ## 2026-10-31 — Precision-oriented training prepared
 
 - Add isolated weighted flow and physical endpoint/expert-increment objectives; preserve upstream code, existing weights, dataset and controller.

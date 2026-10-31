@@ -1,0 +1,95 @@
+{
+  "scope": "Single exposed episode development; no new physics or held-out evaluation",
+  "steps": 1000,
+  "unique_training_frames": 269,
+  "selected_step": 0,
+  "all_saved_metrics_recomputed_exact": true,
+  "all_four_selections_recomputed_rejected": true,
+  "selected_weights_equal_parent": true,
+  "rows": [
+    {
+      "seed": 90000,
+      "baseline": {
+        "approach_position_mean_mm": 61.256036162376404,
+        "precontact_80_119_mean_mm": 20.3306990721579,
+        "precontact_increment_error_mm": 25.358901371349184,
+        "full_position_p95_mm": 158.52734885267665,
+        "orientation_p95_deg": 3.954256697850675,
+        "gripper_error_frames": 5,
+        "gripper_transitions": 3
+      },
+      "last_candidate": {
+        "approach_position_mean_mm": 59.227511286735535,
+        "precontact_80_119_mean_mm": 18.42260900325914,
+        "precontact_increment_error_mm": 22.68424760079187,
+        "full_position_p95_mm": 152.36956628504865,
+        "orientation_p95_deg": 4.067278403065355,
+        "gripper_error_frames": 5,
+        "gripper_transitions": 3
+      },
+      "reduction_percent": {
+        "approach_position_mean_mm": 3.3115509959927736,
+        "precontact_80_119_mean_mm": 9.385265416238509,
+        "precontact_increment_error_mm": 10.54719891603495
+      }
+    },
+    {
+      "seed": 190000,
+      "baseline": {
+        "approach_position_mean_mm": 55.97110465168953,
+        "precontact_80_119_mean_mm": 21.226142833847103,
+        "precontact_increment_error_mm": 21.181056488578022,
+        "full_position_p95_mm": 152.58381093632823,
+        "orientation_p95_deg": 4.173933574791582,
+        "gripper_error_frames": 4,
+        "gripper_transitions": 1
+      },
+      "last_candidate": {
+        "approach_position_mean_mm": 50.87710916996002,
+        "precontact_80_119_mean_mm": 18.263663261032132,
+        "precontact_increment_error_mm": 18.762000626230023,
+        "full_position_p95_mm": 126.50274885650641,
+        "orientation_p95_deg": 4.064980259303356,
+        "gripper_error_frames": 4,
+        "gripper_transitions": 1
+      },
+      "reduction_percent": {
+        "approach_position_mean_mm": 9.101116573327705,
+        "precontact_80_119_mean_mm": 13.956749448095751,
+        "precontact_increment_error_mm": 11.420846092603954
+      }
+    }
+  ],
+  "interpretation": "Modest prediction improvements; no candidate passes predeclared two-noise gates. These are development screens, not calibrated physical success thresholds. No new rollout warranted from the unchanged selected checkpoint.",
+  "inference_variability": {
+    "observations": "same expert training RGB/state",
+    "near_frames": [
+      80,
+      119
+    ],
+    "mean_distance_between_two_noise_draws_mm": {
+      "parent": 24.245363235473633,
+      "last_candidate": 21.57581901550293
+    },
+    "limit": "Two draws show sampling sensitivity but do not estimate a population variance or prove a sole cause. Last candidate weights were not retained; only its generated arrays remain."
+  },
+  "next_proposed_control": "Measure repeated-noise output spread and systematic error at fixed teacher observations using the retained parent; compare inference integration settings if justified. No new training or physics scheduled.",
+  "source_sha256": {
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_144208_499175/report.json": "687b897cc7d0cab788abf5fc3440aa17fa6cb8f2246093603c10403310b970a9",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_144208_499175/run_config.json": "bb491821db9a5c1970e84d353934e62f829a8f3c71de882cb8e01ba4dd6f1777",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_144208_499175/generated_probes.json": "6cfb98f62df618adf3de27ddb401d7907094eb446db9f8a1d0f64735aad47f5e",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_144208_499175/training.jsonl": "cd4184a750a5e424734e9ff3583c9fbd7e5224e21d3639f807046f3921f19632",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_144208_499175/checkpoint_final/model.safetensors": "d8d345e70be7ac1e9ad1c6396a7794397be28cf34bab93941009d2ed8ca861fa",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/checkpoint_final/model.safetensors": "d8d345e70be7ac1e9ad1c6396a7794397be28cf34bab93941009d2ed8ca861fa",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_144208_499175/generated_step0000_seed190000.npy": "678367f0a5123d67c1096e45ac46daa68e1a2f2371fe432da94834c5afea7d14",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_144208_499175/generated_step0000_seed90000.npy": "e07f283dcd6825564210ecb4b1e489cb178b4c764df9e8cea6f2d74fcd233d6f",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_144208_499175/generated_step0250_seed190000.npy": "db76e357ecc483ce8d157b5cf3c9bd56d5d11739140721484ab4a912d9cb0a41",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_144208_499175/generated_step0250_seed90000.npy": "27fdba617cbafe2b07b4b72973eaa786c85eaeccb50f5e57ac68354b0417b482",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_144208_499175/generated_step0500_seed190000.npy": "f3f97f44b6bad0fd26548d1414976526b05b4bc728467303f3dea15b4e9965aa",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_144208_499175/generated_step0500_seed90000.npy": "e3967b0fd38f516182f48024e67a72efbc9f5218de37d2619e7bda08e9fc7e40",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_144208_499175/generated_step0750_seed190000.npy": "688d152338007c86d7bbc0f463d9dc42e23a48ec682cee1fefd06859263b1d87",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_144208_499175/generated_step0750_seed90000.npy": "7b9b6cab9adcb0ac0c44af8a71782004978cc1f01b004defe9437a1d4d0af1e2",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_144208_499175/generated_step1000_seed190000.npy": "b46107c654ab750b56bd752d366a13ecf999a6ba2a3b41d4d7bf2563f0e09685",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_144208_499175/generated_step1000_seed90000.npy": "9fe9b6253d17a4799abb750de50491f1311c97a2308d953e9fc5c383ac7cd65c"
+  }
+}

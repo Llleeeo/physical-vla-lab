@@ -1,5 +1,14 @@
 # Research roadmap
 
+## 31 October 2026 — Precision training completed; parent retained
+
+Run `20261031_144208_499175` completes1,000 additional optimizer steps and samples all269 training frames. All ten saved generated streams reproduce their reported metrics exactly; all four checkpoint selections correctly reject. The selected weights are byte-identical to the3,000-step parent. No new rollout has been run or is justified by an unchanged checkpoint.
+
+For seeds90000/190000, the last candidate reduces approach means61.26→59.23mm /55.97→50.88mm (3.31%/9.10%), near-contact means20.33→18.42mm /21.23→18.26mm, and increment residuals25.36→22.68mm /21.18→18.76mm (10.55%/11.42%). Required approach/increment reductions are10%/20% in both probes. Seed90000 orientation p95 rises3.95→4.07degrees. Jaw errors/transitions are unchanged at step1,000. The conservative engineering screens reject modest improvement; they are not physical laws defining grasp success.
+
+With identical expert observations, the two noise draws differ by24.25mm (parent) and21.58mm (last candidate) on average over frames80..119. This motivates separating inference variability from persistent prediction bias, not claiming randomness alone causes failures. Only two draws were observed. The last candidate's generated arrays remain, but its weights were not saved because it failed selection. Next use the retained parent for a bounded fixed-observation sampling diagnosis before choosing another training or inference change. Source-hashed evidence: `results/summaries/2026-10-31-ball-precision-training-result.json`.
+
+
 ## 31 October 2026 — Precision-oriented training prepared
 
 Saved generated predictions with expert training observations still show20.33mm mean XYZ error and24.95mm mean target step over frames80..119; teacher mean target step is3.84mm. Closed-loop drift is therefore not the only unresolved issue. After XYZ-only postprocessing advanced contact, return to training supervision rather than promoting that filter.
