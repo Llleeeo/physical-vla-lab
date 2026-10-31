@@ -1,5 +1,7 @@
 # Physical VLA Lab
 
+Latest development: the height intervention still failed, with early contact preceding the intervention. A [fixed-command smoothing comparison](docs/project/BALL_SMOOTHING_DIAGNOSTIC.md) is CPU-checked and ready for simulation; no successful learned ball grasp is established.
+
 **Evidence-based research on dynamic manipulation and physical generalization in vision-language-action policies, built on RoboPhys.**
 
 This project connects RoboPhys simulation, expert demonstrations, synchronized visual data, and pretrained VLA policies. The initial testbed is dynamic grasping with a simulated Franka arm. The research objective is to understand when learned behavior transfers across physical conditions and why it fails.

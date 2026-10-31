@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-31 — Fixed-model command smoothing diagnostic prepared
+
+- Record failed height intervention and pre-intervention RGB/action confound; no causal height claim.
+- Add separate raw/smoothed command reexecution, exact source/model-response checks, native motor auditing and independent contact/grasp evaluation.
+- Preserve default online policy and native safety limits. Record filter displacement and verify raw-prefix reproduction; label all outcomes diagnostic.
+- Export saved two-camera RGB to checked slow-motion videos, including failed grasps. GPU pair remains pending user execution.
+
 ## 2026-10-31 — Refined near miss and explicit height diagnostic
 
 - Verify complete refined live integration but no finger contact; near-center alignment precedes upward departure. Preserve raw evidence and exported review videos.

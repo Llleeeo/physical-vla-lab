@@ -1,0 +1,137 @@
+{
+  "scope": "Recorded-height diagnostic; not independent learned success or held-out evaluation",
+  "completed_frames": 269,
+  "physics_callbacks": 807,
+  "runtime_safety_passed": true,
+  "grasp": {
+    "schema": "capstone_grasp_evidence_v1",
+    "status": "fail",
+    "official_benchmark_success": null,
+    "criteria": {
+      "minimum_bilateral_duration_s": 0.25,
+      "final_hold_duration_s": 0.25,
+      "minimum_lift_m": 0.05,
+      "maximum_relative_position_jitter_m": 0.02,
+      "minimum_precontact_speed_m_s": 0.05,
+      "motion_requirement": "linear",
+      "minimum_precontact_angular_speed_rad_s": 0.1,
+      "maximum_final_relative_spin_rad_s": 0.5,
+      "require_lift": true
+    },
+    "checks": {
+      "continuous_bilateral_contact": false,
+      "final_bilateral_hold": false,
+      "sustained_lift": false,
+      "relative_position_retention": true,
+      "bilateral_nonzero_impulses": false,
+      "object_moving_before_first_contact": true,
+      "no_grasp_assistance": true
+    },
+    "measurements": {
+      "frames": 269,
+      "sample_hz": 60.00000000000021,
+      "bilateral_frames": 0,
+      "longest_bilateral_duration_s": 0.0,
+      "first_contact_frame": 120,
+      "first_bilateral_frame": null,
+      "minimum_final_lift_from_first_bilateral_m": null,
+      "final_relative_position_jitter_m": 0.012624265048212372,
+      "object_speed_before_first_contact_m_s": 0.16698041558265686,
+      "object_angular_speed_before_first_contact_rad_s": null,
+      "final_relative_spin_p95_rad_s": null
+    },
+    "scope": "independent engineering check on recorded states; not full geometry/physics-generalization certification"
+  },
+  "intervention": {
+    "verified": true,
+    "channel": 2,
+    "start_frame": 138,
+    "stop_frame_exclusive": 180,
+    "changed_frames": [
+      138,
+      139,
+      140,
+      141,
+      142,
+      143,
+      144,
+      145,
+      146,
+      147,
+      148,
+      149,
+      150,
+      151,
+      152,
+      153,
+      154,
+      155,
+      156,
+      157,
+      158,
+      159,
+      160,
+      161,
+      162,
+      163,
+      164,
+      165,
+      166,
+      167,
+      168,
+      169,
+      170,
+      171,
+      172,
+      173,
+      174,
+      175,
+      176,
+      177,
+      178,
+      179
+    ],
+    "other_channels_exact": true,
+    "raw_model_responses_bound": true
+  },
+  "comparison_valid_for_causal_height_claim": false,
+  "reason": "First contact at120 precedes intervention138. Initial robot state/camera pose match, but initial RGB and first model actions already differ from the prior no-intervention rollout.",
+  "matched_config_fields": {
+    "checkpoint_hashes": true,
+    "model_seed": true,
+    "seed": true,
+    "attempt_offset": true,
+    "camera_protocol": true,
+    "prefix": true,
+    "task_sha256": true,
+    "physics_sha256": true
+  },
+  "earliest_differences": {
+    "state": {
+      "initial_max_abs_difference": 0.0,
+      "first_frame_max_abs_difference_above_1e_minus8": 1
+    },
+    "action": {
+      "initial_max_abs_difference": 0.01835346221923828,
+      "first_frame_max_abs_difference_above_1e_minus8": 0
+    },
+    "camera_pose_world": {
+      "initial_max_abs_difference": 0.0,
+      "first_frame_max_abs_difference_above_1e_minus8": 1
+    }
+  },
+  "initial_RGB_between_runs_MAE_255": {
+    "opst_cam": 1.0528211805555556,
+    "wrist_cam": 5.0334266493055555
+  },
+  "source_sha256": {
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/closed_loop_runs/20261031_140441_130052/report.json": "8813f656ae928cc59b2f02a3673081e9f5dce534a6e8c016a2d91d66ef5f77af",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/closed_loop_runs/20261031_140441_130052/run_config.json": "bf377788b6c4de95facb6dc78cbdd0979fb8d0ec342235961cd8f18816bf01db",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/closed_loop_runs/20261031_140441_130052/live_observations.hdf5": "08ce2c2231b1aaaedc8e50197d3295a84261950257d5a131112d7da0a9f764b4",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/closed_loop_runs/20261031_134508_202376/report.json": "005460bdb61d461b30377ded2e4945417eb8331263ecce53ec166aeff503622d",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/closed_loop_runs/20261031_134508_202376/run_config.json": "70d9ae9596b89e9c9abffeaf0b9c656878243456cfbcc17a52302e2078be4635",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/closed_loop_runs/20261031_134508_202376/live_observations.hdf5": "9619e7da23611c2fa67b4e3d73619a9a871edc4ea66c2283b8f120cf47834af6"
+  },
+  "proposal_at_initial_audit": "Replay identical saved model request streams through native physics twice, with/without the same fixed z window. No new training; diagnose controller/contact effect without changing policy inference. Success remains command-reexecution diagnostic, not live policy success. Verify actual prefix state equality.",
+  "next_proposed_control": "User-directed fixed saved-model action comparison: raw versus causal XYZ smoothing alpha0.25. Check initial correspondence and original-prefix reproduction; no live-policy success claim."
+}
