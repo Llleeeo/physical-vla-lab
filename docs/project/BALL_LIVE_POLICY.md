@@ -4,6 +4,22 @@
 
 **Full live execution verified; learned grasp failed.** The current checkpoint is the exposed `local/traj_00018` model fine-tuned for 2,000 steps. Offline position error remains substantial, especially at startup. The full feedback path now passes; approach/contact behavior is the next diagnostic target.
 
+## Camera control outcome and bounded model refinement
+
+The optional formal capture completes 8 intervals / 24 callbacks without a safety abort, with exactly matching initial robot state and camera poses. It is **not promoted to default**. Initial wrist RGB MAE against training increases from 13.92 to 24.35/255; external increases 8.36 to 10.34/255. External images at frames 4/7 improve, but wrist images do not. The measured pinch discrepancy at frame 7 is 13.49 mm legacy versus 13.78 mm formal, so there is no observed short-motion improvement. Eight frames do not evaluate grasp; later pixel comparisons also include differing robot poses. [Source-hashed result](../../results/summaries/2026-10-31-ball-camera-control-result.json).
+
+Next, refine the existing 2,000-step model with a separate entry, at most 1,000 additional steps at learning rate 1e-5 (previously 1e-4). This loads the parent weights strictly and retains its normalizers, data and backbone freezing. The optimizer restarts because no optimizer state was saved. It does not restart model weights from the official checkpoint. Old scripts/checkpoints and runtime defaults are retained.
+
+Every 250 steps, generate the complete 269-frame stream on recorded expert observations using the same four-action queue and 90000+frame noise. The archived batch4 parent reference has 66.69 mm mean approach target error (before expert closure at 144), six wrong gripper frames, five transitions, orientation p95 of 4.46 degrees and zero native request rejects. Select a candidate only when approach mean improves versus the current best, orientation p95/gripper error count/transitions do not worsen versus the parent, and native rejects remain zero. Selection recomputes the parent baseline with batch1, matching live inference, and verifies the available eight batch1 teacher-input references. Stored batch4 predictions differ slightly and are not used as an exact replay gate. This avoids selecting by a noisy flow loss alone. It remains same-episode development selection, **not a held-out validation metric or grasp success**.
+
+The new run retains one selected full checkpoint under `checkpoint_final` and all candidate predictions/metrics. `selected_checkpoint_step` records when that checkpoint was selected; it can differ from the total number of optimizer steps. If no candidate passes, step 0 retains the parent and `selected_improved=false`. The original parent directory is never overwritten.
+
+```bash
+.venv_dynamicvla/bin/python scripts/refine_hgwind_development.py --run
+```
+
+CPU preflight and strict actual parent reload pass without CUDA; 13 focused selection/prediction checks pass. Training and physical improvement are pending. The user runs GPU jobs; this entry launches no Isaac Sim or robot commands.
+
 ## Input sensitivity result and optional render-protocol control
 
 All 32 predictions completed, and the all-live 20-action chunks match saved execution responses exactly at eight anchors. Across their first four actions, image-only replacement changes predicted target position by 19.28 mm on average (max 43.31 mm); state-only replacement changes it by 6.30 mm (max 11.96 mm). These are input sensitivities, not additive causal failure contributions. At frame 0 states match exactly; replacing only images changes the first target by 18.50 mm. At later anchors the hybrid inputs can be inconsistent. Even teacher images/state retain first target errors 403.28 mm at 0,143.85 mm at 8 and95.27 mm at 40, so image consistency alone is not an established cure.

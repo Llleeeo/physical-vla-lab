@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Camera control reviewed; bounded refinement prepared
+
+- Verify 8 intervals/24 callbacks in optional formal camera mode, but no short-motion improvement; retain legacy default. Initial wrist image mismatch worsens.
+- Add a separate strict parent-weight refinement entry: at most 1,000 extra steps, 1e-5 learning rate, generated 269-frame prefix4 probes every 250 steps, explicit non-regression selection and parent fallback. No training launched by agent.
+- Actual parent CPU reload/preflight and 13 focused selection/prediction tests pass. Training-case selection is not generalization evidence.
+
 ## 2026-10-31 — Input sensitivity measured; formal render control prepared
 
 - Reproduce all saved live chunks at eight anchors; image-only target changes average 19.28 mm versus 6.30 mm for state-only changes. These are sensitivity probes, not success estimates.

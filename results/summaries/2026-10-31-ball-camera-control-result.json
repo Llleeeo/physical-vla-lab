@@ -1,0 +1,80 @@
+{
+  "schema": "physical-vla-lab.ball-camera-control.v1",
+  "frames": 8,
+  "callbacks": 24,
+  "integration_passed": true,
+  "grasp_evaluated": false,
+  "heldout_evaluation": false,
+  "default_kept": "legacy",
+  "new_protocol": "formal-temporal",
+  "comparisons": [
+    {
+      "camera": "opst_cam",
+      "frame": 0,
+      "legacy_rgb_mae_255": 8.361573350694444,
+      "formal_rgb_mae_255": 10.337860243055555
+    },
+    {
+      "camera": "opst_cam",
+      "frame": 4,
+      "legacy_rgb_mae_255": 4.8850282118055555,
+      "formal_rgb_mae_255": 3.1610948350694446
+    },
+    {
+      "camera": "opst_cam",
+      "frame": 7,
+      "legacy_rgb_mae_255": 4.91447265625,
+      "formal_rgb_mae_255": 3.296506076388889
+    },
+    {
+      "camera": "wrist_cam",
+      "frame": 0,
+      "legacy_rgb_mae_255": 13.91568359375,
+      "formal_rgb_mae_255": 24.35472113715278
+    },
+    {
+      "camera": "wrist_cam",
+      "frame": 4,
+      "legacy_rgb_mae_255": 2.877705078125,
+      "formal_rgb_mae_255": 3.1893641493055553
+    },
+    {
+      "camera": "wrist_cam",
+      "frame": 7,
+      "legacy_rgb_mae_255": 3.0112651909722223,
+      "formal_rgb_mae_255": 3.4824457465277776
+    }
+  ],
+  "target_position_error_mm": [
+    {
+      "frame": 0,
+      "legacy": 408.17358382013,
+      "formal": 409.7697368064542
+    },
+    {
+      "frame": 1,
+      "legacy": 22.50315491444413,
+      "formal": 20.055200288324944
+    },
+    {
+      "frame": 4,
+      "legacy": 54.262459265683745,
+      "formal": 52.878035450466285
+    },
+    {
+      "frame": 7,
+      "legacy": 116.40361227464362,
+      "formal": 118.94851789555973
+    }
+  ],
+  "pinch_position_difference_at_frame7_mm": {
+    "legacy": 13.489385796313233,
+    "formal": 13.782683143720387
+  },
+  "interpretation": "Initial wrist image mismatch worsens; later external image MAE improves, but short measured motion does not improve. No evidence to promote formal capture or run a full rollout with it. Later-frame image comparisons are confounded by different robot poses.",
+  "source_sha256": {
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_121355_529372/closed_loop_runs/20261031_124926_003716/report.json": "a24bbe39866fd153f7f2740ce7e35a307c3f239f3497c8647b4ef335c734eb13",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_121355_529372/closed_loop_runs/20261031_132258_898562/report.json": "2359fb03c9f9247fc7b687898206f3cee9b1ff3cca11e8faf66c0531fa567240",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_121355_529372/closed_loop_runs/20261031_132258_898562/run_config.json": "e7abb0dff23123133666f908921530a4229ca0a0a900eb148e894990840ab2a6"
+  }
+}
