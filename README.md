@@ -1,5 +1,7 @@
 # Physical VLA Lab
 
+Next development experiment: [precision-oriented training](docs/project/BALL_PRECISION_TRAINING.md), with stricter generated-action gates. CPU checks pass; training and physical improvement remain pending.
+
 Latest development: the height intervention still failed, with early contact preceding the intervention. The [fixed-command smoothing comparison](docs/project/BALL_SMOOTHING_DIAGNOSTIC.md) also fails: premature finger contact advances from frame120 to97. This filter is not adopted; no successful learned ball grasp is established.
 
 **Evidence-based research on dynamic manipulation and physical generalization in vision-language-action policies, built on RoboPhys.**

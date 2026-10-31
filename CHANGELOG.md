@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Precision-oriented training prepared
+
+- Add isolated weighted flow and physical endpoint/expert-increment objectives; preserve upstream code, existing weights, dataset and controller.
+- Verify actual CPU forward/backward and source-equivalent flow residuals; mask padding from all loss components.
+- Add two-seed generated-action screening every250 steps with parent fallback, complete checkpoint metadata and a1,000-step cap. No GPU training or task-success claim yet.
+
 ## 2026-10-31 — Smoothing comparison completed, no grasp improvement
 
 - Verify both269-frame episodes, native safety, contact evidence and269-frame videos against saved hashes.
