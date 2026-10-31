@@ -2,9 +2,13 @@
 
 ## Purpose and current status
 
-The native expert for exposed development episode `local/traj_00001` now reproduces original success exactly after one verified setup-force omission and one native finger-gain reapplication. This does not establish that the frozen29D action representation can retain the grasp. The next run tests that interface under explicitly carried initialization.
+The native expert for exposed development episode `local/traj_00001` now reproduces original success exactly after one verified setup-force omission and one native finger-gain reapplication. This does not establish that the frozen29D action representation can retain the grasp. The user-run interface result under explicitly carried initialization is recorded below.
 
-**Prepared, physical outcome pending:**338 portable CPU checks, SDK Python3.10 parsing, actual teacher/scene preflight and actual native-entry assembly checks pass. The319×29 float32 action stream is generated from304 captured upper calls plus explicit terminal hold. No new GPU simulation, rendering or training has been launched by the agent.
+**Observed result (31 October): initialization passes, complete execution and grasp fail.** The initialized29D surrogate now verifies startup force/gain alignment but stops after179 complete intervals (180 recorded frames) of319. All180 issued command-boundary fields and jaw targets match the decoded action prefix; full-stream interface flags remain false because the run aborts. First contact166 and bilateral contact170 match the successful teacher. EE error exceeds0.01mm at172 and grows from0.0031mm at171 to4.3217mm at179. Native safety rejects the next command after joint5 reaches-2.8248rad/s against the2.61rad/s limit; required braking also conflicts with acceleration/jerk bounds. Independent grasp fails without sustained lift. This is an expert-labelled interface diagnostic, not learned-policy inference.
+
+The original `initialization_report.json` is preserved. Its `interface=false` requires full319-event coverage; an additional read-only check verifies all180 issued fields and jaw actions match the decoded prefix. Source/callback/settings comparisons find only small numeric representation differences and equivalent quaternion signs in these180 upper calls. Root cause remains unisolated. [Result and hashes](../../results/summaries/2026-10-31-initialized-contract-result.json).
+
+The338 portable CPU checks and actual scene/entry preflight were preparation evidence. The command below describes the already completed run; repeating it without a new controlled change is not the next experiment.
 
 ## Command
 
@@ -15,7 +19,7 @@ data/derived/hf_pilot_render_repo/.venv/bin/python \
   scripts/run_hgwind_initialized_contract.py --run
 ```
 
-One fresh process, attempt60 only, maximum319control intervals; no warmup episodes, retries or rendering. Recent launches suggest about1–2minutes including startup, but this new path has not yet been timed. Without `--run`, preparation checks inputs and prints the command only.
+One fresh process, attempt60 only, maximum319control intervals; no warmup episodes, retries or rendering. This run reached the safety abort after about38seconds of rollout plus startup. Without `--run`, preparation checks inputs and prints the command only.
 
 The source is pinned to the verified teacher under `20261030_022121_219398_fresh60_omit1_gains/attempt_00060`; source and dependency hashes must match the published result. Outputs use a new `data/derived/hgwind_initialized_contract/<timestamp>/` directory. Parent recordings, failed runs, task assets and frozen sources remain untouched.
 

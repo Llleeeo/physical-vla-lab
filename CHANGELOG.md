@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-31 — Initialized surrogate failure localized after bilateral contact
+
+- Verify both initialization interventions and recompute raw contact evidence. All180 issued action/jaw inputs match the decoded prefix; full319-frame execution fails after179 intervals. Contact timing matches the successful teacher, followed by rapid motion divergence and a joint5 velocity/braking-feasibility abort.
+- Preserve original reports and distinguish prefix-field correctness from full-stream interface acceptance. Source upper fields differ only by small numeric representation changes and equivalent quaternion signs in this observed prefix; this does not prove precision causes failure. Propose one matched float64-label control before retuning. Analysis/docs only; no new GPU, rendering, training or runtime edits.
+
 ## 2026-10-31 — Matched initialization carried into one29D surrogate
 
 - Add a dedicated fresh60 entry that explicitly installs the verified force omission, post-setup gain reapplication, passive drive observation and stopped-timeline barrier around packet execution. Reuse the reset boundary for one attempt only; no online task/skill decision or prior episode runs. Preserve the frozen29D representation, existing controller/limits and raw/frozen sources.

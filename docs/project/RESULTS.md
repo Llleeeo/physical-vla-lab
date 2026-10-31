@@ -2,13 +2,17 @@
 
 Snapshot: **2026-10-31, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
-## Initialized29D surrogate prepared, physical result pending
+## Initialized29D surrogate: initialization passes, contact-stage execution fails
 
-The [new one-attempt runner](INITIALIZED_ACTION_CONTRACT.md) prepares319×29 float32 labels from the exactly reproduced fresh60 teacher. Reset/force/gain/barrier hooks are installed explicitly in the actual packet entry. Original task decisions are removed from the assembled collector; no saved joint/OSC commands or learned policy execute. The native gripper configuration helper and non-target safety geometry remain.
+The initialized29D surrogate now verifies startup force/gain alignment but stops after179 complete intervals (180 recorded frames) of319. All180 issued command-boundary fields and jaw targets match the decoded action prefix; full-stream interface flags remain false because the run aborts. First contact166 and bilateral contact170 match the successful teacher. EE error exceeds0.01mm at172 and grows from0.0031mm at171 to4.3217mm at179. Native safety rejects the next command after joint5 reaches-2.8248rad/s against the2.61rad/s limit; required braking also conflicts with acceleration/jerk bounds. Independent grasp fails without sustained lift. This is an expert-labelled interface diagnostic, not learned-policy inference.
 
-338 portable CPU checks and108 focused checks pass. SDK Python3.10 parsing, actual teacher/scene hashes, entry selection and the actual native patch function verify. The packet/reset/force hooks are installed in a CPU-only isolated check, and the prepared action hash is pinned. Physical efficacy is pending; a passing teacher does not imply a passing surrogate.
+Read-only recomputation checks the original raw HDF5 contact evidence, pinned source/action hashes and every issued motor input. The reported `interface=false` remains a full-stream rejection, not evidence of a discovered codec field mismatch: the legacy auditor requires319 events and has only180. Prefix correctness does not establish safe or successful full execution.
 
-Result gates distinguish initialization alignment, decoded motor fields, full safe execution and independent grasp. Initialization additionally compares the first two native ball transform/velocity rows with the teacher; later contract-driven motion need not be identical. Both modified-force provenance and mimic-consistency limitations remain. [Preparation provenance](../../results/summaries/2026-10-31-initialized-contract-prepared.json).
+Through the observed prefix, nonnumeric settings/callbacks/posture match teacher inputs; numeric differences are small float representation changes (maximum position-component difference0.000237mm), with equivalent quaternion sign changes. That excludes a large input-field discrepancy in this prefix, but does not identify a unique cause of contact divergence. The native fifth-joint limit remains2.61rad/s and has not been relaxed.
+
+**Next proposed control:** preserve initialized packet execution and use original double-precision upper labels with the same quaternion hemisphere convention. This tests sensitivity to float32 conversion without changing gains, force, safety limits or scene. It is not implemented or physically tested yet. An exact-label replay success would still not establish robustness to learned-policy errors.
+
+[Source-hashed result](../../results/summaries/2026-10-31-initialized-contract-result.json). No new simulator/render job or runtime code change by agent. The previously passed338 CPU checks belong to interface preparation; this milestone rechecks existing artifacts.
 
 ## Fresh expert grasp restored after measured gain reapplication
 
@@ -18,7 +22,7 @@ A separate read-only recomputation verifies the saved raw hashes, original sourc
 
 The previous omission-only fresh60 control fails after190frames; adding the measured warm gain reapplication restores original success under the retained omission. This supports a causal contribution from the measured gain mismatch in this exposed case. It does not identify the exact internal native overwrite mechanism, establish a cohort success rate, certify dual active gains with mimic coupling, or evaluate a learned policy. Official benchmark success remains unverified; independent engineering criteria pass. Modified-force provenance and training exclusion remain explicit.
 
-**Next:** carry these initialization conditions explicitly into the frozen29D surrogate, then test this same exposed episode without online skill decisions. The existing `--teacher-run` preparation can inherit diagnostic fields into its plan, but its standard packet entry does not install the history/force/gain hooks. Do not assume those fields execute or run an unmatched comparison. Avoid more collection/training until this interface check is meaningful.
+**Follow-up:** the initialized29D surrogate has now been tested; its failed post-contact execution is reported above. The existing `--teacher-run` preparation can inherit diagnostic fields into its plan, but its standard packet entry does not install the history/force/gain hooks. Do not assume those fields execute or run an unmatched comparison. Avoid more collection/training until this interface check is meaningful.
 
 [Source-hashed measured result](../../results/summaries/2026-10-30-gripper-gain-reapplication-result.json). No new GPU/render run or runtime code change by agent in this result milestone.
 

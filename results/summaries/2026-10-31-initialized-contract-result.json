@@ -1,0 +1,177 @@
+{
+  "schema": "physical-vla-lab.initialized-contract-result.v1",
+  "date": "2026-10-31",
+  "run": "20261031_105421_302664",
+  "source_episode": "local/traj_00001",
+  "initialization_verified": true,
+  "recorded_frames": 180,
+  "completed_intervals": 179,
+  "requested_intervals": 319,
+  "physics_callbacks": 537,
+  "full_execution": false,
+  "legacy_interface_gate": false,
+  "issued_prefix_command_fields_match": true,
+  "issued_prefix_commands": 180,
+  "prefix_does_not_certify_full_execution": true,
+  "independent_grasp": {
+    "schema": "capstone_grasp_evidence_v1",
+    "status": "fail",
+    "official_benchmark_success": null,
+    "criteria": {
+      "minimum_bilateral_duration_s": 0.25,
+      "final_hold_duration_s": 0.25,
+      "minimum_lift_m": 0.05,
+      "maximum_relative_position_jitter_m": 0.02,
+      "minimum_precontact_speed_m_s": 0.05,
+      "motion_requirement": "linear",
+      "minimum_precontact_angular_speed_rad_s": 0.1,
+      "maximum_final_relative_spin_rad_s": 0.5,
+      "require_lift": true
+    },
+    "checks": {
+      "continuous_bilateral_contact": false,
+      "final_bilateral_hold": false,
+      "sustained_lift": false,
+      "relative_position_retention": true,
+      "bilateral_nonzero_impulses": true,
+      "object_moving_before_first_contact": true,
+      "no_grasp_assistance": true
+    },
+    "measurements": {
+      "frames": 180,
+      "sample_hz": 60.00000000000021,
+      "bilateral_frames": 10,
+      "longest_bilateral_duration_s": 0.16666666666666607,
+      "first_contact_frame": 166,
+      "first_bilateral_frame": 170,
+      "minimum_final_lift_from_first_bilateral_m": -1.862645149230957e-09,
+      "final_relative_position_jitter_m": 0.006365288452300093,
+      "object_speed_before_first_contact_m_s": 0.16611747443675995,
+      "object_angular_speed_before_first_contact_rad_s": null,
+      "final_relative_spin_p95_rad_s": null
+    },
+    "scope": "independent engineering check on recorded states; not full geometry/physics-generalization certification"
+  },
+  "teacher_contact_frames": {
+    "first_contact_frame": 166,
+    "first_bilateral_frame": 170
+  },
+  "state_comparison": [
+    {
+      "frame": 154,
+      "ee_difference_mm": 0.002620044630020857,
+      "joint5_velocity_rad_s": 0.09974202513694763,
+      "teacher_joint5_velocity_rad_s": 0.09975330531597137
+    },
+    {
+      "frame": 166,
+      "ee_difference_mm": 0.006025176495313644,
+      "joint5_velocity_rad_s": 0.06317619234323502,
+      "teacher_joint5_velocity_rad_s": 0.0631956085562706
+    },
+    {
+      "frame": 170,
+      "ee_difference_mm": 0.004916931502521038,
+      "joint5_velocity_rad_s": 0.14955881237983704,
+      "teacher_joint5_velocity_rad_s": 0.14928525686264038
+    },
+    {
+      "frame": 171,
+      "ee_difference_mm": 0.003116857260465622,
+      "joint5_velocity_rad_s": 0.30735358595848083,
+      "teacher_joint5_velocity_rad_s": 0.30636411905288696
+    },
+    {
+      "frame": 172,
+      "ee_difference_mm": 0.0422961562871933,
+      "joint5_velocity_rad_s": -0.34120890498161316,
+      "teacher_joint5_velocity_rad_s": -0.3302609622478485
+    },
+    {
+      "frame": 173,
+      "ee_difference_mm": 0.13259464502334595,
+      "joint5_velocity_rad_s": 0.1420777589082718,
+      "teacher_joint5_velocity_rad_s": 0.2112928181886673
+    },
+    {
+      "frame": 174,
+      "ee_difference_mm": 0.3967892527580261,
+      "joint5_velocity_rad_s": -1.180311679840088,
+      "teacher_joint5_velocity_rad_s": -1.0177690982818604
+    },
+    {
+      "frame": 175,
+      "ee_difference_mm": 0.5072619318962097,
+      "joint5_velocity_rad_s": -0.35374170541763306,
+      "teacher_joint5_velocity_rad_s": -0.006116290111094713
+    },
+    {
+      "frame": 176,
+      "ee_difference_mm": 0.8801895976066589,
+      "joint5_velocity_rad_s": -2.031717538833618,
+      "teacher_joint5_velocity_rad_s": -0.986446738243103
+    },
+    {
+      "frame": 177,
+      "ee_difference_mm": 1.6923174858093262,
+      "joint5_velocity_rad_s": -0.6912326812744141,
+      "teacher_joint5_velocity_rad_s": -0.032691165804862976
+    },
+    {
+      "frame": 178,
+      "ee_difference_mm": 2.5277962684631348,
+      "joint5_velocity_rad_s": -2.0063276290893555,
+      "teacher_joint5_velocity_rad_s": -2.046839475631714
+    },
+    {
+      "frame": 179,
+      "ee_difference_mm": 4.321714401245117,
+      "joint5_velocity_rad_s": -0.9388872385025024,
+      "teacher_joint5_velocity_rad_s": -0.6108635067939758
+    }
+  ],
+  "first_ee_difference_above_0_01mm_frame": 172,
+  "source_to_boundary_maximum_numeric_difference": {
+    "target_position": 2.3665896708990886e-07,
+    "target_quaternion": 2.8434549159683797e-08,
+    "orientation_axis_world": 1.313177594008258e-12,
+    "target_linear_velocity": 2.8961854914300034e-08,
+    "linear_velocity_reference": 2.8961854914300034e-08,
+    "target_linear_acceleration": 3.5226874217642035e-07,
+    "maximum_relative_linear_speed_mps": 5.638119016104781e-08
+  },
+  "all_other_source_upper_fields_exact_in_observed_prefix": true,
+  "safety_abort": {
+    "joint_offset": 4,
+    "joint_number": 5,
+    "measured_velocity_rad_s": -2.8248,
+    "absolute_limit_rad_s": 2.61,
+    "required_braking_acceleration_lower": 38.6693,
+    "allowed_acceleration_upper": 11.7494,
+    "units": "rad/s^2 for acceleration; values from native abort log"
+  },
+  "root_cause_isolated": false,
+  "next_proposal": "One matched initialization and packet-path diagnostic using original float64 upper labels, preserving quaternion hemisphere convention and controller settings. Not yet implemented/run; separate precision/contact sensitivity from remaining interface effects.",
+  "learned_policy_evaluated": false,
+  "training_eligible": false,
+  "new_gpu_by_agent": false,
+  "render": false,
+  "validation": "Existing HDF5 contact evidence recomputed; action/source hashes checked; all issued boundary fields and jaw targets checked; raw teacher state comparison.",
+  "source_hashes": {
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/plan.json": "27f2d4c68fd27e3607ed60a66b612f9f5f7f196534664c31502c947afb4866a4",
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/report.json": "88129cf76c1fe1a79d49b8470f20607f9c7703d0040c0abfbd740f3d1e8b24b2",
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/initialization_report.json": "3a55b8807769d1f396b85e48d2d67c0e4b4e1b56b5f12e04a088df6b836c325b",
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/cartesian_packet_execution.json": "12dc5fe13e18ef378922985b805b232ccd3193512d8ca64780fada1ec52a54bd",
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/packet_requests.json": "a4f397f9b228bc5546c3d0a6c69bb5ba650a7ce59f28aeb6bac1a2dc4098fd60",
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/actions.npy": "4a1ad757932e15f57cad3aff8910727cb5fd28966d2de11d81759a99dfac9986",
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/gripper_gain_control.json": "f8d3e8484bdd3dc6b7b5545fd64c5ff8b646844b16586f88a4e6e18ea7288e8a",
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/setup_force_control_audit.json": "e9e98505c769550e1bc5f86bedcdacdd4f36200fdc1da225f9f47cadfb58f1f1",
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/startup_force_calls.jsonl": "0faad327dc47d65057dc3c46bbe789cedd08f40541ae7e60b0a6044402d5eb45",
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/simulation.log": "b616165f7e15347f15905da9fe4e463a818d59e6dcbbcd469a4539cb0fd03fd4",
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/replay.hdf5": "25e6eaf1a8e95092ffae9ba9751524854ecddd0d36fa19e1aa602557bec2e9c0",
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/meta.json": "17395f43c39624f4d6505a0797bbeaade58be44922ee63ef059470a4e092d879",
+    "data/derived/hgwind_history_diagnostics/20261030_022121_219398_fresh60_omit1_gains/attempt_00060/worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/traj_00000/replay.hdf5": "546f01e610d76df1486f207a48aeeda1dd2ed020c4297313eea5150108275308",
+    "data/derived/hgwind_history_diagnostics/20261030_022121_219398_fresh60_omit1_gains/attempt_00060/cartesian_target_inputs.json": "c2f351b9804727634e0307a45956c822d4ca73b3b7b686bdcc45a3e605eb50f2",
+    "data/derived/hgwind_history_diagnostics/20261030_022121_219398_fresh60_omit1_gains/attempt_00060/report.json": "12cdc9c205874916871f1071f7bd162dc7eb36b66d51b576704472ca3deeb58d"
+  }
+}
