@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Native upper-target provenance audited
+
+- Rebuild269 labels exactly and verify frozen expert dependencies.
+- Separate startup ingress hold/release and2mm depth adjustment from actual arm motion.
+- Audit all eight retained-parent streams through native pre-collision translation mapping; preserve labels, checkpoint and safety limits.
+
 ## 2026-10-31 — Prefix ablation completed; parent retained
 
 - Verify matched500-step training branches, both checkpoints and24 full generated streams.

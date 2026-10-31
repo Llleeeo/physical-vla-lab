@@ -1,0 +1,419 @@
+{
+  "status": "CPU_UPPER_TARGET_AUDIT_PASS",
+  "source_episode": "local/traj_00018",
+  "labels_rebuilt_exact": true,
+  "frames": 269,
+  "captured_calls": 254,
+  "terminal_hold_frames": 15,
+  "source_hashes": {
+    "scripts/audit_hgwind_upper_targets.py": "7f1b56d3a74d48c3245793831ec515e143860b8ffafa17f8c470d09b16f36431",
+    "data/derived/hgwind_traj18_development_20261031/dataset.json": "ba66f929cf97b6e5f8f4130adce40b0f9e9398f63397cb0e5a09a31f6d560fe2",
+    "data/derived/hgwind_traj18_development_20261031/arrays.npz": "d8087d27afc25ae7060a80fa392c34650494630c1476a0724da8f056f43931b0",
+    "data/derived/hgwind_action_contract_v1/20261029_220618_809794_traj_00018/plan.json": "e7ae16bac5856fcd365a88688977ca7039bfa843b94cc7cd2cf2090770aeb2e3",
+    "data/derived/hgwind_action_contract_v1/20261029_220618_809794_traj_00018/report.json": "e7c1e04ac8adfd0c26602ef797c8ee67f3356aed6e4cd5ca7e78eb4a83fa2478",
+    "data/derived/hgwind_action_contract_v1/20261029_220618_809794_traj_00018/actions.npy": "f76313ced5bfbc53680d534e05ae437b8a2bb548673b42970b98c86ab7ebf915",
+    "data/collected/hgwind_overnight_20261027_230043/local/Trajectory/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/traj_00018/replay.hdf5": "31aaf78161c0136235b2d6a73d344708e14bdf045c6e61cdd7819d6d3cad1e77",
+    "data/derived/hgwind_effort_probes/20261029_220130_402255_joint_online-expert_native-expert_target-capture/cartesian_target_inputs.json": "42469d8d436c78154d239f2e5d8cb77d26a1c4aeda8c43d963d05b8476bb067c",
+    "data/collected/hgwind_overnight_20261027_230043/local/Trajectory/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/traj_00018/analyse.jsonl": "52b9c338b8566c04c88ad170e2a4c028ac4702ae73a344eb474818248ad9f401",
+    "data/derived/hgwind_production_20261027/worker_bundle/data/derived/hgwind_current_baseline_20261027/repo/Scripts/expert_data/skills/catch.py": "ae6cd9d30b1ff5cf8995be1665dbfa3227dcdac3c6b813bd29684a100f16d0d8",
+    "data/derived/hgwind_production_20261027/worker_bundle/data/derived/hgwind_current_baseline_20261027/repo/Scripts/expert_data/expert.py": "27b864d7dd4a33d621bf6e22f1e615fa0ca143cfaf744425829c666f9752ac58",
+    "data/derived/hgwind_production_20261027/worker_bundle/data/derived/hgwind_current_baseline_20261027/repo/Scripts/expert_data/kinematic_servo.py": "95748feec72e2c4b5b891a1ec2cbfe15e5d30ab7ba9fa012d9862bc47bc58a74",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/noise_replanning_diagnostics/20261031_150546_311797/report.json": "0662a2c73854eeda09ccb3e5057b9960dccd388c0df06728afe8d330976912c5",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/noise_replanning_diagnostics/20261031_150546_311797/predictions.npz": "248ffec0d1049ca61f17273f20bc918bdddc0c83ee6adb4b68fe9137e5580e0e",
+    "data/derived/hgwind_effort_probes/20261029_220130_402255_joint_online-expert_native-expert_target-capture/plan.json": "6eb2d4999cd91baad8d54352b3154962dbf1fcb7582d0e1be7de8c1c245aa21f",
+    "data/derived/hgwind_production_20261027/worker_bundle/bundle_manifest.json": "3a461a8224be0dd54f9a984c1f71ed59dc494202f660c6cecd60d5a3a9a1d6af"
+  },
+  "startup": {
+    "target_xyz_m": [
+      [
+        -4.300870418548584,
+        -1.456068515777588,
+        0.4759444296360016
+      ],
+      [
+        -4.281644344329834,
+        -1.4680489301681519,
+        0.0668579638004303
+      ],
+      [
+        -4.299680233001709,
+        -1.4561269283294678,
+        0.0747852772474289
+      ],
+      [
+        -4.298795223236084,
+        -1.4561711549758911,
+        0.06782075017690659
+      ],
+      [
+        -4.297734260559082,
+        -1.456216812133789,
+        0.058120302855968475
+      ],
+      [
+        -4.296500205993652,
+        -1.4562643766403198,
+        0.04568677023053169
+      ],
+      [
+        -4.295099258422852,
+        -1.456316351890564,
+        0.03052286058664322
+      ],
+      [
+        -4.2935333251953125,
+        -1.4563746452331543,
+        0.012630564160645008
+      ],
+      [
+        -4.106708526611328,
+        -1.6411110162734985,
+        0.2957115173339844
+      ],
+      [
+        -4.111632823944092,
+        -1.6340348720550537,
+        0.29292669892311096
+      ]
+    ],
+    "measured_pinch_xyz_m": [
+      [
+        -3.9799091815948486,
+        -1.7516964673995972,
+        0.4779551029205322
+      ],
+      [
+        -3.980534791946411,
+        -1.7510865926742554,
+        0.4772903621196747
+      ],
+      [
+        -3.9834201335906982,
+        -1.749171257019043,
+        0.47694286704063416
+      ],
+      [
+        -3.9878129959106445,
+        -1.74655020236969,
+        0.47514206171035767
+      ],
+      [
+        -3.9929311275482178,
+        -1.7438545227050781,
+        0.4711776077747345
+      ],
+      [
+        -3.998561143875122,
+        -1.7411426305770874,
+        0.4650063216686249
+      ],
+      [
+        -4.0043511390686035,
+        -1.7383557558059692,
+        0.4566243588924408
+      ],
+      [
+        -4.010067462921143,
+        -1.7354706525802612,
+        0.4460403025150299
+      ],
+      [
+        -4.015408039093018,
+        -1.732398271560669,
+        0.43334272503852844
+      ],
+      [
+        -4.020191192626953,
+        -1.7290747165679932,
+        0.4189603328704834
+      ]
+    ],
+    "object_origin_z_m": [
+      0.08999975025653839,
+      0.08838745951652527,
+      0.0842520222067833,
+      0.07739157974720001,
+      0.06780614703893661,
+      0.05549570173025131,
+      0.040460266172885895,
+      0.022699829190969467,
+      0.03099186345934868,
+      0.04122776910662651
+    ],
+    "target_z_change_0_to_1_m": -0.409086475754207,
+    "pinch_z_change_0_to_1_m": -0.0006647408008575439,
+    "nominal_translation_mps": [
+      [
+        -1.2504022229779923,
+        1.151708696635769,
+        -0.007833189978084402
+      ],
+      [
+        -0.8558309897341413,
+        0.8130076920445177,
+        -1.2233445179862976
+      ],
+      [
+        -0.8683915742216402,
+        0.8155315057384758,
+        -1.2127672641396599
+      ],
+      [
+        -0.8337187111864082,
+        0.7919280924928709,
+        -1.2521034330031513
+      ],
+      [
+        -0.7971689302562871,
+        0.7682493389856525,
+        -1.2900831949072717
+      ],
+      [
+        -0.7593692621658408,
+        0.7445630866606426,
+        -1.3262669918459418
+      ],
+      [
+        -0.7212843737097444,
+        0.720633209569763,
+        -1.360307549603149
+      ],
+      [
+        -0.6804052684590086,
+        0.7043214939324042,
+        -1.38959702929952
+      ],
+      [
+        -0.7029461413621902,
+        0.821576446639483,
+        -0.5155263841152191
+      ],
+      [
+        -0.6923496857656818,
+        0.8529134745138146,
+        -0.5714172872093561
+      ]
+    ],
+    "native_admitted_translation_mps": [
+      [
+        -0.8720969459399801,
+        0.8032628922439033,
+        -0.0054642843032946704
+      ],
+      [
+        -0.5052583605498548,
+        0.4799772209620625,
+        -0.7222294451138148
+      ],
+      [
+        -0.5104262572375373,
+        0.47935612880505263,
+        -0.7128453024431585
+      ],
+      [
+        -0.4862860461287517,
+        0.4619107711871171,
+        -0.7303196041723976
+      ],
+      [
+        -0.45965372830350243,
+        0.4429782139631887,
+        -0.7438728257716635
+      ],
+      [
+        -0.43123929879248807,
+        0.4228314432779719,
+        -0.7531765857860908
+      ],
+      [
+        -0.4020172021873705,
+        0.40165563744353927,
+        -0.7581875212752647
+      ],
+      [
+        -0.3694660199094808,
+        0.3824535626021744,
+        -0.7545652532100775
+      ],
+      [
+        -0.5008450520893837,
+        0.585368775954563,
+        -0.3673125209229582
+      ],
+      [
+        -0.45771557893005943,
+        0.563862351362994,
+        -0.3777693967840949
+      ]
+    ],
+    "pre_depth_target_axial_difference_frame0_m": -3.7506251860507184e-07,
+    "telemetry": {
+      "skill_phase": [
+        [
+          3
+        ],
+        [
+          3
+        ],
+        [
+          3
+        ],
+        [
+          3
+        ],
+        [
+          3
+        ],
+        [
+          3
+        ],
+        [
+          3
+        ],
+        [
+          3
+        ],
+        [
+          3
+        ],
+        [
+          3
+        ]
+      ],
+      "phenomenon_phase": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ]
+      ],
+      "pregrasp_corridor_ingress_scale": [
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "target_pose_ingress_scale": [
+        1.0,
+        0.95947165625,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.33056540625,
+        0.34814353125
+      ],
+      "approach_servo_barrier_active": [
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true
+      ]
+    },
+    "gate_interpretation": "Source helper and recorded axial invariant support dynamic-ingress hold then release; internal pre-governor arguments/liveness flag were not captured, so no full branch replay is claimed."
+  },
+  "nominal_translation_comparison": {
+    "scope": "All 8 retained-parent independent-noise streams; same expert measured state per frame; before geometry projection, IK and dynamics.",
+    "per_seed": [
+      {
+        "seed": 90000,
+        "startup_0_39_mean_mps": 0.586916445457522,
+        "near_80_119_mean_mps": 0.06464073486496769,
+        "full_mean_mps": 0.17029470438365749
+      },
+      {
+        "seed": 190000,
+        "startup_0_39_mean_mps": 0.5397446502415166,
+        "near_80_119_mean_mps": 0.07036733655093996,
+        "full_mean_mps": 0.1628854414380255
+      },
+      {
+        "seed": 290000,
+        "startup_0_39_mean_mps": 0.5940752853657697,
+        "near_80_119_mean_mps": 0.0644588248681697,
+        "full_mean_mps": 0.16744993118133442
+      },
+      {
+        "seed": 390000,
+        "startup_0_39_mean_mps": 0.5803482845248317,
+        "near_80_119_mean_mps": 0.060866312914260944,
+        "full_mean_mps": 0.16575856911907777
+      },
+      {
+        "seed": 490000,
+        "startup_0_39_mean_mps": 0.5727853296244309,
+        "near_80_119_mean_mps": 0.07342462550656532,
+        "full_mean_mps": 0.1666165979541419
+      },
+      {
+        "seed": 590000,
+        "startup_0_39_mean_mps": 0.5806192986693128,
+        "near_80_119_mean_mps": 0.0675655262993567,
+        "full_mean_mps": 0.16963246163085063
+      },
+      {
+        "seed": 690000,
+        "startup_0_39_mean_mps": 0.45218041033147693,
+        "near_80_119_mean_mps": 0.06440350992368644,
+        "full_mean_mps": 0.14808820809099615
+      },
+      {
+        "seed": 790000,
+        "startup_0_39_mean_mps": 0.6033205067054259,
+        "near_80_119_mean_mps": 0.06153875834680489,
+        "full_mean_mps": 0.16891708890443347
+      }
+    ],
+    "mean_over_seeds": {
+      "startup_0_39_mean_mps": 0.5637487763650357,
+      "near_80_119_mean_mps": 0.06590820365934397,
+      "full_mean_mps": 0.16495537533781465
+    }
+  },
+  "limitations": [
+    "Single exposed development demonstration; no held-out inference.",
+    "Nominal request error is not measured arm velocity or post-safety command error.",
+    "No evidence for deleting/smoothing labels; no policy/controller change or grasp improvement claimed."
+  ],
+  "evidence_report": "data/derived/hgwind_traj18_development_20261031/upper_target_audits/20261031_153215_364884/report.json",
+  "evidence_report_sha256": "be5ed8807cb143900cef198b3efd0289d7b1ce07f0c9c60c00366aba8c8c92e1"
+}

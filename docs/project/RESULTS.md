@@ -1,5 +1,15 @@
 # Results and limitations
 
+## 31 October 2026 — Startup target jump is present in the native expert
+
+The CPU audit rebuilds all269 action vectors exactly from254 captured native calls plus15 terminal holds, verifies source/control clocks and the frozen native source against its bundle manifest, and checks the existing passing float32 contract. No label conversion mismatch is found. The native upper target Z changes0.475944→0.066858m between frames0 and1; measured pinch Z changes only−0.000665m. Original pre-depth telemetry has the same transition, with the reviewed2mm downward offset accounting for the difference to the capture.
+
+The frozen dynamic-ingress helper holds approach-axis height until target motion is admitted. Recorded frame0 preserves that axial coordinate within0.000000375m; corridor ingress changes0→1 on frame1, while skill phase remains3 and phenomenon phase changes0→1. This supports the hold/release explanation; internal liveness and pre-governor arguments were not captured, so this is not a complete branch reexecution. Subsequent geometric filtering remains active (pose ingress0.95947 at frame1). Do not delete or smooth the target as corrupt data.
+
+The controller converts position error plus feedforward to bounded translation, then applies geometry projection, IK and effort constraints. Reusing all eight independent-noise parent streams on the same expert states gives mean pre-collision nominal translation errors0.56375m/s over frames0–39,0.06591m/s over80–119, and0.16496m/s overall. These are requested-command differences, not measured robot velocities, post-safety errors or grasp outcomes. They show that startup mismatch persists after this part of the control mapping; raw target-coordinate error alone does not measure execution error.
+
+Retain existing labels, model and safety limits. Next investigate a bounded controller-aware training comparison that penalizes nominal translation mismatch alongside the existing action objective, checking startup, near-contact, orientation and jaw regressions together. This remains a hypothesis requiring gradient/algebra checks and matched-budget evaluation; no new training or physics was launched. [Reproducible CPU audit](../../scripts/audit_hgwind_upper_targets.py), [source-hashed evidence](../../results/summaries/2026-10-31-ball-upper-target-audit.json).
+
 ## 31 October 2026 — Prefix weighting provides only a modest tradeoff
 
 Both500-step branches complete; each samples262 distinct observation anchors. Scheduled indices and explicit training noise/time hashes match at every paired step. Both saved checkpoint inspectors pass, source/protocol/checkpoint hashes verify, and all24 generated stream metrics plus paired aggregates recompute exactly.
