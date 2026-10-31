@@ -1,5 +1,9 @@
 # Research roadmap
 
+## 31 October 2026 — Conditional translation training comparison prepared
+
+The [new training comparison](BALL_SERVO_ABLATION.md) retains uniform 29D flow supervision and tests an auxiliary first-four translation-command term against an equal-budget uniform continuation. Teacher cap/reference/masks define the conditional training context; evaluation uses all predicted fields. Future measured robot states are offline supervision only. Two independent 500-step branches use paired training draws and eight matched full-stream inference probes. Both candidates are retained without automatic promotion; GPU training and physical outcomes remain pending.
+
 ## 31 October 2026 — Startup target jump is present in the native expert
 
 The CPU audit rebuilds all269 action vectors exactly from254 captured native calls plus15 terminal holds, verifies source/control clocks and the frozen native source against its bundle manifest, and checks the existing passing float32 contract. No label conversion mismatch is found. The native upper target Z changes0.475944→0.066858m between frames0 and1; measured pinch Z changes only−0.000665m. Original pre-depth telemetry has the same transition, with the reviewed2mm downward offset accounting for the difference to the capture.

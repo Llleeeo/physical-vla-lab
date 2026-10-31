@@ -1,0 +1,56 @@
+{
+  "status": "CPU_IMPLEMENTATION_VERIFIED_GPU_PENDING",
+  "source_hashes": {
+    "scripts/train_hgwind_servo_ablation.py": "9fd0efaea96e59e736b44d9d797abf93ad47e1c985e7873846a97d593a07ff54",
+    "src/capstone_vla/ball_servo_loss.py": "49c5c634f59b24bb4ab8bd496dd241abb8ce7fe9912035e4372c5559ffd5d8c3",
+    "tests/test_ball_servo_loss.py": "8ce5c048d7d373f87c8810f525fb95e2b6b14a9e44e03057b57e6a61aca41692",
+    "results/summaries/2026-10-31-ball-upper-target-audit.json": "2a7fdd6d9ff43f06abc0aa2e466554c264ec1dcea8cb4dad148812e6fa330951"
+  },
+  "parent": "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430",
+  "checks": {
+    "frozen_native_numpy_parity_cases": 807,
+    "parity_tolerance": 1e-12,
+    "finite_difference_gradient_check": true,
+    "perfect_endpoint_zero": true,
+    "auxiliary_padding_tail_unrelated_channel_gradients_zero": true,
+    "actual_model_strict_load_forward_backward": true,
+    "actual_auxiliary_projection_gradient_finite_nonzero": true,
+    "CUDA_initialized": false,
+    "archived_full_command_metric_seed_count": 8,
+    "archived_metric_match_tolerance": 1e-12
+  },
+  "protocol": {
+    "steps_each": 500,
+    "branches": {
+      "uniform": 0.0,
+      "servo": 0.1
+    },
+    "command_scale_mps": 0.1,
+    "learning_rate": 1e-05,
+    "batch_size": 2,
+    "auxiliary_offsets": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "teacher_context": [
+      "velocity_reference",
+      "relative_cap",
+      "enable_masks",
+      "corresponding_future_measured_pinch"
+    ],
+    "supervised_channels": [
+      "target_position",
+      "target_linear_velocity"
+    ],
+    "full_valid29_flow_retained": true,
+    "matched_training_random_inputs": true,
+    "evaluation_noise_seeds": 8
+  },
+  "GPU_training_run": false,
+  "physics_run": false,
+  "default_changed": false,
+  "grasp_improvement_verified": false,
+  "limitations": "Conditional pre-collision training endpoint approximation; complete predicted caps/masks used only in generated-command evaluation. Single exposed demonstration, no held-out claim."
+}

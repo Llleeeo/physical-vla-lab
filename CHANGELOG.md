@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Conditional translation training ablation prepared
+
+- Add a separate matched training pair with endpoint command supervision and unchanged full-action flow loss.
+- Verify native velocity-mapping parity, corresponding future-state supervision, and gradient/padding behavior.
+- Evaluate full predicted speed contracts without silently discarding rejected requests; no automatic promotion or simulation launch.
+
 ## 2026-10-31 — Native upper-target provenance audited
 
 - Rebuild269 labels exactly and verify frozen expert dependencies.
