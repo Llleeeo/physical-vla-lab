@@ -1,6 +1,8 @@
 # Causal gripper confirmation experiment
 
-Status: CPU-verified optional implementation; live efficacy pending. Development case only.
+Status: withdrawn at user request after live failure. Active runtime/CLI no longer contains this experiment; original0.5 decoding is restored. This document is historical, reproducible from commit52c153d, and the command below does not apply to current main. See [visual approach work](BALL_VISUAL_APPROACH.md).
+
+See the [verified live result](../../results/summaries/2026-10-31-ball-gripper-confirmation-live-result.json): maximum raw jaw score0.712 never reaches0.8; contact100 precedes the first gate decision change102. This gate does not protect approach distance.
 
 The retained 3,000-step model and latest prefix1 baseline remain fixed. At each 60 Hz action boundary, start open; require three consecutive raw jaw outputs >=0.8 to close; once closed, reopen only below0.2. Reset the consecutive counter whenever an open-state score is below0.8. These are regression scores, not probabilities; thresholds are development heuristics selected after inspecting this case.
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-10-31 — Withdraw jaw confirmation; inspect approach from RGB
+
+- Remove the0.8 confirmation flag/module and restore pre-experiment live runtime. Preserve all historical results.
+- Add a CPU-only two-view orange-ball localization/geometry prototype with explicit missing/ambiguous-view rejection and evaluator-only object truth.
+- Verify complete precontact coverage on two exposed runs, with worst observed3D error12.3mm. Runtime distance protection remains unimplemented pending uncertainty/missing-view handling.
+
+## 2026-10-31 — Gripper confirmation does not prevent open-finger collision
+
+- Verify all269 consumed raw predictions and the optional gate against saved execution; independent grasp fails without safety abort.
+- All jaw outputs remain below0.8, so the gate never closes. Right-finger contact occurs at100, before the first suppressed raw closure102.
+- Record horizontal misalignment at descent and historical rendering confounds. Export existing RGB to a verified two-view video; retain defaults.
+
 ## 2026-10-31 — Optional causal gripper confirmation prepared
 
 - Add explicit three-frame closure confirmation and reopening hysteresis, preserving raw predictions and all other action channels.

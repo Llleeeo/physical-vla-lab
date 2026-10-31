@@ -1,5 +1,21 @@
 # Results and limitations
 
+## 31 October 2026 — Original jaw decoding restored; RGB localization inspected
+
+The user rejects the0.8 intervention; all four live entry/runtime files are restored exactly to2478647 and the optional flag/module is removed. The standard0.5 action-codec threshold remains. Failed-run evidence is preserved.
+
+A new RGB-only orange-ball prototype triangulates camera pairs without reading object truth; a separate evaluator checks errors afterward. Latest/previous prefix1 runs have100/100 and126/126 precontact frames localized, with median/p95/max errors1.99/6.56/11.76mm and2.04/7.11/12.32mm. Full-episode coverage is147/269 and204/269, chiefly limited by losing the wrist view. These are exposed-case observations, not held-out validation or guaranteed error bounds. There is no runtime distance guard or new physics result yet. [Protocol and limitations](BALL_VISUAL_APPROACH.md) · [Evidence](../../results/summaries/2026-10-31-ball-visual-approach-prototype.json).
+
+## 31 October 2026 — Confirmed jaws remain open; approach still collides
+
+The optional confirmation rollout `20261031_165254_745531` completes269 intervals/807 callbacks without safety abort. Raw model response binding, runtime/checkpoint/artifact hashes and causal postprocessing audit pass. Independent grasp fails. The maximum raw jaw score is0.711921, below0.8 throughout: zero executed closure frames and no jaw transitions. This is an over-restrictive gate for this observed stream, not evidence of stable grasp control.
+
+Right-finger contact occurs only at100 (1.667s); no left or bilateral contact. Both finger joints are approximately0.040m open. Ball position differs from the teacher by over1mm at101. The first gate-induced binary decision change is102, after contact. The original model also requests open at100 (score0.144). Thus filtering closure alone cannot prevent this observed open-finger approach collision.
+
+At100 the right configured finger contact reference point is approximately[3.15,-0.11,23.71]mm relative to ball center, while the two-point midpoint is[55.92,-6.15,24.76]mm. This describes one finger approaching above the ball while the midpoint remains horizontally offset. These are configured reference points, not complete collision-surface clearance; do not use their distance directly as a safety bound.
+
+Historical prefix1 first contact was126. Model hashes and initial robot state match, but initial RGB differs by0.201/255 external and0.322/255 wrist MAE; frame0 position targets differ by4.25mm and robot states differ from1. Earlier collision cannot be causally attributed to the gate. No new training, rendering or simulation is launched by the analysis; saved RGB is encoded to269-frame4x-slow two-view video. [Hashed evidence](../../results/summaries/2026-10-31-ball-gripper-confirmation-live-result.json).
+
 ## 31 October 2026 — Gripper confirmation: CPU verification only
 
 The optional gate starts open, closes after three consecutive jaw scores >=0.8 and reopens below0.2. Scores are regression outputs, not probabilities. On the saved269-frame prefix1 stream it produces one transition at141 instead of13; the other28 channels remain numerically identical. This is a post-hoc exposed-case hypothesis, not a live counterfactual, since the original first contact126 precedes141. Strict CPU checkpoint/preprocessing verification and24 focused tests pass. No new GPU trial or grasp improvement is claimed. [Protocol](BALL_GRIPPER_CONFIRMATION.md) · [Evidence](../../results/summaries/2026-10-31-ball-gripper-confirmation-preflight.json).

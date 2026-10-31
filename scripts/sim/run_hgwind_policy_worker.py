@@ -51,8 +51,6 @@ def summary(policy):
         source_actions_used_for_control=diagnostic,online_task_step_called=False,online_skill_step_called=False,
         learned_policy_evaluated=not diagnostic,model_inference_used=True,
         vertical_diagnostic=diagnostic,standalone_policy_evaluation=not diagnostic,
-        gripper_confirmation=config.get("gripper_confirmation"),
-        policy_postprocessing=config.get("gripper_confirmation") is not None,
         original_expert_used=False,packet_requests_own_motors=True,
         source_success_reused=False,saved_commands_own_motors=diagnostic,command_frames=len(trace._STATE['rows']),
         control_reference_file='live_control_references.json',native_effort_configuration_unchanged=True,

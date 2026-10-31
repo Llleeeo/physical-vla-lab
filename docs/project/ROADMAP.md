@@ -1,5 +1,17 @@
 # Research roadmap
 
+## 31 October 2026 — Withdraw0.8; develop visual approach protection
+
+The original jaw decoding is restored. The explicit next target is to prevent an open finger reaching the ball while the gripper midpoint remains misaligned. An offline RGB-only prototype now localizes all precontact frames in two exposed runs, but worst observed error exceeds12mm and later wrist-view loss reduces coverage. Do not equate ray consistency with accuracy or silently read simulator ball coordinates at runtime.
+
+Next implement uncertainty-aware approach control with bounded missing-view behavior, actual robot finger geometry and coherent pose/motion references. Keep object truth confined to the offline evaluator. A held height alone cannot certify fingertip clearance; complete geometry and native actuator limits still matter. No further0.8 tuning, recollection or model training is planned at this point. [Current implementation boundary](BALL_VISUAL_APPROACH.md).
+
+## 31 October 2026 — Prioritize precontact approach geometry
+
+The confirmation trial fails with jaws open throughout and one right-finger collision at100, before the gate first changes a binary jaw decision102. Maximum raw score0.712 never reaches0.8. Do not promote this gate, characterize absent switching as success, or continue a threshold sweep to address the earlier open-finger collision.
+
+The next question is whether a causal approach condition can keep fingertips clear until the gripper midpoint is horizontally aligned for descent. Inspect recorded reference-point geometry first, then assess visual ball localization from saved calibrated views before adding a runtime gate. Account for tilt, finite finger surfaces and motion during descent; do not equate a fixed wrist height with collision clearance. Waiting only for a learned jaw-confirmation event can deadlock or miss the ball, and does not certify alignment. Simulator target truth can establish offline geometry but must not silently enter the learned policy. Keep existing demonstrations/model and default execution, with no new collection or training. [Observed result](../../results/summaries/2026-10-31-ball-gripper-confirmation-live-result.json).
+
 ## 31 October 2026 — Isolate jaw confirmation before geometry-aware descent
 
 Run one bounded retained-parent prefix1 trial with optional three-frame close confirmation and reopening hysteresis. Preserve raw outputs and compare actual first contact, unilateral/bilateral contact, jaw transitions and independent grasp. Keep the prior default and all failure outcomes. Historical renderer/runtime variation remains a comparison limitation.
