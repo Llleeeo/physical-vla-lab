@@ -2,6 +2,10 @@
 
 Snapshot: **2026-10-31, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Ball offline predictions: adaptation improves pose, fit remains poor
+
+The 200-step model has first-action position mean127.05mm/p95290.69mm and orientation mean6.19degrees on its own training episode. Gripper accuracy is79.18%, with78 thresholded offline transitions versus one expert transition. Before-close position error is129.63mm, so this is not only a contact-stage issue. Velocity/acceleration mean errors worsen relative to the adapted baseline. All source hashes and raw prefix metrics are independently rechecked. Next is a matched2,000-step fit, CPU-preflight passed; efficacy and learned grasp are unverified. [Result](../../results/summaries/2026-10-31-ball-offline-prediction-result.json).
+
 ## Ball development fine-tune: optimization and checkpoint verified
 
 The user-run 200-step update finishes on `local/traj_00018`, sampling198 distinct anchor frames. All six paired flow probes improve: mean4.8705→2.0003, a58.93% reduction. Checkpoint weights change as reported and strictly reload with exact source-derived normalizers on CPU. This establishes a working optimization/checkpoint path, not pose accuracy or learned grasp. Actual29D action prediction is prepared next; no new simulation or GPU inference was started by the agent. [Result](../../results/summaries/2026-10-31-ball-development-finetune-result.json).

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-31 — Ball predictions verified; bounded longer fit prepared
+
+- Recompute raw offline metrics and verify archive/source hashes: first-action mean position error127.05mm, p95290.69mm, gripper accuracy79.18%,78 predicted transitions versus one expert transition. Errors span approach and contact; velocity/acceleration errors do not uniformly improve. Decoder acceptance does not imply physical feasibility.
+- Existing 2,000-step entry passes CPU preflight. It changes training duration only, starts from the same pretrained weights and preserves the 200-step result. GPU run and improvement are pending; no runtime/controller change. [Protocol](docs/project/BALL_DEVELOPMENT_TRAINING.md#verified-offline-result-and-bounded-next-experiment).
+
 ## 2026-10-31 — Ball fine-tune completed; action prediction prepared
 
 - Verify 200 optimizer steps, 198 sampled anchor frames, changed checkpoint weights and a 58.93% reduction across six fixed training-episode flow probes (4.8705 to 2.0003). Strict CPU checkpoint reload and exact new normalizers pass. No learned grasp or held-out claim follows.

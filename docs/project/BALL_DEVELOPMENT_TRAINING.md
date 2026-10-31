@@ -1,8 +1,27 @@
 # Ball development training bridge
 
-Status: 31 October 2026 — 200-step GPU fine-tuning completed and checkpoint strictly reloaded on CPU; generated-action prediction and learned closed-loop grasp remain unverified.
+Status: 31 October 2026 — 200-step fine-tuning and offline generated-action prediction verified. Predictions remain inaccurate; a matched 2,000-step training run is prepared. Learned closed-loop grasp remains unverified.
+
+## Verified offline result and bounded next experiment
+
+Raw prediction archive, input/checkpoint/source hashes and all prefix metrics were independently rechecked. The 200-step model's first-action mean position error is 127.05 mm (p95 290.69 mm), down from 495.93 mm under the adapted pretrained baseline; mean orientation error is 6.19 degrees. These are expert-target prediction errors, not measured robot tracking errors. Before closure, between closure and first teacher contact, and from contact onward, mean position errors are 129.63, 134.58 and 122.30 mm respectively. The error is not confined to contact.
+
+First-action gripper accuracy is 79.18%. Thresholded predictions across recorded observations change state 78 times; the target changes once at frame 144. During frames 144–161, gripper accuracy is only 38.89%. These are offline independently sampled outputs, not 78 executed physical jaw movements. Velocity and acceleration mean prediction errors also worsen relative to the adapted pretrained baseline. Zero decoder rejections means structurally decodable outputs, not successful or feasible control. [Verified result](../../results/summaries/2026-10-31-ball-offline-prediction-result.json).
+
+**Next: test insufficient optimization with one bounded 2,000-step run.** Keep episode, seed, learning rate, batch size, model, normalization and action interface fixed. The existing entry starts from the same official pretrained weights; it does not resume or overwrite the 200-step checkpoint. CPU preflight passes. No improvement is claimed before this run and its matched action prediction finish.
+
+```bash
+cd /home/robophys/Capstone_Project_Yuan_Haoming
+.venv_dynamicvla/bin/python scripts/finetune_hgwind_development.py --steps 2000 --run
+```
+
+After completion, use `scripts/predict_hgwind_development.py --run-dir NEW_TRAINING_OUTPUT --run`, substituting the exact new training directory printed by this run. The prediction entry's default still points to the original 200-step checkpoint; do not inadvertently evaluate that again. Compare identical noise and prefixes, position mean/p95, orientation, closure-window gripper errors/transitions, mode accuracy and motion-reference errors. Reduced flow loss alone is insufficient. If this bounded increase does not meaningfully improve generated actions, inspect action representation/objective rather than repeatedly increasing steps. No temporal smoothing or expert-label substitution is applied to hide prediction errors.
+
+This deliberately exposed single-episode fit is a pipeline check. It does not measure unseen-task generalization or establish that more training data is unnecessary.
 
 ## Observed fine-tuning result and next command
+
+Historical command: this 200-step prediction has completed; use the new experiment instructions above.
 
 The user run completes 200 optimizer steps, sampling 198 distinct anchor frames. Six probes using the same observations, noise and flow time improve from mean 4.8705 to 2.0003 (58.93% reduction); every paired probe improves. This is training-episode flow loss, not physical action error. The last stochastic training loss of 3.4736 uses different sampled frames/noise from earlier steps and alone is not evidence of regression.
 
@@ -69,7 +88,7 @@ Existing output is never overwritten. Normalizer, checkpoint-load, finite-loss/g
 
 ## Next gate and limitations
 
-After the pending prediction result: inspect sampled29D action errors/quaternion/mode/gripper validity on the same episode, then connect the model to the passing simulator executor using **live** camera/robot observations. A single successful grasp remains an integration demonstration, not generalization or robustness. The current training preparation does not implement that live29D policy adapter; the old7D egg adapter cannot be substituted unchanged.
+After improving and rechecking the generated29D actions on this same episode, connect the model to the passing simulator executor using **live** camera/robot observations. A single successful grasp remains an integration demonstration, not generalization or robustness. The current training preparation does not implement that live29D policy adapter; the old7D egg adapter cannot be substituted unchanged.
 
 The other39 stored ball trajectories lack all required upper-command labels; this work does not make them directly convertible. Contact sensitivity in other cases remains recorded. Do not silently fall back to saved expert actions during learned-policy evaluation.
 
@@ -79,4 +98,4 @@ Rollback: stop using these new training/data entry points. Existing simulation, 
 
 374 portable CPU checks pass, including22 focused checks. The real CPU model load confirms exact new normalizers, state input2×32, action input2×20×32,154 instruction tokens and gradients only on valid29D targets; CUDA remains uninitialized. Those preparation checks preceded the user-run training reported above. [Source-hashed preparation](../../results/summaries/2026-10-31-ball-development-preparation.json).
 
-Prediction preparation: 380 portable CPU checks pass, including 11 focused data/metric checks. Actual trained-checkpoint CPU reload passes strictly with exact normalizers; GPU prediction remains user-run.
+Prediction preparation: 380 portable CPU checks pass, including 11 focused data/metric checks. Actual trained-checkpoint CPU reload passes strictly with exact normalizers; GPU prediction was subsequently run by the user and independently verified above.

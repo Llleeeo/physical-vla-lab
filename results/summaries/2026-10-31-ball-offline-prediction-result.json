@@ -1,0 +1,455 @@
+{
+  "date": "2026-10-31",
+  "scope": "single exposed training episode local/traj_00018; offline only",
+  "verified": {
+    "source_hashes": true,
+    "raw_metrics_recomputed": true
+  },
+  "prediction_report_sha256": "72e8f16942fff60aadb0039413e5f086ead6ad619ca7b4226fdbbb4ee39afc26",
+  "prediction_archive_sha256": "b5a2ad46057be460d577f244f9a86f9b17f7854bc2079814a4be757acc5904bd",
+  "phases": {
+    "before_close": {
+      "frame_start": 0,
+      "frame_end_exclusive": 144,
+      "position_error_mm": {
+        "count": 144,
+        "mean": 129.6301118232513,
+        "median": 105.3098822751756,
+        "p95": 317.8745447334578
+      },
+      "gripper_accuracy": 0.8402777777777778
+    },
+    "close_to_first_contact": {
+      "frame_start": 144,
+      "frame_end_exclusive": 162,
+      "position_error_mm": {
+        "count": 18,
+        "mean": 134.58073831168,
+        "median": 124.44469211465098,
+        "p95": 236.23085622844897
+      },
+      "gripper_accuracy": 0.3888888888888889
+    },
+    "from_first_contact": {
+      "frame_start": 162,
+      "frame_end_exclusive": 269,
+      "position_error_mm": {
+        "count": 107,
+        "mean": 122.3017158585486,
+        "median": 104.65582570076396,
+        "p95": 285.1236672408198
+      },
+      "gripper_accuracy": 0.794392523364486
+    }
+  },
+  "target_gripper_transitions": [
+    144
+  ],
+  "predicted_gripper_transition_count": 78,
+  "models": {
+    "pretrained": {
+      "1": {
+        "position_error_mm": {
+          "count": 269,
+          "mean": 495.9274541323697,
+          "median": 505.60044306082784,
+          "p95": 697.4182231610961
+        },
+        "orientation_error_deg": {
+          "count": 269,
+          "mean": 35.76806973387631,
+          "median": 36.07656499788649,
+          "p95": 37.484231673584986
+        },
+        "decoder_rejected_frames": 0,
+        "mode_accuracy": {
+          "acceleration_enabled": 0.6877323420074349,
+          "velocity_reference_enabled": 0.6319702602230484,
+          "relative_speed_enabled": 0.6319702602230484,
+          "orientation_axis_enabled": 1.0,
+          "preserve_orientation_during_translation": 0.7434944237918215,
+          "operational_orientation_task": 0.6319702602230484,
+          "gripper_closed": 0.5353159851301115
+        },
+        "vector_error": {
+          "target_linear_velocity": {
+            "unit": "m/s",
+            "scope": "raw_prediction_on_target_enabled_frames",
+            "count": 269,
+            "mean": 0.10087394873798215,
+            "median": 0.04595207974967381,
+            "p95": 0.37830286426925985
+          },
+          "target_linear_acceleration": {
+            "unit": "m/s^2",
+            "scope": "raw_prediction_on_target_enabled_frames",
+            "count": 185,
+            "mean": 1.8974186930177568,
+            "median": 0.727525595002524,
+            "p95": 9.088023616871444
+          },
+          "linear_velocity_reference": {
+            "unit": "m/s",
+            "scope": "raw_prediction_on_target_enabled_frames",
+            "count": 170,
+            "mean": 0.13180039769066998,
+            "median": 0.06836455859899726,
+            "p95": 0.4941877156465121
+          }
+        },
+        "scalar_projection": {
+          "orientation_roll_weight": {
+            "active_finite_frames": 269,
+            "clipped_frames": 0
+          },
+          "joint_limit_margin_rad": {
+            "active_finite_frames": 269,
+            "clipped_frames": 0
+          },
+          "maximum_relative_linear_speed_mps": {
+            "active_finite_frames": 269,
+            "clipped_frames": 0
+          }
+        },
+        "predicted_gripper_transition_count": 0
+      },
+      "4": {
+        "position_error_mm": {
+          "count": 269,
+          "mean": 501.7671705779738,
+          "median": 516.4577143139593,
+          "p95": 707.2768440312884
+        },
+        "orientation_error_deg": {
+          "count": 269,
+          "mean": 35.756945047284404,
+          "median": 36.11667746033517,
+          "p95": 37.490126256298495
+        },
+        "decoder_rejected_frames": 0,
+        "mode_accuracy": {
+          "acceleration_enabled": 0.6877323420074349,
+          "velocity_reference_enabled": 0.6319702602230484,
+          "relative_speed_enabled": 0.6319702602230484,
+          "orientation_axis_enabled": 1.0,
+          "preserve_orientation_during_translation": 0.7434944237918215,
+          "operational_orientation_task": 0.6319702602230484,
+          "gripper_closed": 0.5353159851301115
+        },
+        "vector_error": {
+          "target_linear_velocity": {
+            "unit": "m/s",
+            "scope": "raw_prediction_on_target_enabled_frames",
+            "count": 269,
+            "mean": 0.10084869308481717,
+            "median": 0.0459413217815817,
+            "p95": 0.37781463320443304
+          },
+          "target_linear_acceleration": {
+            "unit": "m/s^2",
+            "scope": "raw_prediction_on_target_enabled_frames",
+            "count": 185,
+            "mean": 1.8978152113921285,
+            "median": 0.726718364509063,
+            "p95": 9.092229581731834
+          },
+          "linear_velocity_reference": {
+            "unit": "m/s",
+            "scope": "raw_prediction_on_target_enabled_frames",
+            "count": 170,
+            "mean": 0.1317131923016145,
+            "median": 0.06834520921088462,
+            "p95": 0.4941695878607752
+          }
+        },
+        "scalar_projection": {
+          "orientation_roll_weight": {
+            "active_finite_frames": 269,
+            "clipped_frames": 0
+          },
+          "joint_limit_margin_rad": {
+            "active_finite_frames": 269,
+            "clipped_frames": 0
+          },
+          "maximum_relative_linear_speed_mps": {
+            "active_finite_frames": 269,
+            "clipped_frames": 0
+          }
+        },
+        "predicted_gripper_transition_count": 0
+      },
+      "20": {
+        "position_error_mm": {
+          "count": 269,
+          "mean": 505.82130538165046,
+          "median": 497.1036934256313,
+          "p95": 710.1696200411719
+        },
+        "orientation_error_deg": {
+          "count": 269,
+          "mean": 35.69424923891046,
+          "median": 35.95699103985307,
+          "p95": 37.505374943639694
+        },
+        "decoder_rejected_frames": 0,
+        "mode_accuracy": {
+          "acceleration_enabled": 0.6877323420074349,
+          "velocity_reference_enabled": 0.6319702602230484,
+          "relative_speed_enabled": 0.6319702602230484,
+          "orientation_axis_enabled": 1.0,
+          "preserve_orientation_during_translation": 0.7434944237918215,
+          "operational_orientation_task": 0.6319702602230484,
+          "gripper_closed": 0.5353159851301115
+        },
+        "vector_error": {
+          "target_linear_velocity": {
+            "unit": "m/s",
+            "scope": "raw_prediction_on_target_enabled_frames",
+            "count": 269,
+            "mean": 0.10079327504593028,
+            "median": 0.045898224253908236,
+            "p95": 0.3788340988279039
+          },
+          "target_linear_acceleration": {
+            "unit": "m/s^2",
+            "scope": "raw_prediction_on_target_enabled_frames",
+            "count": 185,
+            "mean": 1.8952411952770722,
+            "median": 0.7256308202047002,
+            "p95": 9.10093444176436
+          },
+          "linear_velocity_reference": {
+            "unit": "m/s",
+            "scope": "raw_prediction_on_target_enabled_frames",
+            "count": 170,
+            "mean": 0.13165328611277602,
+            "median": 0.068536992414237,
+            "p95": 0.4950794118176853
+          }
+        },
+        "scalar_projection": {
+          "orientation_roll_weight": {
+            "active_finite_frames": 269,
+            "clipped_frames": 0
+          },
+          "joint_limit_margin_rad": {
+            "active_finite_frames": 269,
+            "clipped_frames": 0
+          },
+          "maximum_relative_linear_speed_mps": {
+            "active_finite_frames": 269,
+            "clipped_frames": 0
+          }
+        },
+        "predicted_gripper_transition_count": 0
+      }
+    },
+    "finetuned": {
+      "1": {
+        "position_error_mm": {
+          "count": 269,
+          "mean": 127.04636798893355,
+          "median": 106.14457337627074,
+          "p95": 290.68836721754224
+        },
+        "orientation_error_deg": {
+          "count": 269,
+          "mean": 6.185003869624829,
+          "median": 5.3886836908288,
+          "p95": 14.59600179131933
+        },
+        "decoder_rejected_frames": 0,
+        "mode_accuracy": {
+          "acceleration_enabled": 0.7732342007434945,
+          "velocity_reference_enabled": 0.8066914498141264,
+          "relative_speed_enabled": 0.8252788104089219,
+          "orientation_axis_enabled": 0.8736059479553904,
+          "preserve_orientation_during_translation": 0.7657992565055762,
+          "operational_orientation_task": 0.7955390334572491,
+          "gripper_closed": 0.79182156133829
+        },
+        "vector_error": {
+          "target_linear_velocity": {
+            "unit": "m/s",
+            "scope": "raw_prediction_on_target_enabled_frames",
+            "count": 269,
+            "mean": 0.12231296681834687,
+            "median": 0.08578148339399615,
+            "p95": 0.4119924170635244
+          },
+          "target_linear_acceleration": {
+            "unit": "m/s^2",
+            "scope": "raw_prediction_on_target_enabled_frames",
+            "count": 185,
+            "mean": 2.555546612913513,
+            "median": 2.02221594090201,
+            "p95": 7.381249978936064
+          },
+          "linear_velocity_reference": {
+            "unit": "m/s",
+            "scope": "raw_prediction_on_target_enabled_frames",
+            "count": 170,
+            "mean": 0.14877332509468563,
+            "median": 0.09820695333302017,
+            "p95": 0.5342954875635908
+          }
+        },
+        "scalar_projection": {
+          "orientation_roll_weight": {
+            "active_finite_frames": 269,
+            "clipped_frames": 67
+          },
+          "joint_limit_margin_rad": {
+            "active_finite_frames": 269,
+            "clipped_frames": 79
+          },
+          "maximum_relative_linear_speed_mps": {
+            "active_finite_frames": 169,
+            "clipped_frames": 13
+          }
+        },
+        "predicted_gripper_transition_count": 78
+      },
+      "4": {
+        "position_error_mm": {
+          "count": 269,
+          "mean": 141.45060929094225,
+          "median": 126.26131014232398,
+          "p95": 298.86007492470736
+        },
+        "orientation_error_deg": {
+          "count": 269,
+          "mean": 6.077543499280494,
+          "median": 4.949957610427023,
+          "p95": 14.047275633368786
+        },
+        "decoder_rejected_frames": 0,
+        "mode_accuracy": {
+          "acceleration_enabled": 0.7769516728624535,
+          "velocity_reference_enabled": 0.828996282527881,
+          "relative_speed_enabled": 0.8587360594795539,
+          "orientation_axis_enabled": 0.9182156133828996,
+          "preserve_orientation_during_translation": 0.7657992565055762,
+          "operational_orientation_task": 0.8475836431226765,
+          "gripper_closed": 0.8364312267657993
+        },
+        "vector_error": {
+          "target_linear_velocity": {
+            "unit": "m/s",
+            "scope": "raw_prediction_on_target_enabled_frames",
+            "count": 269,
+            "mean": 0.12070159272370586,
+            "median": 0.0806897707067797,
+            "p95": 0.39801592764613164
+          },
+          "target_linear_acceleration": {
+            "unit": "m/s^2",
+            "scope": "raw_prediction_on_target_enabled_frames",
+            "count": 185,
+            "mean": 2.623787002848539,
+            "median": 2.0551408871207792,
+            "p95": 7.978428140365581
+          },
+          "linear_velocity_reference": {
+            "unit": "m/s",
+            "scope": "raw_prediction_on_target_enabled_frames",
+            "count": 170,
+            "mean": 0.14421751495816537,
+            "median": 0.0876301269709811,
+            "p95": 0.5510133494521074
+          }
+        },
+        "scalar_projection": {
+          "orientation_roll_weight": {
+            "active_finite_frames": 269,
+            "clipped_frames": 86
+          },
+          "joint_limit_margin_rad": {
+            "active_finite_frames": 269,
+            "clipped_frames": 81
+          },
+          "maximum_relative_linear_speed_mps": {
+            "active_finite_frames": 168,
+            "clipped_frames": 3
+          }
+        },
+        "predicted_gripper_transition_count": 68
+      },
+      "20": {
+        "position_error_mm": {
+          "count": 269,
+          "mean": 138.22776946414726,
+          "median": 112.73825610127383,
+          "p95": 328.47244575336384
+        },
+        "orientation_error_deg": {
+          "count": 269,
+          "mean": 5.523245407833911,
+          "median": 4.408733464029453,
+          "p95": 13.487351561876851
+        },
+        "decoder_rejected_frames": 0,
+        "mode_accuracy": {
+          "acceleration_enabled": 0.7360594795539034,
+          "velocity_reference_enabled": 0.8550185873605948,
+          "relative_speed_enabled": 0.8661710037174721,
+          "orientation_axis_enabled": 0.8810408921933085,
+          "preserve_orientation_during_translation": 0.758364312267658,
+          "operational_orientation_task": 0.8550185873605948,
+          "gripper_closed": 0.8104089219330854
+        },
+        "vector_error": {
+          "target_linear_velocity": {
+            "unit": "m/s",
+            "scope": "raw_prediction_on_target_enabled_frames",
+            "count": 269,
+            "mean": 0.11732384925504383,
+            "median": 0.07887957506834506,
+            "p95": 0.37258957824083483
+          },
+          "target_linear_acceleration": {
+            "unit": "m/s^2",
+            "scope": "raw_prediction_on_target_enabled_frames",
+            "count": 185,
+            "mean": 2.6395266001254236,
+            "median": 1.9392691728291445,
+            "p95": 8.335046924500633
+          },
+          "linear_velocity_reference": {
+            "unit": "m/s",
+            "scope": "raw_prediction_on_target_enabled_frames",
+            "count": 170,
+            "mean": 0.14474985965709283,
+            "median": 0.0943591535669719,
+            "p95": 0.49468985830813816
+          }
+        },
+        "scalar_projection": {
+          "orientation_roll_weight": {
+            "active_finite_frames": 269,
+            "clipped_frames": 83
+          },
+          "joint_limit_margin_rad": {
+            "active_finite_frames": 269,
+            "clipped_frames": 92
+          },
+          "maximum_relative_linear_speed_mps": {
+            "active_finite_frames": 178,
+            "clipped_frames": 5
+          }
+        },
+        "predicted_gripper_transition_count": 57
+      }
+    }
+  },
+  "next_experiment": {
+    "steps": 2000,
+    "previous_steps": 200,
+    "other_training_settings": "unchanged; fresh official pretrained initialization, not resume",
+    "efficacy": "pending"
+  },
+  "cpu_2000_step_preflight": "passed; CUDA not started",
+  "heldout_evaluation": false,
+  "simulation_rollout": false,
+  "task_success_verified": false
+}

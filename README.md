@@ -6,7 +6,7 @@ This project connects RoboPhys simulation, expert demonstrations, synchronized v
 
 This is an independent research integration, not the upstream RoboPhys benchmark or an official DynamicVLA release.
 
-**Latest result:** the [single-episode ball fine-tune](docs/project/BALL_DEVELOPMENT_TRAINING.md#observed-fine-tuning-result-and-next-command) completes 200 optimizer steps. Six fixed training-episode flow probes improve from mean 4.87 to 2.00; the saved29D-action/30D-state checkpoint strictly reloads on CPU. Actual action prediction is the next check. Learned grasp and generalization remain unverified; prior contact/safety failures remain recorded.
+**Latest result:** [offline ball predictions](docs/project/BALL_DEVELOPMENT_TRAINING.md#verified-offline-result-and-bounded-next-experiment) after 200 training steps have mean position error127.05mm and gripper accuracy79.18% on the training episode. Pose improves, but frequent predicted gripper switching and motion-reference errors remain. A matched2,000-step fit passes CPU preflight; improvement, learned grasp and generalization remain unverified.
 
 ## Current status — 31 October 2026
 
