@@ -2,6 +2,10 @@
 
 Snapshot: **2026-10-31, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Contact-stage follow-up: single-drive control pending
+
+[Read-only raw inspection](../../results/summaries/2026-10-31-contact-drive-inspection.json) finds large alternating wrist velocities in both precision conditions. The float32 abort follows a measured joint5 velocity -2.825 rad/s versus model-predicted -0.957 rad/s. The restored drive state powers both fingers while retaining an authored mimic follower. This is a candidate contributor, not a demonstrated cause. A [one-attempt single-drive control](MIMIC_DRIVE_CONTROL.md) now preserves float32 actions, leader gains, scene and arm limits while disabling only follower native stiffness/damping. Active gripping authority changes; physical outcome pending. No VLA inference or training.
+
 ## Matched precision result: float64 reference grasps successfully
 
 The matched float64-label run completes all 319 intervals and 957 physics callbacks safely. Initialization and full decoded motor-boundary audits pass. Independent raw HDF5 recomputation verifies 2.483 s continuous bilateral contact, at least 57.768 mm final lift, 0.211 mm relative-position jitter and no grasp assistance. All 15 core arrays match the successful teacher through the first 180 recorded frames, including the previous float32 failure window. Selected arm/EE/object state arrays first differ exactly at frame 217; this is not whole-episode exact replay.

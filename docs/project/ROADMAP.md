@@ -38,3 +38,7 @@ Gate: comparable frozen baselines and a defensible attribution of any improvemen
 ## 4. Extend embodiment and deployment
 
 UR10e simulation requires its own robot/gripper model, reachable-workspace checks, camera calibration and action execution interface. Real-world testing additionally requires latency characterization, safety review and an authorized human operator. Cross-embodiment adaptation and sim-to-real transfer are separate workstreams.
+
+## Current bounded control — 31 October
+
+Inspect the [single-drive mimic control](MIMIC_DRIVE_CONTROL.md) before further controller changes: same float32 actions, passive follower gain only, no automatic retries/render. Existing single float64 success does not establish robust contact control. Both full grasp retention and reduced sensitivity must be verified before production use or training.

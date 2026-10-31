@@ -54,7 +54,11 @@ class InitializedRuntime:
         self.state = dict(schema=SCHEMA,attempts=[],frames_entered=[],frames_completed=[],
             error=None,online_skill_decisions=False,prior_attempts=0)
         self.recorder = None
-        self.gain = GainControl(plan['gripper_gain_control'])
+        gain_class = GainControl
+        if plan.get('mimic_drive_control'):
+            from .mimic_drive_control import SingleDriveGainControl
+            gain_class = SingleDriveGainControl
+        self.gain = gain_class(plan['gripper_gain_control'])
         self.persist()
 
     def persist(self):
@@ -105,6 +109,9 @@ def install(plan):
     if plan.get('precision_control'):
         from .action_precision_control import verify_runtime
         verify_runtime(plan)
+    if plan.get('mimic_drive_control'):
+        from .mimic_drive_control import verify_runtime as verify_mimic_runtime
+        verify_mimic_runtime(plan)
     runtime=InitializedRuntime(plan,trace.packet_decision,force)
     force.configure(Path(plan['output'])/'pre_attempt_force_calls.jsonl')
     install_force(plan)

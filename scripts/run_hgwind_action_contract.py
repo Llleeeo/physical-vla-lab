@@ -210,7 +210,8 @@ def run_prepared(plan,actions,model_cfg,diagnostics,lab,run=False):
     if not find_probe_episodes(out/'worker_output'):
         print('CONTRACT_RUNTIME_FAILED log='+str(out/'simulation.log'));return code or 1
     report=analyze(out)
-    print('NEXT inspect_matched_precision_result_before_further_runs' if plan.get('precision_control')
+    print('NEXT inspect_single_drive_comparison_before_further_runs' if plan.get('mimic_drive_control')
+        else 'NEXT inspect_matched_precision_result_before_further_runs' if plan.get('precision_control')
         else 'NEXT stop_after_integrated_gate; inspect_result_then_validate_3_to_5_distinct_episodes',flush=True)
     return code or (0 if report['ball_action_contract_passed'] else 1)
 

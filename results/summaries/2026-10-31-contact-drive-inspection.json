@@ -1,0 +1,79 @@
+{
+  "schema": "physical-vla-lab.contact-stage-drive-inspection.v1",
+  "date": "2026-10-31",
+  "learned_policy_evaluated": false,
+  "new_simulation_run": false,
+  "runs": {
+    "20261031_105421_302664": {
+      "window_s": [
+        2.84,
+        2.99
+      ],
+      "window_samples": 27,
+      "window_covered": true,
+      "joint5_max_abs_velocity_rad_s": 2.824829578399658,
+      "joint5_max_abs_secant_acceleration_rad_s2": 339.46961296143945,
+      "finger_max_abs_velocity_m_s": [
+        0.05165138468146324,
+        0.05215991288423538
+      ],
+      "effort_projection_count": 117,
+      "effort_rejection_count": 1,
+      "maximum_model_velocity_prediction_error_rad_s_per_joint": [
+        0.3626045234245091,
+        0.062166509838332634,
+        0.7840712365232987,
+        0.09302465997516425,
+        1.8678832901084514,
+        0.5656594105530015,
+        1.1260683494726185
+      ]
+    },
+    "20261031_111112_768943_float64": {
+      "window_s": [
+        2.84,
+        2.99
+      ],
+      "window_samples": 27,
+      "window_covered": true,
+      "joint5_max_abs_velocity_rad_s": 2.046839475631714,
+      "joint5_max_abs_secant_acceleration_rad_s2": 376.47949849398157,
+      "finger_max_abs_velocity_m_s": [
+        0.052088383585214615,
+        0.05266919732093811
+      ],
+      "effort_projection_count": 219,
+      "effort_rejection_count": 0,
+      "maximum_model_velocity_prediction_error_rad_s_per_joint": [
+        0.48858722158355566,
+        0.09238061576932866,
+        1.009500551743854,
+        0.11318992369543657,
+        2.2232977661289786,
+        1.1628555046557842,
+        1.2777442141869457
+      ]
+    }
+  },
+  "source_hashes": {
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/report.json": "88129cf76c1fe1a79d49b8470f20607f9c7703d0040c0abfbd740f3d1e8b24b2",
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/plan.json": "27f2d4c68fd27e3607ed60a66b612f9f5f7f196534664c31502c947afb4866a4",
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/gripper_gain_control.json": "f8d3e8484bdd3dc6b7b5545fd64c5ff8b646844b16586f88a4e6e18ea7288e8a",
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/meta.json": "17395f43c39624f4d6505a0797bbeaade58be44922ee63ef059470a4e092d879",
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/replay.hdf5": "25e6eaf1a8e95092ffae9ba9751524854ecddd0d36fa19e1aa602557bec2e9c0",
+    "data/derived/hgwind_initialized_contract/20261031_111112_768943_float64/report.json": "4e9adaedb71657fd30f970d649c12a3df65d927437ff3e9fa5c721d4fbbf1f59",
+    "data/derived/hgwind_initialized_contract/20261031_111112_768943_float64/plan.json": "8313ecd9b4db40909dd0d7960f22b6f31b0815265365a2e5bfa57e5103990395",
+    "data/derived/hgwind_initialized_contract/20261031_111112_768943_float64/gripper_gain_control.json": "f8d3e8484bdd3dc6b7b5545fd64c5ff8b646844b16586f88a4e6e18ea7288e8a",
+    "data/derived/hgwind_initialized_contract/20261031_111112_768943_float64/worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/meta.json": "8ea8cdf634ed4819600463cf4a3f2db87d9a0fb393b12bcd9ab845f053bcb020",
+    "data/derived/hgwind_initialized_contract/20261031_111112_768943_float64/worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/replay.hdf5": "a71c7cd82715b618b7069829bb40350000725355480a3cf2e74580a10943a6d9"
+  },
+  "float32_terminal_joint5": {
+    "measured_velocity_rad_s": -2.824829578399658,
+    "predicted_velocity_rad_s": -0.9569462882912066,
+    "previous_model_acceleration_rad_s2": -3.2506288832547714,
+    "measured_minus_predicted_velocity_rad_s": -1.8678832901084514
+  },
+  "observation": "Both runs have contact-stage alternating joint/finger velocities. Failed model prediction differs materially from measured velocity. Existing readback drives both fingers while authored mimic follower references leader.",
+  "hypothesis": "Follower drive plus mimic/contact coupling may contribute to sensitivity; not established as cause. Float64 success also has large velocity alternations.",
+  "proposal": "One matched float32 single-drive control: follower native kp/kd=0; leader10500/140, original mimic, caps, actions, scene and arm safety retained. Active grip authority changes. Outcome pending; excluded from training."
+}

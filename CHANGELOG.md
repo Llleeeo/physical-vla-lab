@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-31 — Single-drive mimic control prepared
+
+- Raw native records show alternating contact-stage velocities in both precision conditions and a large measured/model velocity mismatch before the float32 abort. Driving both fingers while retaining the mimic follower is a candidate contributor, not a proven cause.
+- Add one opt-in float32 control with follower native stiffness/damping zero and leader10500/140 retained; require the original authored mimic relationship, unchanged caps/arm/USD properties, exact baseline actions and matched source/controller hashes. Active grip authority changes. Full safe execution and physical grasp remain separate gates; 369 CPU checks and actual-source/SDK preflight pass; no GPU/render/training launched. [Experiment](docs/project/MIMIC_DRIVE_CONTROL.md).
+
 ## 2026-10-31 — Matched float64 labels pass physical grasp
 
 - Independently verify 319 complete intervals/957 callbacks, full action-boundary and initialization gates, 2.483 s bilateral contact, 57.768 mm retained lift, 0.211 mm relative jitter and no assistance. All 15 core arrays through the first 180 frames match the successful teacher exactly.

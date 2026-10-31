@@ -6,6 +6,8 @@ This project connects RoboPhys simulation, expert demonstrations, synchronized v
 
 This is an independent research integration, not the upstream RoboPhys benchmark or an official DynamicVLA release.
 
+**Current next experiment:** [single-drive mimic control](docs/project/MIMIC_DRIVE_CONTROL.md), CPU validated and awaiting one simulation. Contact-stage wrist oscillation also occurs in the successful float64 case; follower-drive coupling is a hypothesis, not a proven cause.
+
 ## Current status — 31 October 2026
 
 The guarded worker-history launch now reproduces all three selected original episodes: failed58, failed59 and successful60, with all15 full-length action/observation arrays per episode matching exactly. The target retains at least60.349mm lift. A [single matched-startup fresh60 control](docs/project/WORKER_HISTORY_DIAGNOSTIC.md#observed-reproduction-and-one-matched-startup-control-30-october) is prepared to distinguish process history from changed startup scheduling (263 CPU checks). This is expert reproducibility evidence; learned ball-policy success remains unestablished.
