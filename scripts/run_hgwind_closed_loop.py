@@ -2,6 +2,7 @@
 """Bounded live ball policy; default CPU preflight, --run launches simulation."""
 import argparse
 import h5py
+import numpy as np
 from datetime import datetime
 import hashlib
 import json
@@ -26,7 +27,7 @@ TEACHER=ROOT/'data/derived/hgwind_effort_probes/20261029_220130_402255_joint_onl
 SURROGATE=ROOT/'data/derived/hgwind_action_contract_v1/20261029_220618_809794_traj_00018'
 
 
-def prepare(run,frames,prefix,camera_protocol="legacy"):
+def prepare(run,frames,prefix,camera_protocol="legacy",diagnostic_vertical=False):
     require(2<=frames<=269 and prefix in (1,4),'Frames must be2..269, prefix1 or4')
     prior,_,_,_,lab=prepare_teacher(TEACHER)
     passed=json.loads((SURROGATE/'report.json').read_text())
@@ -61,6 +62,22 @@ def prepare(run,frames,prefix,camera_protocol="legacy"):
             validated_clamps(calibration)
         cfg['camera_render_calibration']=calibration
         cfg['camera_render_calibration_source']=meta['images']
+    if diagnostic_vertical:
+        from capstone_vla.ball_vertical_diagnostic import SCHEMA, validate_plan
+        require(frames==269 and prefix==4 and camera_protocol=='legacy', 'Diagnostic requires matched full269/prefix4/legacy')
+        payload=dataset/'arrays.npz'
+        require(sha256(payload)==meta['payload_sha256'], 'Teacher payload changed')
+        with np.load(payload,allow_pickle=False) as f:
+            goals=f['actions']
+            require(goals.shape==(269,29), 'Wrong recorded action shape')
+            z=goals[138:180,2].astype(float).tolist()
+        cfg['vertical_diagnostic']=dict(schema=SCHEMA,channel=2,coordinate_frame='world',unit='m',
+            start_frame=138,stop_frame_exclusive=180,target_z_m=z,
+            reference_payload=str(payload),reference_payload_sha256=meta['payload_sha256'],reference_dataset_sha256=sha256(dataset/'dataset.json'),
+            rationale='Predeclared near-miss window; diagnostic recorded time, not a deployable observation')
+        validate_plan(cfg['vertical_diagnostic'],frames)
+        cfg.update(source_actions_used_for_control=True,learned_policy_evaluated=False,
+            model_inference_used=True,standalone_policy_evaluation=False)
     # Freeze all native Python/config dependencies, without hashing binary assets again.
     manifest=Path(prior['bundle_manifest']);bundle=manifest.parent
     native=[]
@@ -70,7 +87,7 @@ def prepare(run,frames,prefix,camera_protocol="legacy"):
             require(sha256(p)==row['sha256'],'Frozen worker dependency changed: '+row['path']);native.append(p)
     names=['scripts/run_hgwind_closed_loop.py','scripts/hgwind_policy_server.py','scripts/analyze_hgwind_closed_loop.py',
            'scripts/sim/run_hgwind_policy_worker.py','src/capstone_vla/ball_live_protocol.py',
-           'src/capstone_vla/ball_live_runtime.py','src/capstone_vla/ball_action_contract.py','src/capstone_vla/ball_camera_protocol.py',
+           'src/capstone_vla/ball_live_runtime.py','src/capstone_vla/ball_vertical_diagnostic.py','src/capstone_vla/ball_action_contract.py','src/capstone_vla/ball_camera_protocol.py',
            'src/capstone_vla/cartesian_packets.py','src/capstone_vla/posture_anchor.py',
            'src/capstone_vla/hgwind_expert_trace.py','src/capstone_vla/hgwind_development_data.py',
            'src/capstone_vla/closed_loop.py','src/capstone_vla/live_policy_protocol.py',
@@ -78,6 +95,7 @@ def prepare(run,frames,prefix,camera_protocol="legacy"):
            'src/capstone_vla/task2_bridge.py','src/capstone_vla/franka.py']
     paths=[ROOT/n for n in names]+native+[manifest,Path(prior['task']),Path(prior['original_depth_helper']),
         Path(prior['source']),Path(prior['source']).with_name('meta.json'),SURROGATE/'report.json',dataset/'dataset.json']
+    if diagnostic_vertical:paths.append(dataset/'arrays.npz')
     cfg['runtime_hashes']={str(p):sha256(p) for p in dict.fromkeys(paths)}
     repo=Path(prior['worker']).parents[2]
     sys.path.insert(0,str(repo/'Scripts'))
@@ -109,13 +127,15 @@ def main():
     p.add_argument('--prefix',type=int,choices=[1,4],default=4);p.add_argument('--run-dir',type=Path,default=DEFAULT_RUN)
     p.add_argument('--check-load',action='store_true',help='Also strictly reload model on CPU during preflight')
     p.add_argument('--camera-protocol',choices=['legacy','formal-temporal'],default='legacy')
-    a=p.parse_args();cfg,lab,repo=prepare(a.run_dir.resolve(),a.frames,a.prefix,a.camera_protocol)
+    p.add_argument('--diagnostic-vertical',action='store_true',help='Recorded target z on frames138..179; diagnostic only, not learned-policy success')
+    a=p.parse_args();cfg,lab,repo=prepare(a.run_dir.resolve(),a.frames,a.prefix,a.camera_protocol,a.diagnostic_vertical)
     env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1',HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1')
     model_check=[str(ROOT/'.venv_dynamicvla/bin/python'),str(ROOT/'scripts/hgwind_policy_server.py'),'--preflight',str(a.run_dir.resolve())]
     if a.check_load:model_check.append('--check-load')
     subprocess.run(model_check,cwd=ROOT,env=env,check=True)
     cmd=command(cfg,lab)
-    print(f'CPU_PREFLIGHT_OK source=local/traj_00018 frames={a.frames} prefix={a.prefix} absolute29=true state30=true live_RGB=true source_actions=false',flush=True)
+    print(f'CPU_PREFLIGHT_OK source=local/traj_00018 frames={a.frames} prefix={a.prefix} absolute29=true state30=true live_RGB=true source_actions={a.diagnostic_vertical}',flush=True)
+    if a.diagnostic_vertical:print('VERTICAL_DIAGNOSTIC channel=target_position_z frames=138..179 expert_reference=true standalone_policy=false',flush=True)
     print('CAMERA_PROTOCOL '+a.camera_protocol+' physics_and_model_unchanged=true',flush=True)
     print('SIMULATION_MODE synchronous_pause_during_inference; engineering_check_only; real_time=false',flush=True)
     print('COMMAND '+shlex.join(cmd),flush=True)
@@ -149,6 +169,7 @@ def main():
                 except subprocess.TimeoutExpired:os.killpg(process.pid,signal.SIGKILL);process.wait()
     (out/'worker_exit.json').write_text(json.dumps({'exit_code':code,'coordinator_error':error})+'\n')
     result=analyze(out,code)
-    if result['status']!='BALL_LIVE_INTEGRATION_PASS':raise SystemExit(1)
+    expected='BALL_VERTICAL_DIAGNOSTIC_PASS' if a.diagnostic_vertical else 'BALL_LIVE_INTEGRATION_PASS'
+    if result['status']!=expected:raise SystemExit(1)
 
 if __name__=='__main__':main()

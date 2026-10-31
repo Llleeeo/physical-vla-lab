@@ -1,0 +1,60 @@
+{
+  "scope": "One exposed refined-model closed-loop rollout, not generalization or success-rate estimate",
+  "completed_frames": 269,
+  "physics_callbacks": 807,
+  "initial_state_match": true,
+  "runtime_safety_passed": true,
+  "independent_grasp": "fail",
+  "chronology": {
+    "first_live_contact_frame": null,
+    "first_teacher_contact_frame": 162,
+    "first_teacher_bilateral_frame": 163,
+    "live_bilateral_frames": 0,
+    "live_left_contact_frames": 0,
+    "live_right_contact_frames": 0,
+    "live_jaw_transitions": [
+      112,
+      113,
+      115,
+      117,
+      118,
+      119,
+      127,
+      128,
+      131
+    ],
+    "teacher_jaw_transitions": [
+      144
+    ],
+    "first_ball_position_difference_above_1mm_frame": 166,
+    "ee_difference_at_first_contact_mm": null,
+    "jaw_requested_closed_at_first_contact": null,
+    "finger_positions_at_first_contact_m": null
+  },
+  "near_miss_geometry": {
+    "minimum_pinch_to_ball_center_mm": 8.170204065148889,
+    "minimum_frame": 138,
+    "live_finger_midpoint_z_change_138_to156_mm": 15.46798712354129,
+    "teacher_finger_midpoint_z_change_138_to156_mm": -15.026388156382412
+  },
+  "interpretation": "Near capture geometry is followed by upward gripper motion while successful teacher descends. Recorded finger contact remains zero. Height-only causal intervention is proposed, not yet run. Center distance is not contact clearance.",
+  "runtime_comparison_limit": "Scene, seed, prefix, camera protocol and limits match previous run. Runtime source hashes include optional camera-hook additions; reviewed diff retains legacy branch. Not a bit-identical runtime comparison.",
+  "next_diagnostic": {
+    "channel": "world target_position z (index2)",
+    "frames_inclusive": [
+      138,
+      179
+    ],
+    "all_other_action_channels": "model on current live observations",
+    "source": "recorded expert upper target",
+    "no_online_skill": true,
+    "unassisted_policy_success_claim": false
+  },
+  "source_sha256": {
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/closed_loop_runs/20261031_134508_202376/report.json": "005460bdb61d461b30377ded2e4945417eb8331263ecce53ec166aeff503622d",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/closed_loop_runs/20261031_134508_202376/run_config.json": "70d9ae9596b89e9c9abffeaf0b9c656878243456cfbcc17a52302e2078be4635",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/closed_loop_runs/20261031_134508_202376/failure_diagnostics/20261031_135206_284443/report.json": "448f2fe4329f0127ba7e376dc669b2b7cb780c6cde65ad71b25a9cdd533eea19",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/closed_loop_runs/20261031_134508_202376/worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/replay.hdf5": "062df2470ed68f35a1294b273f0ff452cabfb5c6a6c384b40222080ab4f4eee6",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/closed_loop_runs/20261031_134508_202376/live_observations.hdf5": "9619e7da23611c2fa67b4e3d73619a9a871edc4ea66c2283b8f120cf47834af6"
+  }
+}

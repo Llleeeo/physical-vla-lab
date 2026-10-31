@@ -14,6 +14,7 @@ from capstone_vla.ball_action_contract import native_inputs_match,normalization_
 from capstone_vla.cartesian_packets import audit_packets
 from capstone_vla.grasp_evidence import GraspEvidenceCriteria,evaluate_grasp
 from capstone_vla.hf_archive import sha256
+from capstone_vla.ball_vertical_diagnostic import audit_height, validate_provenance
 
 
 def analyze(out,exit_code):
@@ -23,6 +24,15 @@ def analyze(out,exit_code):
         real_time_evaluated=False,official_benchmark_success=None,independent_grasp=None,
         scope='Exposed training-case synchronous live integration; not a benchmark success-rate estimate')
     try:
+        diagnostic=validate_provenance(cfg)
+        result.update(source_actions_used_for_control=diagnostic,standalone_policy_evaluation=not diagnostic,
+            diagnostic_only=diagnostic)
+        if diagnostic:
+            result['scope']='Recorded-height intervention with live model feedback; any grasp is hybrid diagnostic success, not unassisted VLA success'
+            plan=cfg['vertical_diagnostic']
+            if sha256(plan['reference_payload'])!=plan['reference_payload_sha256']:raise ValueError('Height reference payload changed')
+            with np.load(plan['reference_payload'],allow_pickle=False) as reference:
+                np.testing.assert_array_equal(plan['target_z_m'],reference['actions'][plan['start_frame']:plan['stop_frame_exclusive'],2])
         for path,digest in cfg['runtime_hashes'].items():
             if sha256(path)!=digest:raise ValueError('Runtime changed: '+path)
         eps=find_probe_episodes(out/'worker_output')
@@ -31,7 +41,7 @@ def analyze(out,exit_code):
         tag=meta['capstone_effort_probe']
         if abs(float(meta['sim']['physics_dt'])-1/180)>1e-8 or float(meta['control_hz'])!=60:
             raise ValueError('Native physics/control cadence changed')
-        if not tag.get('vla_policy') or tag.get('source_actions_used_for_control') is not False:
+        if not tag.get('vla_policy') or tag.get('source_actions_used_for_control') is not diagnostic:
             raise ValueError('Motor provenance mismatch')
         original=json.loads(Path(cfg['source']).with_name('meta.json').read_text())
         if meta['robot_limit_profile']['sha256']!=original['robot_limit_profile']['sha256']:raise ValueError('Native motion limits differ')
@@ -71,12 +81,17 @@ def analyze(out,exit_code):
                             {name:np.stack([obs[name][j] for j in ids]) for name in cfg['cameras']})
                 with np.load(out/'ipc'/f'response_{origin:06d}.npz',allow_pickle=False) as response:
                     if int(response['frame'])!=origin:raise ValueError('Response index mismatch')
-                    np.testing.assert_array_equal(actions[i],response['absolute'][i-origin])
+                    raw=response['absolute'][i-origin]
+                    if diagnostic:
+                        np.testing.assert_array_equal(obs['model_action'][i],raw)
+                        audit_height(raw,actions[i],i,cfg['vertical_diagnostic'],cfg['frames'])
+                    else:np.testing.assert_array_equal(actions[i],raw)
                 expected=decoded_request(actions[i],i,anchor)
                 if i>=len(packets) or not native_inputs_match(packets[i]['inputs'],expected['inputs']):raise ValueError('Consumed action differs from native request')
             adjusted=normalization_audit_copy(payload,packets)
             audit=audit_packets(adjusted,packets,rows,n)
-            audit['learned_policy_evaluated']=True  # Reused mechanical auditor, live packet provenance.
+            audit['learned_policy_evaluated']=not diagnostic
+            audit['recorded_height_intervention']=diagnostic
             assistance=np.load(out/'command_diagnostics.npz',allow_pickle=False)['assistance']
             if assistance.shape!=(n,3) or assistance.any():raise ValueError('Unexpected/missing grasp assistance record')
             target=original['policy']['roles']['A'];idx=meta['object_paths'].index(target)
@@ -88,10 +103,18 @@ def analyze(out,exit_code):
             if cfg['frames']==269 and n==269:result['independent_grasp']=evidence
             good=(exit_code==0 and n==m==complete==cfg['frames'] and callbacks==osc==3*n
                   and meta['runtime_safety']['passed'] and initial_ok and audit['packet_execution_verified']
-                  and payload['learned_policy_evaluated'] and not payload['source_motion_and_gripper_stream_retained'])
+                  and payload['learned_policy_evaluated'] is (not diagnostic)
+                  and payload['source_actions_used_for_control'] is diagnostic
+                  and not payload['source_motion_and_gripper_stream_retained'])
             result.update(live_state_alignment_verified=True,model_response_binding_verified=True,
                 packet_audit=audit,full_requested_integration_passed=bool(good))
-            if good:result['status']='BALL_LIVE_INTEGRATION_PASS'
+            if diagnostic:
+                plan=cfg['vertical_diagnostic'];raw=obs['model_action'][:]
+                result['vertical_intervention_audit']=dict(verified=True,channel=2,
+                    start_frame=plan['start_frame'],stop_frame_exclusive=plan['stop_frame_exclusive'],
+                    changed_frames=np.flatnonzero(actions[:,2]!=raw[:,2]).tolist(),
+                    other_channels_exact=True,raw_model_responses_bound=True)
+            if good:result['status']='BALL_VERTICAL_DIAGNOSTIC_PASS' if diagnostic else 'BALL_LIVE_INTEGRATION_PASS'
         result['artifacts']={str(p.relative_to(out)):sha256(p) for p in [ep/'replay.hdf5',ep/'meta.json',out/'live_observations.hdf5',out/'policy_timing.json']}
     except Exception as exc:
         result['analysis_error']=type(exc).__name__+': '+str(exc)

@@ -1,7 +1,8 @@
 """Live sensor/robot observations and learned requests through native packets.
 
 The world object is passed only to the existing target-blind geometry adapter.
-No recorded action stream, task step or privileged target state generates commands.
+Default execution uses no recorded actions. An explicit diagnostic can replace
+one target-height channel; raw model actions and hybrid provenance are retained.
 """
 import json
 import time
@@ -15,6 +16,7 @@ from .hgwind_development_data import states_from_robot
 from .live_policy_protocol import atomic_npz, wait_file, history_pair
 from .pilot_dataset import CAMERAS
 from .posture_anchor import initialize_anchor
+from .ball_vertical_diagnostic import apply_height, validate_plan
 
 
 class LiveExecutor(PacketStreamExecutor):
@@ -23,6 +25,8 @@ class LiveExecutor(PacketStreamExecutor):
         self.config=config; self.root=Path(config['output']); self.ipc=self.root/'ipc'
         self.queue=ActionQueue(config['prefix'],config['frames']); self.history=[]
         self.camera=None; self.archive=None; self.timing=[]; self.closed=False
+        self.vertical=config.get("vertical_diagnostic")
+        if self.vertical is not None:validate_plan(self.vertical,config["frames"])
 
     def _open_camera(self, stage, sim, robot):
         from .closed_loop import LiveRGB, publish_gui_physics_state
@@ -48,6 +52,9 @@ class LiveExecutor(PacketStreamExecutor):
         for name,shape in [('state',(30,)),('action',(29,)),('camera_pose_world',(2,7))]:
             self.archive.create_dataset(name,shape=(0,*shape),maxshape=(None,*shape),dtype='f8')
         self.archive.create_dataset('timestamp_s',shape=(0,),maxshape=(None,),dtype='f8')
+        if self.vertical is not None:
+            self.archive.create_dataset('model_action',shape=(0,29),maxshape=(None,29),dtype='f8')
+            self.archive.attrs['vertical_diagnostic_json']=json.dumps(self.vertical)
 
     @property
     def camera_order(self):
@@ -89,9 +96,12 @@ class LiveExecutor(PacketStreamExecutor):
             require(abs(float(sim.current_time)-before)<1e-9,'Physics advanced during policy inference')
             print(f'BALL_LIVE_POLICY frame={index} prefix={self.queue.prefix} wait_s={waiting:.3f}',flush=True)
         action,origin=self.queue.pop(index)
+        model_action=action.copy()
+        if self.vertical is not None:action=apply_height(action,index,self.vertical,self.config["frames"])
         poses=np.asarray(self.camera.last_poses,float)
         require(poses.shape==(2,7) and np.isfinite(poses).all(),'Invalid live camera transforms')
         values=dict(state=state,action=action,camera_pose_world=poses,timestamp_s=index/60,**images)
+        if self.vertical is not None:values["model_action"]=model_action
         for name,value in values.items():
             ds=self.archive[name];ds.resize(index+1,axis=0);ds[index]=value
         self.archive.flush()
@@ -113,6 +123,10 @@ class LiveExecutor(PacketStreamExecutor):
         payload.update(learned_policy_evaluated=True,source_motion_and_gripper_stream_retained=False,
             source_numeric_controller_settings_retained=False,source_actions_used_for_control=False,
             synchronous_inference=True,real_time_evaluated=False)
+        if self.vertical is not None:
+            payload.update(learned_policy_evaluated=False,model_inference_used=True,
+                source_actions_used_for_control=True,vertical_diagnostic=self.vertical,
+                standalone_policy_evaluation=False)
         return payload
 
     def save_progress(self):

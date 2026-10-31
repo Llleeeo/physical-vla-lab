@@ -69,13 +69,13 @@ def inspect(run):
                 live_right_contact_frames=int((lc[:, 1] > 1e-12).sum()),
                 live_jaw_transitions=transitions(jaw), teacher_jaw_transitions=transitions(teacher_jaw),
                 first_ball_position_difference_above_1mm_frame=first(op > 1),
-                ee_difference_at_first_contact_mm=float(ep[cframe]),
-                jaw_requested_closed_at_first_contact=bool(jaw[cframe] >= .5),
-                finger_positions_at_first_contact_m=l['obs/joint_pos'][cframe, 7:].tolist()),
+                ee_difference_at_first_contact_mm=float(ep[cframe]) if cframe is not None else None,
+                jaw_requested_closed_at_first_contact=bool(jaw[cframe] >= .5) if cframe is not None else None,
+                finger_positions_at_first_contact_m=l['obs/joint_pos'][cframe, 7:].tolist() if cframe is not None else None),
             checkpoints=[dict(frame=i, ee_difference_mm=float(ep[i]), ball_difference_mm=float(op[i]),
                 live_ball_minus_ee_mm=((lo[i]-lp[i])*1000).tolist(),
                 teacher_ball_minus_ee_mm=((so[i]-sp[i])*1000).tolist()) for i in [0, 40, 80, 104, 106, 130, 144, 162, 268]],
-            interpretation='Right-finger contact precedes close-command chatter; approach deviation is already present. Gripper filtering alone is not an established repair.',
+            interpretation=('No recorded finger contact; inspect approach geometry and closure timing.' if cframe is None else 'Contact detected; compare its chronology with jaw transitions and approach deviation before assigning a failure cause.'),
             limits='Same-time expert comparisons after diverging states are descriptive, not oracle corrective actions. Hybrid image/state inputs are sensitivity probes and may be inconsistent; no causal success claim.')
         # Inspect camera calibration only at the exactly matched initial robot/object state.
         with h5py.File(meta['images']) as image:
@@ -214,8 +214,11 @@ def main():
         ax[1].axhline(.5,color='gray',ls=':');ax[1].set_ylabel('Close output / threshold');ax[1].legend()
         ax[2].plot(plot['t'],plot['lc'][:,0],label='Live left');ax[2].plot(plot['t'],plot['lc'][:,1],label='Live right')
         ax[2].set_ylabel('Contact impulse (N s)');ax[2].set_xlabel('Simulation time (s)');ax[2].legend()
-        for axis in ax:axis.axvline(result['chronology']['first_live_contact_frame']/60,color='red',ls='--',alpha=.5);axis.grid(alpha=.2)
-        fig.suptitle('Learned rollout: approach deviation precedes gripper chatter');fig.tight_layout();fig.savefig(out/'contact_chronology.png',dpi=150);plt.close(fig)
+        for axis in ax:
+            if result['chronology']['first_live_contact_frame'] is not None:
+                axis.axvline(result['chronology']['first_live_contact_frame']/60,color='red',ls='--',alpha=.5)
+            axis.grid(alpha=.2)
+        fig.suptitle('Learned rollout: approach, gripper commands and recorded contacts');fig.tight_layout();fig.savefig(out/'contact_chronology.png',dpi=150);plt.close(fig)
     (out/'report.json').write_text(json.dumps(result,indent=2,allow_nan=False)+'\n')
     print('CPU_FAILURE_AUDIT_PASS '+json.dumps(result['chronology']),flush=True)
     print('OUTPUT '+str(out),flush=True)

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Refined near miss and explicit height diagnostic
+
+- Verify complete refined live integration but no finger contact; near-center alignment precedes upward departure. Preserve raw evidence and exported review videos.
+- Add opt-in recorded target-z substitution on frames138..179, raw/executed action logging and independent provenance/command audit. Default model-only branch and native limits retained.
+- Handle zero-contact failure diagnostics without indexing a nonexistent contact frame. Diagnostic simulation remains pending and cannot count as unassisted policy success.
+
 ## 2026-10-31 — Bounded refinement completed; matched rollout ready
 
 - Verify all saved generated-action probes and selection. Approach mean improves 8.16%; position p95 worsens. Step750 has a cleaner jaw sequence than selected step1000.

@@ -11,6 +11,7 @@ ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT/'src'))
 from capstone_vla import hgwind_expert_trace as trace
 from capstone_vla.ball_live_protocol import patch_collector
 from capstone_vla.ball_live_runtime import LiveExecutor
+from capstone_vla.ball_vertical_diagnostic import validate_provenance
 from capstone_vla.hf_archive import sha256
 # Load local sensor/bridge dependencies before the frozen control namespace.
 from capstone_vla.closed_loop import LiveRGB, publish_gui_physics_state
@@ -18,8 +19,7 @@ from capstone_vla.closed_loop import LiveRGB, publish_gui_physics_state
 config=json.loads(Path(os.environ['CAPSTONE_BALL_LIVE_CONFIG']).read_text())
 if any(x in sys.argv for x in ['--replay_trajectories','--replay_state_exact','--repair-action-reference']):
     raise RuntimeError('Learned rollout cannot replay source states or commands')
-if config['source_actions_used_for_control'] is not False or config['learned_policy_evaluated'] is not True:
-    raise RuntimeError('Wrong learned rollout provenance')
+diagnostic=validate_provenance(config)
 for path,digest in config['runtime_hashes'].items():
     if sha256(path)!=digest:raise RuntimeError('Runtime changed: '+Path(path).name)
 worker=Path(config['worker']);source=patch_collector(worker.read_text())
@@ -48,13 +48,15 @@ def summary(policy):
     import numpy as np
     np.savez(root/'command_diagnostics.npz',assistance=np.asarray(trace._STATE['assistance']))
     return dict(schema='physical-vla-lab.ball-live-policy.v1',vla_policy=True,
-        source_actions_used_for_control=False,online_task_step_called=False,online_skill_step_called=False,
-        learned_policy_evaluated=True,original_expert_used=False,packet_requests_own_motors=True,
-        source_success_reused=False,saved_commands_own_motors=False,command_frames=len(trace._STATE['rows']),
+        source_actions_used_for_control=diagnostic,online_task_step_called=False,online_skill_step_called=False,
+        learned_policy_evaluated=not diagnostic,model_inference_used=True,
+        vertical_diagnostic=diagnostic,standalone_policy_evaluation=not diagnostic,
+        original_expert_used=False,packet_requests_own_motors=True,
+        source_success_reused=False,saved_commands_own_motors=diagnostic,command_frames=len(trace._STATE['rows']),
         control_reference_file='live_control_references.json',native_effort_configuration_unchanged=True,
         real_time_evaluated=False,heldout_evaluation=False)
 
-print('BALL_LIVE_WORKER absolute29=true source_actions=false online_skill_step=false native_limits=unchanged',flush=True)
+print(f'BALL_LIVE_WORKER absolute29=true source_actions={diagnostic} diagnostic={diagnostic} online_skill_step=false native_limits=unchanged',flush=True)
 try:
     exec(compile(source,str(worker),'exec'),{'__name__':'__main__','__file__':str(worker),
         'CAPSTONE_LIVE_DECISION':executor.live_step,'CAPSTONE_PROFILE_SUMMARY':profile_summary,

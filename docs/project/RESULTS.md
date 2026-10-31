@@ -2,6 +2,10 @@
 
 Snapshot: **2026-10-31, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Refined live rollout: near miss, no finger contact
+
+The selected refinement completes all269 control intervals/807 physics callbacks without a safety abort, but independent grasp fails and neither finger contacts the ball. Nine jaw transitions remain. Pinch-to-ball-center distance reaches8.17mm at138; this is not contact clearance. Over138..156 the finger midpoint rises15.47mm while the teacher descends15.03mm. A [fixed target-height-only diagnostic](BALL_VERTICAL_DIAGNOSTIC.md) is prepared to test this clue; no causal repair or policy success has yet been demonstrated. [Evidence](../../results/summaries/2026-10-31-ball-refined-live-result.json).
+
 ## Bounded refinement result — 31 October 2026
 
 The user completed 1,000 additional optimizer steps from the saved 2,000-step checkpoint, at learning rate 1e-5. The saved baseline and all four generated-action probes were recomputed in the model environment and match the report. The selected checkpoint is additional step 1,000 (3,000 lineage steps).
