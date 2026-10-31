@@ -2,11 +2,21 @@
 
 Snapshot: **2026-10-31, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
-## Live29D ball policy: implementation prepared, physics result pending
+## Full live ball rollout: integration passes, grasp fails
 
-The [live integration](BALL_LIVE_POLICY.md) now connects calibrated real-time simulator RGB and measured state30 to the 2,000-step DynamicVLA checkpoint and the existing native packet controller. Nine new CPU regressions cover queue semantics, invalid requests, input history and expert-decision exclusion; 389 portable checks pass. Five actual recorded observations produce exactly the training preprocessing, and the model strictly reloads on CPU. The real scene/patch preflight passes.
+The user-run eight-frame integration and subsequent full 269-frame rollout both pass the live-chain audit. The full run completes 807 physics callbacks with matching initial conditions and unchanged native safety checks. **The learned grasp fails**: zero bilateral-contact frames, no retained lift. This is one exposed training case, synchronous simulation, not held-out or real-time evaluation.
 
-The next user-run command executes eight control intervals on the exposed training case. No new GPU simulation or learned grasp is claimed. Full timing/motor evidence and independent grasp evaluation are separate gates. [Preparation summary](../../results/summaries/2026-10-31-ball-live-policy-preparation.json).
+Raw evidence locates the first right-finger contact at frame 104 while the fingers are still open (about 0.040 m per finger). The measured EE differs from the expert by 60.73 mm at that time. The ball remains on the expert path through that pre-action frame, then differs by more than 1 mm at frame 105. The model's 15 gripper-threshold transitions begin later, at frame 106, ending at 130. The expert closes at 144, first contacts at 162, and achieves bilateral contact at 163. Live right-finger contact occurs in only one control interval; left contact is absent throughout.
+
+This supports prioritizing approach deviation and premature single-finger impact over a gripper-only fix. It does not identify why the learned approach differs. At the identical initial state, camera poses agree within 0.001 mm and 0.001 degrees; live/train RGB differs (mean absolute 8.36/255 external and 13.94/255 wrist). Brightness/rendering differences are a candidate input shift, not a demonstrated cause.
+
+A new diagnostic keeps the checkpoint, noise seed, history and prefix fixed and crosses teacher/live images with teacher/live measured robot states at eight pre-contact/contact anchors. Frame 0 has identical states, isolating the image input contrast there. Later hybrid inputs can be inconsistent and are sensitivity probes, not realistic rollouts or counterfactual-success claims. Each all-live prediction must reproduce its saved response within explicit numerical tolerance before interpretation. No object ground truth enters the model; source object states are used only by the CPU evaluator.
+
+```bash
+.venv_dynamicvla/bin/python scripts/diagnose_hgwind_live_failure.py --run
+```
+
+This runs 32 model input combinations on GPU; it does not train or launch Isaac Sim. Without `--run`, it saves the CPU chronology and optionally a plot. No matplotlib installation is required in the model environment. The actual 32 input combinations, checkpoint contract, frame 0 state equality and saved request bindings have passed CPU preparation; GPU inference is pending. [Compact verified result](../../results/summaries/2026-10-31-ball-live-failure.json).
 
 ## Ball startup audit: target semantics and remaining response error
 
@@ -82,7 +92,7 @@ The previous omission-only fresh60 control fails after190frames; adding the meas
 
 The passive drive pair completes with `comparison_ready=true`. Independent rechecks confirm15 original core arrays for all three history episodes, and15 exact arrays against the previous fresh-omission failure. Target history60 succeeds; fresh60+omit1 still aborts at190recorded frames. The observer did not change these known arrays.
 
-At frame0 before `ensure_gripper_force`, both have native Kp[10000,0]/Kd[1000,0]. Both call `ensure_gripper_force(70, speed=.05, reconfigure=True)` exactly once. In the fresh episode it returns true and records requested10500/140, but native gains stay unchanged. In history59/60 the same call yields Kp[10500,10500]/Kd[140,140], retained at first close frame154. At closure native caps are equal:70N and0.05m/s on both fingers; applied targets and USD/mimic properties also match in the compared snapshots. The7.2N/0N fresh cap is a **pre-configuration frame0** reading, not the closure cap.
+At frame 0 before `ensure_gripper_force`, both have native Kp[10000,0]/Kd[1000,0]. Both call `ensure_gripper_force(70, speed=.05, reconfigure=True)` exactly once. In the fresh episode it returns true and records requested10500/140, but native gains stay unchanged. In history59/60 the same call yields Kp[10500,10500]/Kd[140,140], retained at first close frame154. At closure native caps are equal:70N and0.05m/s on both fingers; applied targets and USD/mimic properties also match in the compared snapshots. The7.2N/0N fresh cap is a **pre-configuration frame 0** reading, not the closure cap.
 
 The frozen method sets native gains before authoring USD maxForce and adding a missing second-finger drive schema. That first-episode USD addition and the post-call gain mismatch are measured; an internal native overwrite mechanism remains inferred. Both warm active finger gains coexist with mimic coupling, so copying them is diagnostic reproduction, not certification of mechanically correct production actuation.
 

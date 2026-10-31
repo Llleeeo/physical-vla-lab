@@ -1,0 +1,208 @@
+{
+  "schema": "physical-vla-lab.ball-live-failure.v1",
+  "integration_passed": true,
+  "grasp_passed": false,
+  "heldout_evaluation": false,
+  "model_probe_executed": false,
+  "chronology": {
+    "first_live_contact_frame": 104,
+    "first_teacher_contact_frame": 162,
+    "first_teacher_bilateral_frame": 163,
+    "live_bilateral_frames": 0,
+    "live_left_contact_frames": 0,
+    "live_right_contact_frames": 1,
+    "live_jaw_transitions": [
+      106,
+      107,
+      108,
+      109,
+      112,
+      113,
+      115,
+      117,
+      118,
+      119,
+      123,
+      124,
+      126,
+      128,
+      130
+    ],
+    "teacher_jaw_transitions": [
+      144
+    ],
+    "first_ball_position_difference_above_1mm_frame": 105,
+    "ee_difference_at_first_contact_mm": 60.728424072265625,
+    "jaw_requested_closed_at_first_contact": false,
+    "finger_positions_at_first_contact_m": [
+      0.03999947011470795,
+      0.039999473839998245
+    ]
+  },
+  "checkpoints": [
+    {
+      "frame": 0,
+      "ee_difference_mm": 0.0,
+      "ball_difference_mm": 0.0,
+      "live_ball_minus_ee_mm": [
+        -314.9781188964844,
+        290.1007995605469,
+        -400.2543029785156
+      ],
+      "teacher_ball_minus_ee_mm": [
+        -314.9781188964844,
+        290.1007995605469,
+        -400.2543029785156
+      ]
+    },
+    {
+      "frame": 40,
+      "ee_difference_mm": 50.601356506347656,
+      "ball_difference_mm": 0.0,
+      "live_ball_minus_ee_mm": [
+        -115.285400390625,
+        156.35252380371094,
+        -122.59757232666016
+      ],
+      "teacher_ball_minus_ee_mm": [
+        -113.40045928955078,
+        201.62535095214844,
+        -100.07392120361328
+      ]
+    },
+    {
+      "frame": 80,
+      "ee_difference_mm": 69.93998718261719,
+      "ball_difference_mm": 0.0,
+      "live_ball_minus_ee_mm": [
+        -104.10189819335938,
+        26.22735595703125,
+        -58.214935302734375
+      ],
+      "teacher_ball_minus_ee_mm": [
+        -45.90320587158203,
+        62.78085708618164,
+        -71.19010162353516
+      ]
+    },
+    {
+      "frame": 104,
+      "ee_difference_mm": 60.728424072265625,
+      "ball_difference_mm": 0.0,
+      "live_ball_minus_ee_mm": [
+        -71.38871765136719,
+        4.933714866638184,
+        -31.457141876220703
+      ],
+      "teacher_ball_minus_ee_mm": [
+        -21.622180938720703,
+        14.31739330291748,
+        -64.97101593017578
+      ]
+    },
+    {
+      "frame": 106,
+      "ee_difference_mm": 58.392906188964844,
+      "ball_difference_mm": 10.111172676086426,
+      "live_ball_minus_ee_mm": [
+        -76.995849609375,
+        5.370974540710449,
+        -30.705644607543945
+      ],
+      "teacher_ball_minus_ee_mm": [
+        -19.557714462280273,
+        12.65108585357666,
+        -63.98447036743164
+      ]
+    },
+    {
+      "frame": 130,
+      "ee_difference_mm": 17.047819137573242,
+      "ball_difference_mm": 181.88294982910156,
+      "live_ball_minus_ee_mm": [
+        -196.0113067626953,
+        15.164852142333984,
+        -24.241884231567383
+      ],
+      "teacher_ball_minus_ee_mm": [
+        -13.825654983520508,
+        4.22060489654541,
+        -41.27119827270508
+      ]
+    },
+    {
+      "frame": 144,
+      "ee_difference_mm": 6.994645118713379,
+      "ball_difference_mm": 281.6087646484375,
+      "live_ball_minus_ee_mm": [
+        -290.1451721191406,
+        23.631214141845703,
+        -26.879528045654297
+      ],
+      "teacher_ball_minus_ee_mm": [
+        -10.40339469909668,
+        0.735163688659668,
+        -28.167526245117188
+      ]
+    },
+    {
+      "frame": 162,
+      "ee_difference_mm": 27.446529388427734,
+      "ball_difference_mm": 409.31781005859375,
+      "live_ball_minus_ee_mm": [
+        -431.3092346191406,
+        34.82353591918945,
+        -26.105579376220703
+      ],
+      "teacher_ball_minus_ee_mm": [
+        -1.2030601501464844,
+        0.26619434356689453,
+        -13.038854598999023
+      ]
+    },
+    {
+      "frame": 268,
+      "ee_difference_mm": 77.9137191772461,
+      "ball_difference_mm": 978.5732421875,
+      "live_ball_minus_ee_mm": [
+        -903.3229370117188,
+        75.91461944580078,
+        -40.158409118652344
+      ],
+      "teacher_ball_minus_ee_mm": [
+        -0.7693767547607422,
+        -1.0389089584350586,
+        -12.574225425720215
+      ]
+    }
+  ],
+  "initial_camera_comparison": {
+    "opst_cam": {
+      "initial_position_difference_mm": 7.158904146811085e-05,
+      "initial_orientation_difference_deg": 2.4148365394514667e-06,
+      "initial_rgb_mae_255": 8.355277777777777,
+      "live_mean_255": 111.893671875,
+      "training_mean_255": 104.74965494791667
+    },
+    "wrist_cam": {
+      "initial_position_difference_mm": 0.00039243978702841836,
+      "initial_orientation_difference_deg": 5.7476153469947745e-05,
+      "initial_rgb_mae_255": 13.938643663194444,
+      "live_mean_255": 123.06453884548611,
+      "training_mean_255": 109.21072374131944
+    }
+  },
+  "interpretation": "Right-finger contact precedes close-command chatter; approach deviation is already present. Gripper filtering alone is not an established repair.",
+  "limits": "Same-time expert comparisons after diverging states are descriptive, not oracle corrective actions. Hybrid image/state inputs are sensitivity probes and may be inconsistent; no causal success claim.",
+  "completed_frames": 269,
+  "physics_callbacks": 807,
+  "runtime_safety_passed": true,
+  "source_actions_used_for_control": false,
+  "real_time_evaluated": false,
+  "evidence_sha256": {
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_121355_529372/closed_loop_runs/20261031_125333_149097/report.json": "463393db8cb86094d505d1ab5183947c9fc0df747269b9711e02ce1619d903bb",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_121355_529372/closed_loop_runs/20261031_125333_149097/failure_diagnostics/20261031_130501_786260/report.json": "19d434fbe22e371047d320ca5d877e1267387c353e7af362e3ebf5f8af405af4",
+    "scripts/diagnose_hgwind_live_failure.py": "aff06675c0d673b3056ec1c2aa0413fa36f059b9bd6a98fc67ba65a98db5a498"
+  },
+  "preparation_checks": "32 actual input combinations verified on CPU, exact live IPC requests and frame0 state; GPU sensitivity test pending"
+}

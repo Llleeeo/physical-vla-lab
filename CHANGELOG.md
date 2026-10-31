@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Full learned rollout and contact diagnosis
+
+- Verify 269 control intervals/807 physics callbacks without expert actions or safety abort; independent grasp fails with zero bilateral frames.
+- First right-finger contact 104 precedes jaw chatter 106–130; expert first contact 162. Preserve failure evidence and unchanged controller.
+- Add CPU chronology/plot and opt-in 32-condition GPU image/state sensitivity diagnostic, with matched noise and saved-response fidelity checks. GPU diagnostic pending.
+
 ## 2026-10-31 — Live absolute29 ball-policy integration prepared
 
 - Add isolated simulator/model entries using live calibrated RGB and the same measured state30/preprocessing as training. Consume model absolute29 chunks through the existing native packet/effort controller; no online expert decisions or recorded action fallback.

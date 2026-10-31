@@ -6,7 +6,7 @@ This project connects RoboPhys simulation, expert demonstrations, synchronized v
 
 This is an independent research integration, not the upstream RoboPhys benchmark or an official DynamicVLA release.
 
-**Latest result:** a [matched 2,000-step ball fit](docs/project/BALL_DEVELOPMENT_TRAINING.md#observed-2000-step-result) improves offline first-action position error from 127.05 to 46.42 mm and gripper accuracy from 79.18% to 97.03%. Early target errors and closure timing remain unresolved. This is a training-episode diagnostic; learned grasp and generalization remain unverified. The [startup target audit](docs/project/BALL_STARTUP_TARGET_AUDIT.md) now identifies rebound/braking-clearance contributions and remaining nominal control-request errors; [live29D integration](docs/project/BALL_LIVE_POLICY.md) is now CPU checked, with the first eight-interval physical run pending.
+**Latest result:** the [DynamicVLA ball policy](docs/project/BALL_LIVE_POLICY.md) completes 269 live control intervals and 807 physics steps with verified input/action binding and unchanged safety checks, but **does not grasp the ball**. Premature right-finger contact at frame 104 precedes gripper chatter; the successful expert first contacts at 162. A matched-input inference diagnostic is prepared to separate image-input sensitivity from robot-state drift. This remains one exposed training case, not physical generalization evidence.
 
 ## Current status — 31 October 2026
 
