@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-31 — Ball fine-tune completed; action prediction prepared
+
+- Verify 200 optimizer steps, 198 sampled anchor frames, changed checkpoint weights and a 58.93% reduction across six fixed training-episode flow probes (4.8705 to 2.0003). Strict CPU checkpoint reload and exact new normalizers pass. No learned grasp or held-out claim follows.
+- Add independent absolute29D generated-action comparison, same noise/normalizers before and after fine-tuning, prefixes1/4/20 and explicit decoder/mode/clipping diagnostics. CPU regressions cover quaternion signs, units, padding-tail execution and invalid outputs. Prediction is user-run; no GPU/simulation launched by agent. [Details](docs/project/BALL_DEVELOPMENT_TRAINING.md#observed-fine-tuning-result-and-next-command).
+
 ## 2026-10-31 — Passed ball case connected to development training
 
 - Prioritize a complete learned-policy pipeline using exposed `local/traj_00018`, whose expert and float32 surrogate already pass. Keep the other case's contact/safety defects unresolved; no controller limits or dynamics changed.

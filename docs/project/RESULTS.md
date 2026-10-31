@@ -2,9 +2,13 @@
 
 Snapshot: **2026-10-31, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Ball development fine-tune: optimization and checkpoint verified
+
+The user-run 200-step update finishes on `local/traj_00018`, sampling198 distinct anchor frames. All six paired flow probes improve: mean4.8705→2.0003, a58.93% reduction. Checkpoint weights change as reported and strictly reload with exact source-derived normalizers on CPU. This establishes a working optimization/checkpoint path, not pose accuracy or learned grasp. Actual29D action prediction is prepared next; no new simulation or GPU inference was started by the agent. [Result](../../results/summaries/2026-10-31-ball-development-finetune-result.json).
+
 ## Current priority: one passing ball case through the model pipeline
 
-The development bridge for `local/traj_00018` now verifies269 synchronized60Hz frames, bit-exact successful float32 action labels, source/teacher/render state equality and calibrated30D robot state. Official pretrained weights load with action29/state30 on CPU; normalization, image/language preprocessing and loss-padding gradients pass. These are data/model-interface checks, not trained-policy results. GPU fine-tuning and live policy integration are pending. Use this deliberately selected passing case to advance the pipeline while retaining the following failures as known defects. [Details](BALL_DEVELOPMENT_TRAINING.md).
+The development bridge for `local/traj_00018` now verifies269 synchronized60Hz frames, bit-exact successful float32 action labels, source/teacher/render state equality and calibrated30D robot state. Official pretrained weights load with action29/state30 on CPU; normalization, image/language preprocessing and loss-padding gradients pass. These are data/model-interface checks, not trained-policy results. GPU fine-tuning subsequently completed as reported above; generated-action prediction and live policy integration remain pending. Use this deliberately selected passing case to advance the pipeline while retaining the following failures as known defects. [Details](BALL_DEVELOPMENT_TRAINING.md).
 
 ## Single-drive control: early motion reduced, full grasp still fails
 

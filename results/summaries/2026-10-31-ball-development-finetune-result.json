@@ -1,0 +1,85 @@
+{
+  "schema": "physical-vla-lab.ball-development-finetune-result.v1",
+  "date": "2026-10-31",
+  "episode": "local/traj_00018",
+  "optimizer_steps": 200,
+  "unique_sampled_anchor_frames": 198,
+  "paired_flow_before": {
+    "frames": [
+      0,
+      100,
+      150,
+      162,
+      200,
+      268
+    ],
+    "valid_29d_flow_mse": [
+      10.354598999023438,
+      2.8495748043060303,
+      3.7383973598480225,
+      4.0424933433532715,
+      3.568328619003296,
+      4.669699668884277
+    ],
+    "mean": 4.870515465736389,
+    "same_training_episode": true,
+    "flow_time": 0.5,
+    "noise_seed": "9100+frame"
+  },
+  "paired_flow_after": {
+    "frames": [
+      0,
+      100,
+      150,
+      162,
+      200,
+      268
+    ],
+    "valid_29d_flow_mse": [
+      5.926456451416016,
+      0.7603747248649597,
+      1.980513334274292,
+      1.7167015075683594,
+      1.011634111404419,
+      0.6060592532157898
+    ],
+    "mean": 2.0002898971239724,
+    "same_training_episode": true,
+    "flow_time": 0.5,
+    "noise_seed": "9100+frame"
+  },
+  "paired_mean_reduction_percent": 58.93063247215164,
+  "all_six_paired_probe_values_improved": true,
+  "action_projection_l2_change": 0.1578930914402008,
+  "peak_torch_allocated_bytes": 2093180416,
+  "checkpoint_strict_CPU_reload_passed": true,
+  "checkpoint_normalizers_exact_to_dataset": true,
+  "training_source_hashes_and_200_log_steps_verified": true,
+  "GPU_inference_started_by_agent": false,
+  "prepared_prediction_frames": 269,
+  "prepared_models": [
+    "pretrained",
+    "finetuned"
+  ],
+  "prepared_offline_prefixes": [
+    1,
+    4,
+    20
+  ],
+  "prediction_action_format": "absolute29; no delta conversion",
+  "heldout_evaluation": false,
+  "learned_grasp_verified": false,
+  "interpretation": "Development optimization improves six fixed probes. Flow loss is not pose error, grasp success, or generalization.",
+  "source_hashes": {
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_115841_081174/report.json": "06f0c2f775eb507feb43240603acd77c924b8d41eb2464884c0d963ce93fe0c4",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_115841_081174/run_config.json": "f7b081071ddc015c5c4ffe14c5c1d352fd8156b77d619d356d6e11b4fdc93224",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_115841_081174/training.jsonl": "a12a0921b88332e5688f8cdff34dd4f35ec19fedfd4bcda9e504b6ea62f0b6cb",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_115841_081174/checkpoint_final/model.safetensors": "11487474bb70e1058348c69036175ec2510059422210542b4b6699a2d4048011",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_115841_081174/checkpoint_final/config.json": "3ab6e6ead216c84d597ed68c7ead242b57c397415f514bc97556cbaa660121f5",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_115841_081174/checkpoint_final/capstone_normalization.json": "2c795ee17fe46b3352ea685e49a53c9f506a9619c448c0ecb4b87b2438fa6b59",
+    "scripts/predict_hgwind_development.py": "d1b5c8936e58154dae63975e58717c360e79aba9a5c106020e9873135a54ba27",
+    "src/capstone_vla/ball_prediction_metrics.py": "98d6cb41b424b225eb0a76c6c1b2f6e114e0c9d833e871a4b87e614ce83b1238"
+  },
+  "portable_CPU_tests_passed": 380,
+  "focused_CPU_tests_passed": 11
+}

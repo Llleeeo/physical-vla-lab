@@ -6,7 +6,7 @@ This project connects RoboPhys simulation, expert demonstrations, synchronized v
 
 This is an independent research integration, not the upstream RoboPhys benchmark or an official DynamicVLA release.
 
-**Latest result:** the [single-drive mimic control](docs/project/MIMIC_DRIVE_CONTROL.md#observed-result--31-october) verifies the intervention and reduces early contact-aligned wrist motion in one exposed pair, but still aborts after213/319 intervals with no sustained lift. It is not an adequate fix; original defaults remain. Next inspect contact-stage model/physical response mismatch; no learned-policy success is claimed.
+**Latest result:** the [single-episode ball fine-tune](docs/project/BALL_DEVELOPMENT_TRAINING.md#observed-fine-tuning-result-and-next-command) completes 200 optimizer steps. Six fixed training-episode flow probes improve from mean 4.87 to 2.00; the saved29D-action/30D-state checkpoint strictly reloads on CPU. Actual action prediction is the next check. Learned grasp and generalization remain unverified; prior contact/safety failures remain recorded.
 
 ## Current status — 31 October 2026
 

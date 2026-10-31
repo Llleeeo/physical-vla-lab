@@ -1,6 +1,23 @@
 # Ball development training bridge
 
-Status: 31 October 2026 — source/data and CPU model-loading checks passed; GPU fine-tuning and learned closed-loop grasp remain unverified.
+Status: 31 October 2026 — 200-step GPU fine-tuning completed and checkpoint strictly reloaded on CPU; generated-action prediction and learned closed-loop grasp remain unverified.
+
+## Observed fine-tuning result and next command
+
+The user run completes 200 optimizer steps, sampling 198 distinct anchor frames. Six probes using the same observations, noise and flow time improve from mean 4.8705 to 2.0003 (58.93% reduction); every paired probe improves. This is training-episode flow loss, not physical action error. The last stochastic training loss of 3.4736 uses different sampled frames/noise from earlier steps and alone is not evidence of regression.
+
+The saved full checkpoint strictly reloads on CPU. Normalizers exactly match the source data, and the saved action projection update matches the training report. No learned simulation rollout has occurred. [Hashed result](../../results/summaries/2026-10-31-ball-development-finetune-result.json).
+
+Next, generate actual 20-action chunks from all 269 recorded observations, comparing original pretrained and fine-tuned weights with the **same new normalizers and per-frame noise**:
+
+```bash
+cd /home/robophys/Capstone_Project_Yuan_Haoming
+.venv_dynamicvla/bin/python scripts/predict_hgwind_development.py --run
+```
+
+This command performs inference only, with no training or simulation. It saves raw absolute29D chunks and reports position/quaternion errors, velocity/acceleration/reference errors, nullable/mode/gripper accuracy, scalar clipping and decoder rejection. Quaternion signs are equivalent; invalid/degenerate outputs are counted, not silently scored as valid. Offline prefixes 1, 4 and 20 use the recorded observation at each chunk anchor; they do not simulate feedback. Decoder acceptance is not physical feasibility. These differently defined29D channels make the official baseline an adaptation diagnostic, not an unchanged zero-shot benchmark.
+
+`--check-load` performs strict CPU reload without inference; the default is CPU preflight. Prediction output is a fresh `offline_predictions/<timestamp>/` directory inside the fixed training run. No checkpoint, source data or controller is modified. Disable the new prediction entry to roll back.
 
 ## Immediate objective
 
@@ -52,7 +69,7 @@ Existing output is never overwritten. Normalizer, checkpoint-load, finite-loss/g
 
 ## Next gate and limitations
 
-After the user-run result: strictly reload the checkpoint, inspect sampled29D action errors/quaternion/mode/gripper validity on the same episode, then connect the model to the passing simulator executor using **live** camera/robot observations. A single successful grasp remains an integration demonstration, not generalization or robustness. The current training preparation does not implement that live29D policy adapter; the old7D egg adapter cannot be substituted unchanged.
+After the pending prediction result: inspect sampled29D action errors/quaternion/mode/gripper validity on the same episode, then connect the model to the passing simulator executor using **live** camera/robot observations. A single successful grasp remains an integration demonstration, not generalization or robustness. The current training preparation does not implement that live29D policy adapter; the old7D egg adapter cannot be substituted unchanged.
 
 The other39 stored ball trajectories lack all required upper-command labels; this work does not make them directly convertible. Contact sensitivity in other cases remains recorded. Do not silently fall back to saved expert actions during learned-policy evaluation.
 
@@ -60,4 +77,6 @@ Rollback: stop using these new training/data entry points. Existing simulation, 
 
 ## Verified preparation
 
-374 portable CPU checks pass, including22 focused checks. The real CPU model load confirms exact new normalizers, state input2×32, action input2×20×32,154 instruction tokens and gradients only on valid29D targets; CUDA remains uninitialized. No model forward or optimizer step has run. [Source-hashed preparation](../../results/summaries/2026-10-31-ball-development-preparation.json).
+374 portable CPU checks pass, including22 focused checks. The real CPU model load confirms exact new normalizers, state input2×32, action input2×20×32,154 instruction tokens and gradients only on valid29D targets; CUDA remains uninitialized. Those preparation checks preceded the user-run training reported above. [Source-hashed preparation](../../results/summaries/2026-10-31-ball-development-preparation.json).
+
+Prediction preparation: 380 portable CPU checks pass, including 11 focused data/metric checks. Actual trained-checkpoint CPU reload passes strictly with exact normalizers; GPU prediction remains user-run.

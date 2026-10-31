@@ -2,7 +2,7 @@
 
 ## Priority update — 31 October 2026
 
-Advance the full training/prediction/live-feedback pipeline on the previously passing `local/traj_00018` float32 surrogate. The [single-episode data/model bridge](BALL_DEVELOPMENT_TRAINING.md) is CPU verified; the user-run200-step development fine-tune is next. Then inspect sampled29D commands and connect the live robot/camera adapter. The prior wait-for-all-cases training gate is superseded only for this exposed integration check. Keep contact-model sensitivity, threshold review and failed-case reproduction recorded; they must be resolved or reported before broader benchmark claims. No runtime safety settings have changed.
+Advance the full training/prediction/live-feedback pipeline on the previously passing `local/traj_00018` float32 surrogate. The [single-episode data/model bridge](BALL_DEVELOPMENT_TRAINING.md) is CPU verified; the user-run200-step development fine-tune now completes and strictly reloads. Next inspect sampled29D commands and connect the live robot/camera adapter. The prior wait-for-all-cases training gate is superseded only for this exposed integration check. Keep contact-model sensitivity, threshold review and failed-case reproduction recorded; they must be resolved or reported before broader benchmark claims. No runtime safety settings have changed.
 
 
 ## 1. Complete and review the spherical-object baseline data
