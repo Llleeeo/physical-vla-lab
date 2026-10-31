@@ -6,7 +6,7 @@ This project connects RoboPhys simulation, expert demonstrations, synchronized v
 
 This is an independent research integration, not the upstream RoboPhys benchmark or an official DynamicVLA release.
 
-## Current status — 30 October 2026
+## Current status — 31 October 2026
 
 The guarded worker-history launch now reproduces all three selected original episodes: failed58, failed59 and successful60, with all15 full-length action/observation arrays per episode matching exactly. The target retains at least60.349mm lift. A [single matched-startup fresh60 control](docs/project/WORKER_HISTORY_DIAGNOSTIC.md#observed-reproduction-and-one-matched-startup-control-30-october) is prepared to distinguish process history from changed startup scheduling (263 CPU checks). This is expert reproducibility evidence; learned ball-policy success remains unestablished.
 
@@ -15,6 +15,8 @@ The [Linux watch-resource shortage](docs/project/NATIVE_STARTUP_RESOURCES.md) ha
 The [single wind-force intervention](docs/project/SETUP_FORCE_CONTROL.md#observed-result-startup-ball-mismatch-removed-finger-response-differs) now restores exact ball velocity/pose through native rows0..500, but grasp still fails. Recorded close targets match; actual fingers close more slowly and first contact is about89ms later. Next inspect actual gripper drive/reset state. This is modified-force expert evidence, with no learned-policy success or general reset fix.
 
 The [passive gripper-drive pair](docs/project/GRIPPER_DRIVE_DIAGNOSTIC.md#observed-result-30-october) now verifies a concrete initialization mismatch: first-episode setup reports requested10500/140 gains but native readback remains10000/1000 on the first finger and0/0 on the mimic finger; later history episodes retain10500/140 on both. At closure both conditions have the same70N force ceiling and0.05m/s speed ceiling. Known motion arrays remain exact under observation. The [single post-setup gain reapplication](results/summaries/2026-10-30-gripper-gain-reapplication-result.json) now succeeds:319 intervals/957 physics callbacks, independent grasp pass, all15 core arrays and all958 native ball pose/velocity rows exactly match original success. Continuous bilateral contact lasts2.483s with at least60.349mm final lift. This restores one exposed fresh-worker expert case under the explicit force/gain controls; learned-policy success and production mimic consistency remain unverified. Next explicitly carry initialization into the29D surrogate path.
+
+The [initialized29D surrogate check](docs/project/INITIALIZED_ACTION_CONTRACT.md) is now prepared from that exactly reproduced expert:319×29 float32 actions, one fresh attempt, explicit reset/force/finger-gain hooks and separate initialization/interface/grasp gates.338 CPU checks, SDK parsing and actual native-entry/scene preflight pass. Physical surrogate outcome is pending; no learned ball-policy result is claimed.
 
 | Workstream | Verified progress | Remaining work |
 |---|---|---|

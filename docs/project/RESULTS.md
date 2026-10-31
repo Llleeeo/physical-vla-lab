@@ -1,6 +1,14 @@
 # Results and limitations
 
-Snapshot: **2026-10-30, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
+Snapshot: **2026-10-31, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
+
+## Initialized29D surrogate prepared, physical result pending
+
+The [new one-attempt runner](INITIALIZED_ACTION_CONTRACT.md) prepares319×29 float32 labels from the exactly reproduced fresh60 teacher. Reset/force/gain/barrier hooks are installed explicitly in the actual packet entry. Original task decisions are removed from the assembled collector; no saved joint/OSC commands or learned policy execute. The native gripper configuration helper and non-target safety geometry remain.
+
+338 portable CPU checks and108 focused checks pass. SDK Python3.10 parsing, actual teacher/scene hashes, entry selection and the actual native patch function verify. The packet/reset/force hooks are installed in a CPU-only isolated check, and the prepared action hash is pinned. Physical efficacy is pending; a passing teacher does not imply a passing surrogate.
+
+Result gates distinguish initialization alignment, decoded motor fields, full safe execution and independent grasp. Initialization additionally compares the first two native ball transform/velocity rows with the teacher; later contract-driven motion need not be identical. Both modified-force provenance and mimic-consistency limitations remain. [Preparation provenance](../../results/summaries/2026-10-31-initialized-contract-prepared.json).
 
 ## Fresh expert grasp restored after measured gain reapplication
 

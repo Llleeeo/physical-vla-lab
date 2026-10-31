@@ -1,0 +1,75 @@
+{
+  "schema": "physical-vla-lab.initialized-contract-preparation.v1",
+  "date": "2026-10-31",
+  "implemented": true,
+  "physical_result_pending": true,
+  "learned_policy_evaluated": false,
+  "training_eligible": false,
+  "new_gpu_by_agent": false,
+  "render": false,
+  "source_teacher": "20261030_022121_219398_fresh60_omit1_gains/attempt_00060",
+  "source_exposed_episode": "local/traj_00001",
+  "teacher_result_summary_sha256": "99a07f8ab466502c99a8dd205136a1af488e14b19a677092401dcd15e43a8601",
+  "action_shape": [
+    319,
+    29
+  ],
+  "state_dim": 30,
+  "action_dtype": "float32",
+  "maximum_attempts": 1,
+  "integration": [
+    "Explicit pre-reset single-attempt hook",
+    "Existing verified force omission",
+    "Passive native finger observer",
+    "One post-native-setup finger-gain reapplication",
+    "Existing stopped-timeline scene barrier",
+    "Frozen packet motor ownership and always-on non-target geometry"
+  ],
+  "outcomes_separated": [
+    "Initialization validity",
+    "Actual motor-boundary interface validity",
+    "Full safe execution",
+    "Independent grasp"
+  ],
+  "limitations": [
+    "One exposed seed, not held-out policy evaluation",
+    "Mimic retained with both measured warm finger gains; production consistency unverified",
+    "Float32/fixed gains/latched posture/always-on callback changes remain integrated, not one-factor ablations",
+    "Explicit modified forcing history excluded from training"
+  ],
+  "validation": {
+    "portable_cpu_checks": 338,
+    "focused_cpu_checks": 108,
+    "sdk_python310_parse": "passed five files",
+    "actual_entry": {
+      "schema": "physical-vla-lab.initialized-entry-preflight.v1",
+      "actual_native_patch_function_exercised": true,
+      "patch_sha256": "456d743d650c7e36c0d124b1606721bae2c69860a70f4279db1f804f900bcc63",
+      "original_task_decision_removed": true,
+      "packet_hook_installed": true,
+      "reset_hook_installed": true,
+      "force_proxy_installed": true,
+      "stage_barrier_installed": true,
+      "passive_and_gain_observers_ready": true,
+      "action_shape": [
+        319,
+        29
+      ],
+      "action_sha256": "a39ee3e406b3b03e632bfc5fecceda0a114981dd131d598346ba4eab9aea3bdc",
+      "max_attempts": 1,
+      "gpu_started": false
+    },
+    "real_teacher_scene_preflight": "passed",
+    "legacy_default_preflight": "passed; old209-frame baseline still selects original entry"
+  },
+  "source_hashes": {
+    "src/capstone_vla/initialized_contract.py": "6321202592df79c041c8fbf0fad0a009f9b62e6d2a1eda0548ba39e1bfddab25",
+    "scripts/sim/run_hgwind_initialized_contract_worker.py": "c49f5c69f07d6d4e675168383db6e655c3cd01c6ec90d91e4ba93589ee62a9bd",
+    "scripts/run_hgwind_initialized_contract.py": "fb96edc647707320e65aa17e09e9e8aa97354340911b293ff35a87e0173dbcb7",
+    "scripts/run_hgwind_action_contract.py": "8a80eeb8f1bdfb6a32cfc6c18c215f7f75c54e246dc978d271109dac3b96b29e",
+    "tests/test_initialized_contract.py": "376fa4c77da3a8ff9cac260f72f657c948b06ab51067e61b38da2d1e8381ab78"
+  },
+  "preflight_log_sha256": "ecbe6787245f266bb591fd72233025a5a585733eb14900226792ac9699aa3094",
+  "rollback": "Use prior runner; initialized path only selected by new schema/entry. No frozen/upstream edits.",
+  "legacy_preflight_log_sha256": "60bd2b549bb4feba29342034ae9ec7279cdc13cd7a8159efa3a569b4246092ef"
+}

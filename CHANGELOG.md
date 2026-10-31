@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-31 — Matched initialization carried into one29D surrogate
+
+- Add a dedicated fresh60 entry that explicitly installs the verified force omission, post-setup gain reapplication, passive drive observation and stopped-timeline barrier around packet execution. Reuse the reset boundary for one attempt only; no online task/skill decision or prior episode runs. Preserve the frozen29D representation, existing controller/limits and raw/frozen sources.
+- Pin the verified teacher and generate319×29 float32 actions. Reject inactive inherited hooks in the standard entry. Report initialization, interface decoding, safe completion and independent grasp separately; preserve failures and support analysis-only finish.338 portable CPU checks,108 focused checks, SDKPy310 parse and actual scene/native-entry assembly pass. User-run physical outcome pending; no GPU/render/training by agent.
+
 ## 2026-10-30 — Fresh expert grasp restored exactly
 
 - User run with verified setup-force omission plus one post-setup native finger-gain reapplication completes319 intervals/957 physics callbacks safely and passes independent grasp. Independently recomputed all15 core arrays and all958 native ball transform/velocity rows match original success exactly; bilateral contact2.483s, final lift at least60.349mm, no assistance.

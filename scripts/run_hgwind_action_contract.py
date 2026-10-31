@@ -140,7 +140,15 @@ def prepare(baseline):
 
 def command(plan,lab):
     meta=json.loads((Path(plan['source']).parent/'meta.json').read_text())
-    return [str(lab/'isaaclab.sh'),'-p',str(ROOT/'scripts/sim/run_hgwind_native_expert_worker.py'),
+    worker=ROOT/'scripts/sim/run_hgwind_native_expert_worker.py'
+    if plan.get('initialized_contract'):
+        from capstone_vla.initialized_contract import validate
+        validate(plan)
+        worker=ROOT/'scripts/sim/run_hgwind_initialized_contract_worker.py'
+    else:
+        require(not plan.get('setup_force_control') and not plan.get('gripper_gain_control'),
+            'Initialization hooks require the explicit initialized-contract entry')
+    return [str(lab/'isaaclab.sh'),'-p',str(worker),
         '--task',plan['task'],'--out_root',plan['worker_output'],'--episodes','1','--max_attempts','1',
         '--seed',str(plan['seed']),'--attempt_offset',str(plan['attempt_offset']),
         '--variation',str(meta['variation']),'--control_hz','60','--grasp_mode','physical',
@@ -182,7 +190,8 @@ def run_prepared(plan,actions,model_cfg,diagnostics,lab,run=False):
             for line in process.stdout:
                 log.write(line);log.flush()
                 if any(x in line for x in ['COLLECT ATTEMPT','HGWIND_EFFORT_PROBE_ACTIVE',
-                    'SAFETY ABORT','Traceback','RuntimeError','ValueError']):
+                    'SAFETY ABORT','Traceback','RuntimeError','ValueError','INITIALIZED_CONTRACT',
+                    'GRIPPER_GAIN_CONTROL','STAGE_LOAD_BARRIER','SETUP_FORCE_CONTROL']):
                     print(line.rstrip(),flush=True)
             code=process.wait()
         except KeyboardInterrupt:

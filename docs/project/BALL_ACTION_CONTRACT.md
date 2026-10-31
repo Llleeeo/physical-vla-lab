@@ -1,5 +1,7 @@
 # Ball action contract v1: one integrated development gate
 
+**31 October update:** the failed fresh teacher for `local/traj_00001` now exactly reproduces original success after verified startup-force/gain controls. The [initialized29D retest](INITIALIZED_ACTION_CONTRACT.md) is prepared and CPU validated; its physical result is pending. This does not revise the earlier surrogate failures or establish cohort readiness.
+
 ## Decision and purpose
 
 **Latest bounded diagnostic:** the frozen 29D surrogate passes a second exposed case, `local/traj_00018` (269 intervals, 1.767 s bilateral contact, at least 57.277 mm lift). The first case's retention failure remains. Two other selected native teachers safety-abort before surrogate tests; their source-reproduction blocker is unresolved. See [results](RESULTS.md). This is not learned-policy evaluation or broad validation.
