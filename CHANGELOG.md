@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Prefix ablation completed; parent retained
+
+- Verify matched500-step training branches, both checkpoints and24 full generated streams.
+- Record modest prefix-weighting tradeoffs versus uniform continuation, without near-contact improvement over parent; preserve both candidates without promotion.
+- Flag startup upper-goal discontinuity for provenance review, explicitly distinguishing it from physical arm motion or proven label corruption.
+
 ## 2026-10-31 — Matched executed-prefix training ablation prepared
 
 Add two matched500-step continuations from the same parent: uniform temporal weights versus4x first-four weights, with valid-weight normalization. Match batches and explicit flow noise/time hashes; preserve all29 channels and later-horizon supervision. Save both final candidates and evaluate all eight fixed seeds without promotion or physics.

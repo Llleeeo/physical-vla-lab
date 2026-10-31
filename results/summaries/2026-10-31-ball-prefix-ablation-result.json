@@ -1,0 +1,183 @@
+{
+  "status": "verified_completed_paired_training_ablation",
+  "source_run": "data/derived/hgwind_traj18_development_20261031/prefix_ablation_runs/20261031_151458_961337",
+  "source_hashes": {
+    "report.json": "c1675ef3f95211760bf36c6bdfdc0c26ebccbbc84ce0fb1db42c473ca69c4f80",
+    "protocol.json": "562940159f8228618294bbb001142aaba6b908ce4a1d44bcf8e41f6d8b61cb39",
+    "parent_metrics.json": "76b9cee34af1ed837c64d10797a87b9cf84778c003678294c64c607607bfe644",
+    "parent_predictions.npz": "fad2c8389147a468a74a6916f642633685750d6a14788f127b38c5ee171190c4",
+    "uniform/report.json": "ec6a92dc562ff0dbedfceab20d8739758847802dd64ddc97c70221be642ab215",
+    "uniform/run_config.json": "7a9f6fbe400f0ac36ba3ab693d81b4bce71584a24f7d563c2f747f50ea40b636",
+    "uniform/training.jsonl": "abf18502ef733751c308a928d3d7dd727eefcb4b5e737140d10849ab3be022d3",
+    "uniform/final_predictions.npz": "8def52b44f2e23dd99f48a8c7948aaff27e7f79aef505e7396c11bbfdb6f997c",
+    "uniform/checkpoint_final/model.safetensors": "0d01d7b564059f6abe84295ab998ad5da3dddf790f89b3fc60b867cef720fa7c",
+    "prefix4/report.json": "dcc1813b07f1310e26477d1a4180c35b3d57a7c5257145573d29b8b9ddcef9f1",
+    "prefix4/run_config.json": "32f564338aabf01da2bcab42a81e1e18c686abc23e0bcc770294a5f41a2e30f7",
+    "prefix4/training.jsonl": "b19eb50b216c374f7f3f6005c417e9c79dd44286bbf00ba3a760b8eb19cb53e3",
+    "prefix4/final_predictions.npz": "410f005793946df322148627490efda4d29e742988fc39bbeeb9071d2d054b38",
+    "prefix4/checkpoint_final/model.safetensors": "c80c2b3d0ada447adb8097cd50b42d4406319de7a24df21a65c7624505c2b275"
+  },
+  "paired_comparison": {
+    "approach_position_mean_mm": {
+      "parent_mean": 58.62282542511821,
+      "uniform_mean": 59.19877998530865,
+      "prefix4_mean": 58.93583595752716,
+      "prefix4_minus_uniform": [
+        -0.07623434066772461,
+        -0.5189366638660431,
+        -0.18277019262313843,
+        -0.16972050070762634,
+        -0.24908408522605896,
+        -0.24099647998809814,
+        -0.3277286887168884,
+        -0.3380812704563141
+      ],
+      "improved_pairs": 8,
+      "worsened_pairs": 0
+    },
+    "precontact_80_119_mean_mm": {
+      "parent_mean": 20.281212529422145,
+      "uniform_mean": 21.96130761587864,
+      "prefix4_mean": 21.41959179353154,
+      "prefix4_minus_uniform": [
+        -0.5210197963999299,
+        -0.4649170315016917,
+        -0.5956867653892637,
+        -0.40351047015403907,
+        -0.2948615818183917,
+        -0.48375329351029706,
+        -0.818122035360723,
+        -0.7518556046424578
+      ],
+      "improved_pairs": 8,
+      "worsened_pairs": 0
+    },
+    "precontact_increment_error_mm": {
+      "parent_mean": 21.102118890523826,
+      "uniform_mean": 20.287480167106203,
+      "prefix4_mean": 20.501870137890002,
+      "prefix4_minus_uniform": [
+        0.2248442712711558,
+        0.27085831289940643,
+        0.179119981086437,
+        0.2677089262210792,
+        0.16297228648097928,
+        0.22235930175812157,
+        0.15962816388822887,
+        0.22762852266502165
+      ],
+      "improved_pairs": 0,
+      "worsened_pairs": 8
+    },
+    "full_position_p95_mm": {
+      "parent_mean": 161.36322000036174,
+      "uniform_mean": 161.49641997520484,
+      "prefix4_mean": 160.75751752740194,
+      "prefix4_minus_uniform": [
+        0.6265675877594958,
+        -3.5663618933869827,
+        -1.9901083285607228,
+        1.2436993129574034,
+        0.41921462354613936,
+        -5.796976668802955,
+        0.4029529462936523,
+        2.749792837770542
+      ],
+      "improved_pairs": 3,
+      "worsened_pairs": 5
+    },
+    "orientation_p95_deg": {
+      "parent_mean": 3.7288505526335998,
+      "uniform_mean": 3.6597442908347926,
+      "prefix4_mean": 3.6138308934985295,
+      "prefix4_minus_uniform": [
+        -0.10864614077408552,
+        -0.31234264057289085,
+        0.08696847855753775,
+        0.197773229004083,
+        -0.007926328167926933,
+        -0.12299850341368712,
+        0.08704357307396604,
+        -0.1871788463970958
+      ],
+      "improved_pairs": 5,
+      "worsened_pairs": 3
+    },
+    "gripper_error_frames": {
+      "parent_mean": 4.5,
+      "uniform_mean": 4.5,
+      "prefix4_mean": 4.25,
+      "prefix4_minus_uniform": [
+        -1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        -1,
+        0
+      ],
+      "improved_pairs": 2,
+      "worsened_pairs": 0
+    },
+    "gripper_transitions": {
+      "parent_mean": 2.0,
+      "uniform_mean": 2.0,
+      "prefix4_mean": 1.75,
+      "prefix4_minus_uniform": [
+        -2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "improved_pairs": 1,
+      "worsened_pairs": 0
+    },
+    "native_rejected_frames": {
+      "parent_mean": 0.0,
+      "uniform_mean": 0.0,
+      "prefix4_mean": 0.0,
+      "prefix4_minus_uniform": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "improved_pairs": 0,
+      "worsened_pairs": 0
+    }
+  },
+  "verification": "Both checkpoint inspectors pass; each branch has500 logged optimizer steps,262 unique observation anchors, matching scheduled frames and explicit noise/time hashes. All24 generated stream metric dictionaries and comparison aggregates recompute exactly. Protocol and source/checkpoint hashes verified.",
+  "startup_mean_mm": {
+    "uniform": 142.1706106448592,
+    "prefix4": 142.20816142136556
+  },
+  "first_four_mean_mm": {
+    "uniform": 225.58373097037116,
+    "prefix4": 223.77258254276882
+  },
+  "label_observation": {
+    "target_z_frame0_m": 0.4759444296360016,
+    "target_z_frame1_m": 0.0668579638004303,
+    "target_z_change_m": -0.4090864658355713,
+    "measured_pinch_z_frame0_m": 0.4779551029205322,
+    "measured_pinch_z_frame1_m": 0.4772903621196747,
+    "frame0_normalized_target_z": 8.37529862667991,
+    "frame0_anchor_draws_each_branch": 5,
+    "interpretation": "Upper-controller target discontinuity; not measured arm motion or proof of a bad label. Phase/startup/avoidance provenance requires audit."
+  },
+  "decision": "Do not promote either continuation. Prefix4 modestly improves target position versus matched uniform control but remains worse than the retained parent near contact; increment error worsens in every paired seed versus uniform. Inspect source upper-goal/feedback-label transitions before another weighting or step-count sweep.",
+  "default_changed": false,
+  "heldout": false,
+  "physics": false,
+  "task_success_verified": false,
+  "limitations": "One paired training schedule on one exposed episode; eight noise draws are not independent datasets. No causal attribution from target discontinuity alone."
+}

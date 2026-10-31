@@ -1,5 +1,16 @@
 # Research roadmap
 
+## 31 October 2026 — Prefix weighting provides only a modest tradeoff
+
+Both500-step branches complete; each samples262 distinct observation anchors. Scheduled indices and explicit training noise/time hashes match at every paired step. Both saved checkpoint inspectors pass, source/protocol/checkpoint hashes verify, and all24 generated stream metrics plus paired aggregates recompute exactly.
+
+Across eight evaluation seeds, parent/uniform/prefix4 near-contact position means are20.28/21.96/21.42mm. Prefix4 improves versus uniform in all eight pairs by0.54mm on average (2.47%), but remains worse than the retained parent. Approach means are58.62/59.20/58.94mm. Increment residual means are21.10/20.29/20.50mm: prefix4 is worse than uniform in all eight pairs. Jaw errors average4.50/4.50/4.25frames and jaw transitions2.0/2.0/1.75; all native decoder rejects remain zero. Mean per-run position p95 is161.36/161.50/160.76mm, with prefix4 p95 worse than uniform in five pairs despite the slightly lower mean. This is a modest tradeoff, not a robust improvement over the existing model.
+
+Startup0..39 position errors remain142.17mm (uniform) and142.21mm (prefix4), with first-four errors225.58/223.77mm. Do not promote either branch or launch physics solely because one statistic improves. Both final candidates remain available; the default3,000-step parent stays unchanged. One training schedule/eight inference seeds do not establish generalization.
+
+A read-only label inspection finds target height0.47594→0.06686m from frame0 to1, while measured pinch height changes0.47796→0.47729m. The first target Z is about8.38 normalization standard deviations; frame0 was actually sampled five times in each training branch. This is an upper-goal discontinuity, not a40.9cm physical arm step or proof of corrupted labels. Next audit source upper-goal/feedback generation around startup and target switches, including time binding and control mode/avoidance context, before another loss-coefficient or step-count sweep. Do not delete or smooth these labels without establishing their meaning. [Source-hashed result](../../results/summaries/2026-10-31-ball-prefix-ablation-result.json).
+
+
 ## 31 October 2026 — Test temporal loss emphasis against equal-budget training
 
 The [executed-prefix ablation](BALL_PREFIX_ABLATION.md) is prepared. Compare500-step uniform and prefix4-weight continuations with paired training draws, then evaluate parent and both final models on the same eight full-episode probes. This isolates temporal weighting from extra optimization; no startup oversampling or additional objective changes. Review pose/jaw/mode and startup regressions before any deployment. GPU results pending.
