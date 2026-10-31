@@ -1,5 +1,9 @@
 # Research roadmap
 
+## 31 October 2026 — Approach filter avoids contact but misses descent window
+
+The first guarded rollout has no finger contact and still fails grasp. Only 0.15 s is geometrically aligned; fingers remain above the ball before protection re-engages. Later wrist-view loss causes a hold. Preserve this negative outcome and the unchanged 0.5 jaw decoding. Next quantify relative ball/hand motion and vertical response time before proposing interception-aware release; do not blindly relax margins or launch training. The floating-point post-run audit error is repaired without a physics rerun. [Result](RESULTS.md).
+
 ## 31 October 2026 — Execute one bounded visual approach trial
 
 The optional approach filter and CPU preflight are ready. Run one 269-interval retained-parent trial with prefix 1, legacy cameras and `--approach-guard`. Keep jaw decoding at 0.5 and all native physics/actuator limits. Compare first contact geometry and independent grasp, and explicitly report visual holds and raw/filtered actions. Do not infer success from an integration pass or from nominal clearance alone. No further training or collection is needed for this experiment. [Implementation and limitations](BALL_VISUAL_APPROACH.md).

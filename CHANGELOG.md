@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Verify visual approach outcome and repair roundoff audit
+
+- Complete the existing 269-frame result audit without rerunning physics; preserve the original incomplete report.
+- Accept only 1e-12 floating reconstruction noise while keeping discrete decisions, raw predictions, jaw scores and unchanged channels exact; bind the single legacy analyzer revision.
+- Record zero finger contact, a nine-frame alignment window and failed grasp; export recorded RGB for review. Keep the filter optional.
+
 ## 2026-10-31 — Optional RGB approach-distance filter prepared
 
 - Add default-off robot-finger height projection with coherent vertical motion references, latched missing-view pose hold and two-estimate reacquisition.

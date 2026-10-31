@@ -1,0 +1,52 @@
+{
+  "schema": "physical-vla-lab.visual-approach-result.v1",
+  "run": "20261031_172808_195612",
+  "frames": 269,
+  "physics_callbacks": 807,
+  "runtime_safety_passed": true,
+  "integration_passed": true,
+  "independent_grasp": "fail",
+  "left_contact_frames": 0,
+  "right_contact_frames": 0,
+  "bilateral_frames": 0,
+  "mode_counts": {
+    "unaligned_height_floor": 220,
+    "missing_pose_hold": 40,
+    "aligned_pass": 9
+  },
+  "aligned_frames_inclusive": [
+    134,
+    142
+  ],
+  "aligned_duration_s": 0.15,
+  "missing_pose_hold_frames_inclusive": [
+    229,
+    268
+  ],
+  "lowest_finger_bound_above_ball_top_mm_at_aligned_start": 30.31,
+  "lowest_finger_bound_above_ball_top_mm_at_aligned_end": 17.49,
+  "first_raw_close_frame": 102,
+  "jaw_threshold": 0.5,
+  "raw_jaw_scores_preserved": true,
+  "posthoc_analyzer_correction": {
+    "original_sha256": "36291fdf6055aa9f7470bd6ba57177df68578a20b0bd46afe1e5c441e10dcbb8",
+    "current_sha256": "1560021ea4d891722e742ed62de5f78f755321f9c926e8a84a1406156d92e40b",
+    "reason": "Allow 1e-12 floating roundoff; decisions/jaw/model provenance remain exact"
+  },
+  "maximum_recomputed_action_difference": 7.216449660063518e-16,
+  "conclusion": "No finger contact in this trial; alignment window ends before descent reaches ball. Guard is not promoted as successful grasp control.",
+  "limitations": [
+    "Same exposed training case",
+    "Historical comparison is not an isolated causal trial",
+    "Bounding-corner height is not full collision mesh clearance",
+    "No runtime target truth; object truth used only for post-run measurements"
+  ],
+  "sources": {
+    "report.json": "ebd3b7c007e97aee7db4929fda84b6f44710d65261a2c1d8645afb5c90e742d2",
+    "report.before_roundoff_correction.json": "a27f12691783432415ce14ec986df87d706f7664fd621a2f6f2e82ac19309c66",
+    "run_config.json": "8e129acdfbb00c8ccaf802b7d6045f57573977456036009861eb9a219d3fee6e",
+    "approach_guard_events.json": "0079df7995cd8f4f6f52a78708c31d4046e373a6814d845ddb24925d5efffe92",
+    "live_observations.hdf5": "28401f821294cdbf7496b810b9795e97058ec794ececec0f957be036d7152f72",
+    "video_review/manifest.json": "3e05436a17abb4da241f837760e1d0f06f285198eb2cfcf244502952e928f229"
+  }
+}

@@ -1,5 +1,15 @@
 # Results and limitations
 
+## 31 October 2026 — Visual approach trial: no finger impact, no grasp
+
+The optional filter completes 269 intervals / 807 native callbacks without a safety abort. All raw model responses, unchanged jaw scores, filter decisions and native execution pass the corrected audit. Independent grasp fails: zero left, right or bilateral contact intervals. Unaligned height protection runs for 220 intervals, alignment passes for 9 (134–142, 0.15 s), and missing-view pose hold runs for the final 40 (229–268).
+
+During the permitted descent window, the lowest recorded finger bounding corner remains approximately 30.31 mm above the ball top at frame 134 and 17.49 mm above it at 142. At 143 horizontal alignment is lost and height protection returns. This supports a missed descent/interception window; removing early contact alone has not made a grasp. These bounding-height measurements use object truth only after execution and do not certify full mesh clearance. The guard preserves jaw outputs; first raw close is 102, with continued switching.
+
+The original `INCOMPLETE` report was a verifier error: exact equality of recomputed floating geometry rejected roundoff (maximum action difference 7.22e-16). The revised audit uses absolute tolerance 1e-12 for floating geometry/actions, while decisions, original model responses, jaw values and untouched channels remain exact. Only the explicitly identified legacy analyzer revision can be superseded; other runtime hashes still must match. The original report is retained. No simulation rerun was needed. A 269-frame, 4x-slow two-view video is exported from the actual saved RGB.
+
+This is one exposed VLA-plus-visual-controller trial, not evidence of general grasp improvement. Keep the guard optional. Next inspect interception/vertical response time within the alignment window before changing clearance or adding more training. [Source-hashed evidence](../../results/summaries/2026-10-31-ball-visual-approach-live-result.json).
+
 ## 31 October 2026 — Visual approach guard: CPU preparation only
 
 An optional RGB-guided approach filter is implemented with unchanged original jaw decoding. It uses full robot finger bounds to set an unaligned height floor, removes conflicting downward feedforward, and holds a latched robot pose when localization is unavailable. Two consistent visual estimates release the hold. Static ball size is declared; live target position is estimated from RGB without simulator object-state access.
