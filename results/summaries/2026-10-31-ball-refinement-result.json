@@ -1,0 +1,405 @@
+{
+  "scope": "Same exposed training episode local/traj_00018; recorded observations, not closed-loop or held-out evaluation",
+  "selected_additional_step": 1000,
+  "parent_steps": 2000,
+  "learning_rate": 1e-05,
+  "baseline": {
+    "approach_end_exclusive": 144,
+    "approach_position_mean_mm": 66.69634580612183,
+    "orientation_p95_deg": 4.457058563069111,
+    "gripper_error_frames": 6,
+    "gripper_transitions": 5,
+    "nonfinite_frames": 0,
+    "native_rejected_frames": 0,
+    "native_rejections": [],
+    "full_stream_metrics": {
+      "frames": 269,
+      "finite_frames": 269,
+      "nonfinite_frames": 0,
+      "position_error_mm": {
+        "count": 269,
+        "mean": 44.747047926080505,
+        "median": 25.019644842676428,
+        "p95": 146.77542397534873
+      },
+      "orientation_error_deg": {
+        "count": 269,
+        "mean": 1.8353378045851918,
+        "median": 1.3928340563738375,
+        "p95": 4.457058563069111
+      },
+      "orientation_invalid_frames": 0,
+      "raw_quaternion_norm": {
+        "count": 269,
+        "mean": 1.0000324471278028,
+        "median": 1.0000958666995168,
+        "p95": 1.0151706279820834
+      },
+      "decoder_rejected_frames": 0,
+      "decoder_rejections": [],
+      "decoder_acceptance_is_not_physical_feasibility": true,
+      "mode_accuracy": {
+        "acceleration_enabled": {
+          "correct": 262,
+          "total": 269,
+          "accuracy": 0.9739776951672863,
+          "target_true_count": 185,
+          "predicted_true_finite_count": 188
+        },
+        "velocity_reference_enabled": {
+          "correct": 268,
+          "total": 269,
+          "accuracy": 0.9962825278810409,
+          "target_true_count": 170,
+          "predicted_true_finite_count": 171
+        },
+        "relative_speed_enabled": {
+          "correct": 269,
+          "total": 269,
+          "accuracy": 1.0,
+          "target_true_count": 170,
+          "predicted_true_finite_count": 170
+        },
+        "orientation_axis_enabled": {
+          "correct": 268,
+          "total": 269,
+          "accuracy": 0.9962825278810409,
+          "target_true_count": 269,
+          "predicted_true_finite_count": 268
+        },
+        "preserve_orientation_during_translation": {
+          "correct": 232,
+          "total": 269,
+          "accuracy": 0.862453531598513,
+          "target_true_count": 200,
+          "predicted_true_finite_count": 205
+        },
+        "operational_orientation_task": {
+          "correct": 268,
+          "total": 269,
+          "accuracy": 0.9962825278810409,
+          "target_true_count": 99,
+          "predicted_true_finite_count": 100
+        },
+        "gripper_closed": {
+          "correct": 263,
+          "total": 269,
+          "accuracy": 0.9776951672862454,
+          "target_true_count": 125,
+          "predicted_true_finite_count": 131
+        }
+      },
+      "scalar_projection": {
+        "orientation_roll_weight": {
+          "active_finite_frames": 269,
+          "clipped_frames": 69
+        },
+        "joint_limit_margin_rad": {
+          "active_finite_frames": 269,
+          "clipped_frames": 68
+        },
+        "maximum_relative_linear_speed_mps": {
+          "active_finite_frames": 170,
+          "clipped_frames": 3
+        }
+      },
+      "vector_error": {
+        "target_linear_velocity": {
+          "unit": "m/s",
+          "scope": "raw_prediction_on_target_enabled_frames",
+          "count": 269,
+          "mean": 0.08099303883175377,
+          "median": 0.021091904844030798,
+          "p95": 0.4404630737467383
+        },
+        "target_linear_acceleration": {
+          "unit": "m/s^2",
+          "scope": "raw_prediction_on_target_enabled_frames",
+          "count": 185,
+          "mean": 1.3672115060301548,
+          "median": 0.33746978267373334,
+          "p95": 7.416916449129528
+        },
+        "linear_velocity_reference": {
+          "unit": "m/s",
+          "scope": "raw_prediction_on_target_enabled_frames",
+          "count": 170,
+          "mean": 0.11892930542002257,
+          "median": 0.027699162519804175,
+          "p95": 0.6207056787808236
+        }
+      },
+      "raw_per_channel_mse": [
+        0.0016326910261936737,
+        0.00046954210351060404,
+        0.0036169723763898294,
+        2.8258912822468068e-05,
+        0.0004962199114498094,
+        0.00026706210821996385,
+        2.754314277841338e-05,
+        0.000270598670886645,
+        1.2955452650299945e-05,
+        0.04529926876813712,
+        0.047095095270462815,
+        4.782251039323107e-06,
+        5.072806354367537,
+        0.02966696545559176,
+        0.0003912162483701361,
+        8.725118571742411e-06,
+        0.0459829012936482,
+        0.013191115324292697,
+        0.013655956435075795,
+        0.010828638508528214,
+        7.267224589838199e-07,
+        1.3936892369998815e-06,
+        4.357884066000147e-11,
+        0.010807385881116906,
+        0.02229255443225768,
+        5.72412244079904e-05,
+        0.10707108278570455,
+        0.009477252880829947,
+        0.02991676073659606
+      ],
+      "target_gripper_transition_frames": [
+        144
+      ],
+      "predicted_gripper_transition_frames": [
+        136,
+        137,
+        138,
+        139,
+        140
+      ]
+    }
+  },
+  "selected": {
+    "approach_end_exclusive": 144,
+    "approach_position_mean_mm": 61.256036162376404,
+    "orientation_p95_deg": 3.954256697850675,
+    "gripper_error_frames": 5,
+    "gripper_transitions": 3,
+    "nonfinite_frames": 0,
+    "native_rejected_frames": 0,
+    "native_rejections": [],
+    "full_stream_metrics": {
+      "frames": 269,
+      "finite_frames": 269,
+      "nonfinite_frames": 0,
+      "position_error_mm": {
+        "count": 269,
+        "mean": 38.77759069992367,
+        "median": 18.666498951560083,
+        "p95": 158.52734885267665
+      },
+      "orientation_error_deg": {
+        "count": 269,
+        "mean": 1.3763978636802943,
+        "median": 0.8217498017104446,
+        "p95": 3.954256697850675
+      },
+      "orientation_invalid_frames": 0,
+      "raw_quaternion_norm": {
+        "count": 269,
+        "mean": 1.001083360744553,
+        "median": 1.0015345524959889,
+        "p95": 1.0083681614926765
+      },
+      "decoder_rejected_frames": 0,
+      "decoder_rejections": [],
+      "decoder_acceptance_is_not_physical_feasibility": true,
+      "mode_accuracy": {
+        "acceleration_enabled": {
+          "correct": 261,
+          "total": 269,
+          "accuracy": 0.9702602230483272,
+          "target_true_count": 185,
+          "predicted_true_finite_count": 189
+        },
+        "velocity_reference_enabled": {
+          "correct": 268,
+          "total": 269,
+          "accuracy": 0.9962825278810409,
+          "target_true_count": 170,
+          "predicted_true_finite_count": 169
+        },
+        "relative_speed_enabled": {
+          "correct": 268,
+          "total": 269,
+          "accuracy": 0.9962825278810409,
+          "target_true_count": 170,
+          "predicted_true_finite_count": 169
+        },
+        "orientation_axis_enabled": {
+          "correct": 269,
+          "total": 269,
+          "accuracy": 1.0,
+          "target_true_count": 269,
+          "predicted_true_finite_count": 269
+        },
+        "preserve_orientation_during_translation": {
+          "correct": 237,
+          "total": 269,
+          "accuracy": 0.8810408921933085,
+          "target_true_count": 200,
+          "predicted_true_finite_count": 212
+        },
+        "operational_orientation_task": {
+          "correct": 268,
+          "total": 269,
+          "accuracy": 0.9962825278810409,
+          "target_true_count": 99,
+          "predicted_true_finite_count": 100
+        },
+        "gripper_closed": {
+          "correct": 264,
+          "total": 269,
+          "accuracy": 0.9814126394052045,
+          "target_true_count": 125,
+          "predicted_true_finite_count": 130
+        }
+      },
+      "scalar_projection": {
+        "orientation_roll_weight": {
+          "active_finite_frames": 269,
+          "clipped_frames": 123
+        },
+        "joint_limit_margin_rad": {
+          "active_finite_frames": 269,
+          "clipped_frames": 114
+        },
+        "maximum_relative_linear_speed_mps": {
+          "active_finite_frames": 169,
+          "clipped_frames": 7
+        }
+      },
+      "vector_error": {
+        "target_linear_velocity": {
+          "unit": "m/s",
+          "scope": "raw_prediction_on_target_enabled_frames",
+          "count": 269,
+          "mean": 0.07795624982784385,
+          "median": 0.014976319054031913,
+          "p95": 0.4821431513777518
+        },
+        "target_linear_acceleration": {
+          "unit": "m/s^2",
+          "scope": "raw_prediction_on_target_enabled_frames",
+          "count": 185,
+          "mean": 1.3539975418239023,
+          "median": 0.2667194446316213,
+          "p95": 8.318034142230585
+        },
+        "linear_velocity_reference": {
+          "unit": "m/s",
+          "scope": "raw_prediction_on_target_enabled_frames",
+          "count": 170,
+          "mean": 0.1170999029855406,
+          "median": 0.01973078639127248,
+          "p95": 0.6351667833768896
+        }
+      },
+      "raw_per_channel_mse": [
+        0.0013172101134987602,
+        0.0004764197579413872,
+        0.0037404992771040047,
+        2.8294453659590065e-05,
+        0.00037126554602786297,
+        0.00022585690800239354,
+        3.0098880124439856e-05,
+        0.0001632658777979375,
+        1.2238693269519088e-05,
+        0.04899736550614127,
+        0.04944460779373991,
+        4.626229887022215e-06,
+        5.75775995743529,
+        0.02808175203057993,
+        0.00022361120001309918,
+        8.796549581128641e-06,
+        0.0493708620340903,
+        0.005742233539593482,
+        0.010636760430574677,
+        0.005148400301508772,
+        4.814471557047884e-07,
+        1.235808585390279e-06,
+        2.6974922914947205e-11,
+        0.0048102184555996064,
+        0.011076629416045434,
+        3.414418424541531e-05,
+        0.09871287683760713,
+        0.005638096552081619,
+        0.021335526876253483
+      ],
+      "target_gripper_transition_frames": [
+        144
+      ],
+      "predicted_gripper_transition_frames": [
+        138,
+        139,
+        140
+      ]
+    }
+  },
+  "probes": [
+    {
+      "step": 250,
+      "accepted": true,
+      "approach_position_mean_mm": 64.06419724225998,
+      "orientation_p95_deg": 4.138089032194297,
+      "gripper_error_frames": 5,
+      "gripper_transitions": 3
+    },
+    {
+      "step": 500,
+      "accepted": true,
+      "approach_position_mean_mm": 62.92042136192322,
+      "orientation_p95_deg": 3.977808382831379,
+      "gripper_error_frames": 5,
+      "gripper_transitions": 3
+    },
+    {
+      "step": 750,
+      "accepted": true,
+      "approach_position_mean_mm": 62.218938022851944,
+      "orientation_p95_deg": 4.066046367293198,
+      "gripper_error_frames": 4,
+      "gripper_transitions": 1
+    },
+    {
+      "step": 1000,
+      "accepted": true,
+      "approach_position_mean_mm": 61.256036162376404,
+      "orientation_p95_deg": 3.954256697850675,
+      "gripper_error_frames": 5,
+      "gripper_transitions": 3
+    }
+  ],
+  "selection_limitation": "Guardrails compare to the parent, not the previously selected candidate. Step750 has one jaw transition and four wrong jaw frames; selected step1000 has three and five. Full-stream position p95 worsens from146.775 to158.527mm.",
+  "verification": {
+    "saved_stream_metrics_recomputed": true,
+    "strict_cpu_checkpoint_reload": true,
+    "live_preprocessing_exact": true,
+    "cuda_started_by_agent": false,
+    "task_success_verified": false
+  },
+  "metadata_completion": {
+    "kind": "post_run_metadata_completion",
+    "reason": "Refinement writer omitted loader-required projection delta; recomputed from saved tensors on CPU, not a training-time measurement.",
+    "original_report": "report.original_before_projection_audit.json",
+    "original_report_sha256": "57a70383dded8eae497efc73a75a7af91cddc6096d8bb8a13bbf43895f67d1fc",
+    "checkpoint_sha256": "d8d345e70be7ac1e9ad1c6396a7794397be28cf34bab93941009d2ed8ca861fa",
+    "official_weights_sha256": "e3da8b1e0326d7a3ee6873f7fa17cdf7015201251901be5107377cb851ce3af8",
+    "tensor": "model.action_out_proj.weight",
+    "weights_modified": false
+  },
+  "source_sha256": {
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/report.json": "1c0d9dc683af2f8c549f9d9cec705ed8aaf291c7b8775870a42074ef69f9ef9c",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/report.original_before_projection_audit.json": "57a70383dded8eae497efc73a75a7af91cddc6096d8bb8a13bbf43895f67d1fc",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/run_config.json": "bd4f0436d6723903282f1f5bb0767aab22de128139e6c41b421f0e88b7d3f8b5",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/generated_probes.json": "548c7d5edfa86320812991e378f794f97aaf5f06d391499ab1e73db6861920ee",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/generated_step0000.npy": "c20535e15bdfef6e9ec4b044cac3b7404210b25ab8ca6c8c92d316fb64f66c1d",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/generated_step0250.npy": "ba933d21a5e16184f41aeb7c692278539dbe3fb82b0df39bb1a40b7a49309e74",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/generated_step0500.npy": "2ac6d0952418b7cf24031ddb98195a06394e4b33f1f8728f60c039bd4a903263",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/generated_step0750.npy": "232ce02ae041b6f2bd67ddf42718189d4d4ecaef0f723669a512a97a6006670c",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/generated_step1000.npy": "e07f283dcd6825564210ecb4b1e489cb178b4c764df9e8cea6f2d74fcd233d6f"
+  }
+}

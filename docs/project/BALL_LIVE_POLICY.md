@@ -106,3 +106,16 @@ New entries: `scripts/run_hgwind_closed_loop.py`, `scripts/hgwind_policy_server.
 New adapters: `src/capstone_vla/ball_live_protocol.py`, `src/capstone_vla/ball_live_runtime.py`; regressions: `tests/test_ball_live_policy.py`.
 
 Rollback consists of stopping use of these new entries; existing expert/surrogate/training interfaces and immutable artifacts are preserved. The coordinator stops only its own model/simulation process groups on exit.
+
+
+## Selected refinement checkpoint: matched full rollout
+
+The additional-step1,000 checkpoint passed strict CPU reload and live-input preprocessing after an explicitly recorded report metadata completion. Recorded-input improvements do not establish grasp success; see [results](RESULTS.md#bounded-refinement-result--31-october-2026). Run the same initial condition and controller with the new weights:
+
+```bash
+data/derived/hf_pilot_render_repo/.venv/bin/python scripts/run_hgwind_closed_loop.py \
+  --run-dir data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430 \
+  --frames 269 --prefix 4 --camera-protocol legacy --run
+```
+
+Outputs go to a new `closed_loop_runs` subdirectory of this training run. GPU simulation/inference uses synchronous pause; this does not measure real-time performance.

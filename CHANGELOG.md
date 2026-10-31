@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Bounded refinement completed; matched rollout ready
+
+- Verify all saved generated-action probes and selection. Approach mean improves 8.16%; position p95 worsens. Step750 has a cleaner jaw sequence than selected step1000.
+- Preserve the original report and complete missing projection-change metadata from unchanged saved weights. Strict CPU reload and live preprocessing pass; matched full rollout remains user-run and pending.
+- Record source hashes and limits; no new physical success or held-out result.
+
 ## 2026-10-31 — Repair CPU test import isolation
 
 - Actions runs 71 and 72 failed during test collection with the same missing diagnostic-script import. Local checks had included an extra `scripts` search path.

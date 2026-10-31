@@ -6,7 +6,7 @@ This project connects RoboPhys simulation, expert demonstrations, synchronized v
 
 This is an independent research integration, not the upstream RoboPhys benchmark or an official DynamicVLA release.
 
-**Latest result:** the [DynamicVLA ball policy](docs/project/BALL_LIVE_POLICY.md) completes 269 live control intervals and 807 physics steps with verified input/action binding and unchanged safety checks, but **does not grasp the ball**. Premature right-finger contact at frame 104 precedes gripper chatter; the successful expert first contacts at 162. Matched-input inference now confirms image and state sensitivity; an eight-frame formal-render control shows no clear improvement. Bounded lower-learning-rate refinement with generated-action checkpoint selection is now prepared; further training and grasp improvement remain pending. This remains one exposed training case, not physical generalization evidence.
+**Latest result:** the [DynamicVLA ball policy](docs/project/BALL_LIVE_POLICY.md) completes 269 live control intervals and 807 physics steps with verified input/action binding and unchanged safety checks, but **does not grasp the ball**. Premature right-finger contact at frame 104 precedes gripper chatter; the successful expert first contacts at 162. Matched-input inference now confirms image and state sensitivity; an eight-frame formal-render control shows no clear improvement. Bounded lower-learning-rate refinement now reduces recorded-input approach target error from 66.70 to 61.26 mm, but position p95 worsens and a matched live grasp test is pending. This remains one exposed training case, not physical generalization evidence.
 
 ## Current status — 31 October 2026
 

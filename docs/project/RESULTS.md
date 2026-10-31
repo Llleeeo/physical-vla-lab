@@ -2,6 +2,18 @@
 
 Snapshot: **2026-10-31, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Bounded refinement result — 31 October 2026
+
+The user completed 1,000 additional optimizer steps from the saved 2,000-step checkpoint, at learning rate 1e-5. The saved baseline and all four generated-action probes were recomputed in the model environment and match the report. The selected checkpoint is additional step 1,000 (3,000 lineage steps).
+
+On the same 269 recorded observations with prefix4 execution, mean approach target error improves from 66.696 to 61.256 mm (8.16%). Full-stream mean improves from 44.747 to 38.778 mm, but position p95 **worsens** from 146.775 to 158.527 mm. Orientation p95 improves from 4.457 to 3.954 degrees. Wrong jaw frames decrease from 6 to 5; transitions decrease from 5 to 3, at frames 138/139/140 versus expert closure at 144. Native request decoding rejects no frames; this is not a physical feasibility result.
+
+Step 750 has the cleaner jaw sequence (one transition at 140, four wrong jaw frames) and approach error 62.219 mm. The predetermined selector chooses step 1,000 because approach error is lower and its guardrails compare with the original parent, not the previous candidate. The selected model is not best on every metric. Only the selected full checkpoint was retained; candidate predictions are retained for audit.
+
+CPU downstream loading exposed a missing `action_projection_l2_change` report field. Preserve the byte-identical original report, recompute this metadata from saved tensors (0.3136768937), and annotate it as a post-run audit with report/model/official-weight hashes. No model weights or training history were changed. Strict CPU checkpoint loading, normalization checks and live preprocessing now pass without CUDA. The refinement writer remains frozen to preserve recorded source hashes; another run using that writer requires the same explicit metadata completion before downstream loading.
+
+Next: one matched 269-frame live simulation using this selected checkpoint, legacy camera protocol, prefix4, original seed/initialization and unchanged safety/controller settings. Compare first contact, approach tracking, jaw transitions, bilateral contact and independent grasp evidence with the parent. This remains training-case development; no grasp improvement or generalization is established. [Source-hashed result](../../results/summaries/2026-10-31-ball-refinement-result.json).
+
 ## Camera control outcome and bounded model refinement
 
 The optional formal capture completes 8 intervals / 24 callbacks without a safety abort, with exactly matching initial robot state and camera poses. It is **not promoted to default**. Initial wrist RGB MAE against training increases from 13.92 to 24.35/255; external increases 8.36 to 10.34/255. External images at frames 4/7 improve, but wrist images do not. The measured pinch discrepancy at frame 7 is 13.49 mm legacy versus 13.78 mm formal, so there is no observed short-motion improvement. Eight frames do not evaluate grasp; later pixel comparisons also include differing robot poses. [Source-hashed result](../../results/summaries/2026-10-31-ball-camera-control-result.json).
@@ -16,7 +28,7 @@ The new run retains one selected full checkpoint under `checkpoint_final` and al
 .venv_dynamicvla/bin/python scripts/refine_hgwind_development.py --run
 ```
 
-CPU preflight and strict actual parent reload pass without CUDA; 13 focused selection/prediction checks pass. Training and physical improvement are pending. The user runs GPU jobs; this entry launches no Isaac Sim or robot commands.
+CPU preflight and strict actual parent reload pass without CUDA; 13 focused selection/prediction checks pass. Training completion is reported above; physical improvement remains pending. The user runs GPU jobs; this entry launches no Isaac Sim or robot commands.
 
 ## Input sensitivity result and optional render-protocol control
 
