@@ -15,6 +15,7 @@ from capstone_vla.cartesian_packets import audit_packets
 from capstone_vla.grasp_evidence import GraspEvidenceCriteria,evaluate_grasp
 from capstone_vla.hf_archive import sha256
 from capstone_vla.ball_vertical_diagnostic import audit_height, validate_provenance
+from capstone_vla.ball_gripper_confirmation import audit_stream, validate as validate_gripper
 
 
 def analyze(out,exit_code):
@@ -25,6 +26,12 @@ def analyze(out,exit_code):
         scope='Exposed training-case synchronous live integration; not a benchmark success-rate estimate')
     try:
         diagnostic=validate_provenance(cfg)
+        gripper_plan=cfg.get("gripper_confirmation")
+        if gripper_plan is not None:
+            validate_gripper(gripper_plan)
+            if diagnostic:raise ValueError("Combined experiments are unsupported")
+            result.update(policy_postprocessing=True,unmodified_model_actions=False,gripper_confirmation=gripper_plan,
+                scope="Exposed live policy with causal gripper postprocessing; not unmodified model or held-out success")
         result.update(source_actions_used_for_control=diagnostic,standalone_policy_evaluation=not diagnostic,
             diagnostic_only=diagnostic)
         if diagnostic:
@@ -46,6 +53,8 @@ def analyze(out,exit_code):
         original=json.loads(Path(cfg['source']).with_name('meta.json').read_text())
         if meta['robot_limit_profile']['sha256']!=original['robot_limit_profile']['sha256']:raise ValueError('Native motion limits differ')
         payload=json.loads((out/'cartesian_packet_execution.json').read_text())
+        if gripper_plan is not None and (payload.get('gripper_confirmation')!=gripper_plan or tag.get('gripper_confirmation')!=gripper_plan):
+            raise ValueError('Gripper postprocessing provenance mismatch')
         packets=json.loads((out/'packet_requests.json').read_text())
         rows=json.loads((out/'live_control_references.json').read_text())
         timing=json.loads((out/'policy_timing.json').read_text())
@@ -85,9 +94,14 @@ def analyze(out,exit_code):
                     if diagnostic:
                         np.testing.assert_array_equal(obs['model_action'][i],raw)
                         audit_height(raw,actions[i],i,cfg['vertical_diagnostic'],cfg['frames'])
+                    elif gripper_plan is not None:
+                        np.testing.assert_array_equal(obs['model_action'][i],raw)
                     else:np.testing.assert_array_equal(actions[i],raw)
                 expected=decoded_request(actions[i],i,anchor)
                 if i>=len(packets) or not native_inputs_match(packets[i]['inputs'],expected['inputs']):raise ValueError('Consumed action differs from native request')
+                if packets[i]['gripper_closed'] is not expected['gripper_closed']:raise ValueError('Consumed jaw differs from native request')
+            if gripper_plan is not None:
+                result['gripper_confirmation_audit']=audit_stream(obs['model_action'][:],actions,gripper_plan)
             adjusted=normalization_audit_copy(payload,packets)
             audit=audit_packets(adjusted,packets,rows,n)
             audit['learned_policy_evaluated']=not diagnostic

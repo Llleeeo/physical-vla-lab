@@ -1,5 +1,11 @@
 # Research roadmap
 
+## 31 October 2026 — Isolate jaw confirmation before geometry-aware descent
+
+Run one bounded retained-parent prefix1 trial with optional three-frame close confirmation and reopening hysteresis. Preserve raw outputs and compare actual first contact, unilateral/bilateral contact, jaw transitions and independent grasp. Keep the prior default and all failure outcomes. Historical renderer/runtime variation remains a comparison limitation.
+
+The user proposes holding height until alignment. This is plausible but distinct from jaw filtering: use fingertip clearance and horizontal interception readiness, not a condition that requires an elevated ball to already be inside the jaws. A deployed geometry gate needs verified visual ball localization/motion estimation, currently absent. Simulator ground truth is only suitable for explicitly privileged diagnostics. No height gate, expert-time substitution or new data collection is introduced here. If early open-finger contact persists, prioritize descent geometry rather than accumulating closure delays. [Experiment scope](BALL_GRIPPER_CONFIRMATION.md).
+
 ## 31 October 2026 — Per-step replanning does not establish a grasp improvement
 
 The retained-parent prefix1 trial `20261031_163409_608214` completes269 intervals/807 callbacks without a safety abort. All269 consumed commands equal the first action of the corresponding current-frame model response. Raw artifact and checkpoint hashes verify. Independent grasp fails: first contact126 versus teacher162 (0.6s earlier), six right-contact intervals, zero left/bilateral contact. The first sustained closure request begins125; earlier transient jaw requests bring the total to13 transitions, versus one teacher closure at144. Ball position first differs by more than1mm from the source at127. EE difference from the same-time expert at first contact is21.73mm; this is not measured ball clearance.

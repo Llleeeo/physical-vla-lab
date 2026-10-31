@@ -1,0 +1,73 @@
+{
+  "schema": "physical-vla-lab.gripper-confirmation-preflight.v1",
+  "plan": {
+    "schema": "physical-vla-lab.gripper-confirmation.v1",
+    "close_threshold": 0.8,
+    "open_threshold": 0.2,
+    "consecutive_close_frames": 3,
+    "initial_closed": false,
+    "control_hz": 60,
+    "channel": 28
+  },
+  "source": "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/closed_loop_runs/20261031_163409_608214/live_observations.hdf5",
+  "source_sha256": "8587707a37a77c3b778bd77733c511308fcd94d466ef490e79c5df206936a34b",
+  "frames": 269,
+  "audit": {
+    "verified": true,
+    "channel": 28,
+    "other_channels_exact": true,
+    "raw_threshold_transitions": [
+      102,
+      103,
+      109,
+      110,
+      112,
+      113,
+      116,
+      118,
+      119,
+      120,
+      121,
+      124,
+      125
+    ],
+    "executed_transitions": [
+      141
+    ],
+    "changed_jaw_decision_frames": [
+      102,
+      109,
+      112,
+      116,
+      117,
+      119,
+      121,
+      122,
+      123,
+      125,
+      126,
+      127,
+      128,
+      129,
+      130,
+      131,
+      132,
+      133,
+      134,
+      135,
+      136,
+      137,
+      138,
+      139,
+      140
+    ]
+  },
+  "physics_run": false,
+  "scope": "Post-hoc saved-stream development hypothesis, not a live outcome or counterfactual prediction",
+  "height_gate": "Proposed only; verified visual ball-position estimation absent; no simulator target truth used",
+  "cpu_checks": {
+    "focused_passed": 24,
+    "strict_checkpoint_load": true,
+    "cuda_used": false
+  }
+}

@@ -27,7 +27,7 @@ TEACHER=ROOT/'data/derived/hgwind_effort_probes/20261029_220130_402255_joint_onl
 SURROGATE=ROOT/'data/derived/hgwind_action_contract_v1/20261029_220618_809794_traj_00018'
 
 
-def prepare(run,frames,prefix,camera_protocol="legacy",diagnostic_vertical=False):
+def prepare(run,frames,prefix,camera_protocol="legacy",diagnostic_vertical=False,gripper_confirmation=False):
     require(2<=frames<=269 and prefix in (1,4),'Frames must be2..269, prefix1 or4')
     prior,_,_,_,lab=prepare_teacher(TEACHER)
     passed=json.loads((SURROGATE/'report.json').read_text())
@@ -62,6 +62,12 @@ def prepare(run,frames,prefix,camera_protocol="legacy",diagnostic_vertical=False
             validated_clamps(calibration)
         cfg['camera_render_calibration']=calibration
         cfg['camera_render_calibration_source']=meta['images']
+    if gripper_confirmation:
+        from capstone_vla.ball_gripper_confirmation import PLAN
+        require(not diagnostic_vertical and prefix==1 and frames==269 and camera_protocol=='legacy',
+                'Gripper experiment requires full269/prefix1/legacy and no height intervention')
+        cfg['gripper_confirmation']=dict(PLAN)
+        cfg['policy_postprocessing']=True
     if diagnostic_vertical:
         from capstone_vla.ball_vertical_diagnostic import SCHEMA, validate_plan
         require(frames==269 and prefix==4 and camera_protocol=='legacy', 'Diagnostic requires matched full269/prefix4/legacy')
@@ -96,6 +102,7 @@ def prepare(run,frames,prefix,camera_protocol="legacy",diagnostic_vertical=False
     paths=[ROOT/n for n in names]+native+[manifest,Path(prior['task']),Path(prior['original_depth_helper']),
         Path(prior['source']),Path(prior['source']).with_name('meta.json'),SURROGATE/'report.json',dataset/'dataset.json']
     if diagnostic_vertical:paths.append(dataset/'arrays.npz')
+    if gripper_confirmation:paths.append(ROOT/'src/capstone_vla/ball_gripper_confirmation.py')
     cfg['runtime_hashes']={str(p):sha256(p) for p in dict.fromkeys(paths)}
     repo=Path(prior['worker']).parents[2]
     sys.path.insert(0,str(repo/'Scripts'))
@@ -128,7 +135,8 @@ def main():
     p.add_argument('--check-load',action='store_true',help='Also strictly reload model on CPU during preflight')
     p.add_argument('--camera-protocol',choices=['legacy','formal-temporal'],default='legacy')
     p.add_argument('--diagnostic-vertical',action='store_true',help='Recorded target z on frames138..179; diagnostic only, not learned-policy success')
-    a=p.parse_args();cfg,lab,repo=prepare(a.run_dir.resolve(),a.frames,a.prefix,a.camera_protocol,a.diagnostic_vertical)
+    p.add_argument('--gripper-confirmation',action='store_true',help='Causal jaw postprocessing: three frames >=0.8 to close; <0.2 to reopen')
+    a=p.parse_args();cfg,lab,repo=prepare(a.run_dir.resolve(),a.frames,a.prefix,a.camera_protocol,a.diagnostic_vertical,a.gripper_confirmation)
     env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1',HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1')
     model_check=[str(ROOT/'.venv_dynamicvla/bin/python'),str(ROOT/'scripts/hgwind_policy_server.py'),'--preflight',str(a.run_dir.resolve())]
     if a.check_load:model_check.append('--check-load')
@@ -136,6 +144,7 @@ def main():
     cmd=command(cfg,lab)
     print(f'CPU_PREFLIGHT_OK source=local/traj_00018 frames={a.frames} prefix={a.prefix} absolute29=true state30=true live_RGB=true source_actions={a.diagnostic_vertical}',flush=True)
     if a.diagnostic_vertical:print('VERTICAL_DIAGNOSTIC channel=target_position_z frames=138..179 expert_reference=true standalone_policy=false',flush=True)
+    if a.gripper_confirmation:print('GRIPPER_CONFIRMATION close=0.8 consecutive=3 open_below=0.2 raw_model_saved=true expert_timing=false',flush=True)
     print('CAMERA_PROTOCOL '+a.camera_protocol+' physics_and_model_unchanged=true',flush=True)
     print('SIMULATION_MODE synchronous_pause_during_inference; engineering_check_only; real_time=false',flush=True)
     print('COMMAND '+shlex.join(cmd),flush=True)

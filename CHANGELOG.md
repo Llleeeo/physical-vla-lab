@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Optional causal gripper confirmation prepared
+
+- Add explicit three-frame closure confirmation and reopening hysteresis, preserving raw predictions and all other action channels.
+- Audit consumed jaw commands against native execution; keep the switch off by default.
+- CPU preflight passes; saved-stream13 transitions reduce to1, with no live success claim. Document height protection as a separate proposal requiring verified perception.
+
 ## 2026-10-31 — Per-step live replanning result verified
 
 - Bind all269 executed first actions and verify premature single-finger contact with no grasp.

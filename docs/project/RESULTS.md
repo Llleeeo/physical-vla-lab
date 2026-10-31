@@ -1,5 +1,9 @@
 # Results and limitations
 
+## 31 October 2026 — Gripper confirmation: CPU verification only
+
+The optional gate starts open, closes after three consecutive jaw scores >=0.8 and reopens below0.2. Scores are regression outputs, not probabilities. On the saved269-frame prefix1 stream it produces one transition at141 instead of13; the other28 channels remain numerically identical. This is a post-hoc exposed-case hypothesis, not a live counterfactual, since the original first contact126 precedes141. Strict CPU checkpoint/preprocessing verification and24 focused tests pass. No new GPU trial or grasp improvement is claimed. [Protocol](BALL_GRIPPER_CONFIRMATION.md) · [Evidence](../../results/summaries/2026-10-31-ball-gripper-confirmation-preflight.json).
+
 ## 31 October 2026 — Per-step replanning does not establish a grasp improvement
 
 The retained-parent prefix1 trial `20261031_163409_608214` completes269 intervals/807 callbacks without a safety abort. All269 consumed commands equal the first action of the corresponding current-frame model response. Raw artifact and checkpoint hashes verify. Independent grasp fails: first contact126 versus teacher162 (0.6s earlier), six right-contact intervals, zero left/bilateral contact. The first sustained closure request begins125; earlier transient jaw requests bring the total to13 transitions, versus one teacher closure at144. Ball position first differs by more than1mm from the source at127. EE difference from the same-time expert at first contact is21.73mm; this is not measured ball clearance.

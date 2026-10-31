@@ -17,6 +17,7 @@ from .live_policy_protocol import atomic_npz, wait_file, history_pair
 from .pilot_dataset import CAMERAS
 from .posture_anchor import initialize_anchor
 from .ball_vertical_diagnostic import apply_height, validate_plan
+from .ball_gripper_confirmation import GripperConfirmation
 
 
 class LiveExecutor(PacketStreamExecutor):
@@ -26,6 +27,9 @@ class LiveExecutor(PacketStreamExecutor):
         self.queue=ActionQueue(config['prefix'],config['frames']); self.history=[]
         self.camera=None; self.archive=None; self.timing=[]; self.closed=False
         self.vertical=config.get("vertical_diagnostic")
+        self.gripper_plan=config.get("gripper_confirmation")
+        require(not (self.vertical and self.gripper_plan), "Do not combine height and gripper experiments")
+        self.gripper_gate=GripperConfirmation(self.gripper_plan) if self.gripper_plan is not None else None
         if self.vertical is not None:validate_plan(self.vertical,config["frames"])
 
     def _open_camera(self, stage, sim, robot):
@@ -52,9 +56,10 @@ class LiveExecutor(PacketStreamExecutor):
         for name,shape in [('state',(30,)),('action',(29,)),('camera_pose_world',(2,7))]:
             self.archive.create_dataset(name,shape=(0,*shape),maxshape=(None,*shape),dtype='f8')
         self.archive.create_dataset('timestamp_s',shape=(0,),maxshape=(None,),dtype='f8')
-        if self.vertical is not None:
+        if self.vertical is not None or self.gripper_gate is not None:
             self.archive.create_dataset('model_action',shape=(0,29),maxshape=(None,29),dtype='f8')
             self.archive.attrs['vertical_diagnostic_json']=json.dumps(self.vertical)
+            self.archive.attrs['gripper_confirmation_json']=json.dumps(self.gripper_plan)
 
     @property
     def camera_order(self):
@@ -98,10 +103,11 @@ class LiveExecutor(PacketStreamExecutor):
         action,origin=self.queue.pop(index)
         model_action=action.copy()
         if self.vertical is not None:action=apply_height(action,index,self.vertical,self.config["frames"])
+        if self.gripper_gate is not None:action=self.gripper_gate.apply(action,index)
         poses=np.asarray(self.camera.last_poses,float)
         require(poses.shape==(2,7) and np.isfinite(poses).all(),'Invalid live camera transforms')
         values=dict(state=state,action=action,camera_pose_world=poses,timestamp_s=index/60,**images)
-        if self.vertical is not None:values["model_action"]=model_action
+        if self.vertical is not None or self.gripper_gate is not None:values["model_action"]=model_action
         for name,value in values.items():
             ds=self.archive[name];ds.resize(index+1,axis=0);ds[index]=value
         self.archive.flush()
@@ -123,6 +129,9 @@ class LiveExecutor(PacketStreamExecutor):
         payload.update(learned_policy_evaluated=True,source_motion_and_gripper_stream_retained=False,
             source_numeric_controller_settings_retained=False,source_actions_used_for_control=False,
             synchronous_inference=True,real_time_evaluated=False)
+        if self.gripper_gate is not None:
+            payload.update(gripper_confirmation=self.gripper_plan,policy_postprocessing=True,
+                unmodified_model_actions=False)
         if self.vertical is not None:
             payload.update(learned_policy_evaluated=False,model_inference_used=True,
                 source_actions_used_for_control=True,vertical_diagnostic=self.vertical,
