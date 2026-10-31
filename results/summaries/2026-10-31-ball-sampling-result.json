@@ -1,0 +1,104 @@
+{
+  "status": "verified_completed_offline_development_diagnostic",
+  "source_run": "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/sampling_diagnostics/20261031_145658_077694",
+  "source_hashes": {
+    "report.json": "6ecc10f43e08d52b6fa4b0e208a0aad8a7475c2f17d8a746897ac8d547e2dd74",
+    "run_config.json": "2a0eb5dcd28ed256102652d599fb2acc0635a692e094dd31913f5928e996d149",
+    "predictions.npz": "ed14f93b6093a0717d6bfde07b9d3e23c634b2e37fa3500cf76b3b4f75e6749f"
+  },
+  "scope": {
+    "exposed_episode": "local/traj_00018",
+    "anchors": 12,
+    "draws_per_anchor": 8,
+    "near_contact_target_offsets": 20,
+    "training": false,
+    "physics": false,
+    "heldout": false
+  },
+  "conditions": {
+    "10": {
+      "near_contact": {
+        "draws": 8,
+        "targets": 20,
+        "empirical_mean_bias_rms_mm": 14.96525173292611,
+        "sampling_spread_rms_mm": 17.931879544453587,
+        "total_error_rms_mm": 23.356178270998036,
+        "identity_residual_mm2": -5.421010862427522e-14
+      },
+      "initial_four_targets": {
+        "frame": 0,
+        "draws": 8,
+        "targets": 4,
+        "empirical_mean_bias_rms_mm": 212.73461614944003,
+        "sampling_spread_rms_mm": 147.46051515491925,
+        "total_error_rms_mm": 258.8447805886836,
+        "identity_residual_mm2": -3.469446951953614e-12
+      },
+      "latency_s": {
+        "mean": 0.08989411356742494,
+        "median": 0.0875298478640616,
+        "p95": 0.08860290120355785
+      },
+      "orientation": {
+        "count": 384,
+        "mean": 1.148327943262031,
+        "median": 0.8504708330345576,
+        "p95": 3.2896527538729226
+      },
+      "gripper": {
+        "correct": 353,
+        "total": 384,
+        "accuracy": 0.9192708333333334,
+        "target_true_count": 64,
+        "predicted_true_finite_count": 95
+      },
+      "native_rejected_targets": 0
+    },
+    "30": {
+      "near_contact": {
+        "draws": 8,
+        "targets": 20,
+        "empirical_mean_bias_rms_mm": 15.611615305125747,
+        "sampling_spread_rms_mm": 21.558965363970287,
+        "total_error_rms_mm": 26.617879705192653,
+        "identity_residual_mm2": -1.0842021724855044e-13
+      },
+      "initial_four_targets": {
+        "frame": 0,
+        "draws": 8,
+        "targets": 4,
+        "empirical_mean_bias_rms_mm": 215.06896255129718,
+        "sampling_spread_rms_mm": 153.74700425014177,
+        "total_error_rms_mm": 264.37246446781177,
+        "identity_residual_mm2": 6.938893903907228e-12
+      },
+      "latency_s": {
+        "mean": 0.2117402428314866,
+        "median": 0.21182595053687692,
+        "p95": 0.2136579325888306
+      },
+      "orientation": {
+        "count": 384,
+        "mean": 1.2784295857457566,
+        "median": 0.9586420059590471,
+        "p95": 3.5107558863610646
+      },
+      "gripper": {
+        "correct": 353,
+        "total": 384,
+        "accuracy": 0.9192708333333334,
+        "target_true_count": 64,
+        "predicted_true_finite_count": 95
+      },
+      "native_rejected_targets": 0
+    }
+  },
+  "same_noise_repeat_max_abs": 0.0,
+  "archived_parent_max_abs": 0.0,
+  "near_error_increase_percent": 13.965047690378164,
+  "mean_latency_ratio": 2.355440578127189,
+  "observed_jaw_errors": "For each integration count, all31 mismatched prefix predictions occur at anchor140 offsets0..3 over8 draws; teacher stays open there. Selected anchors144 and160 all close correctly. Sparse anchors do not establish whole-episode jaw timing.",
+  "verification": "Run config, saved arrays and every listed source hash verified; both pooled XYZ decompositions and complete prefix action metric dictionaries exactly recomputed.",
+  "decision": "Retain10 integration steps; no new training or physics. Next proposed diagnostic compares independent versus shared-noise replanning across the complete episode while checking startup bias, pose/mode validity and jaw timing.",
+  "limitations": "Eight-draw empirical mean is not the exact population mean. Sparse-window RMS is not prior dense-window mean distance. No evidence of improved grasp or generalization; native acceptance only checks action decoding."
+}

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Sampling diagnostic verified; retain10 steps
+
+- Verify source hashes, exact repeatability and recomputed prediction metrics.
+- Record13.97% higher sampled near-contact RMS and2.36x mean latency with30 steps; no sampler promotion.
+- Identify startup bias and sampled premature jaw closure; propose shared-noise replanning diagnosis without claiming grasp success.
+
 ## 2026-10-31 — Fixed-input sampling diagnostic prepared
 
 Add paired10/30-step, eight-draw inference checks at12 fixed expert-observation anchors. Protect shared initial noise from upstream in-place mutation; audit actual solver counts and restore runtime settings. Separate empirical XYZ bias/spread and report decoder/mode errors. GPU results pending; no training or controller change.

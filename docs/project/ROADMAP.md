@@ -1,5 +1,16 @@
 # Research roadmap
 
+## 31 October 2026 — More denoising steps worsen this matched probe
+
+The fixed-input diagnostic completes at12 anchors with8 matched draws per condition. All recorded hashes verify and pooled position decompositions/action metrics recompute exactly. Identical-noise repeats and archived parent predictions match exactly (maximum difference0). This supports genuine noise sensitivity rather than nondeterminism for these checked calls.
+
+For the20 sampled target offsets in frames80..119,10-step empirical mean bias/spread/total RMS are14.97/17.93/23.36mm;30-step values are15.61/21.56/26.62mm. Total RMS increases13.97%; mean synchronized inference time rises89.9→211.7ms (2.36x, first-call warmup included). Both have zero native decoder rejects. These sparse RMS statistics differ from earlier dense-window means. Do not promote30 steps.
+
+Both bias and variability remain. Startup anchor0 has212.73mm empirical mean bias RMS over its first four targets under10 steps; it warrants attention independently of contact-stage noise. At anchor140,31 of32 predictions close the jaw while the expert remains open. These are all31 observed jaw mismatches in the sampled384 targets, under both integration counts. This does not establish full-episode timing or directly explain closed-loop chatter.
+
+Next proposed bounded check: compare independent-noise versus shared-noise replanning across all269 expert-observation frames with predeclared seeds. Check target increments, startup/near-contact errors, orientation, mode validity and jaw timing together; never select a noise seed using task success. Fixed noise may reduce variation but cannot remove the demonstrated mean bias. No default inference changes, new optimizer steps or physics rollout are justified yet. This remains one exposed development episode. [Source-hashed result](../../results/summaries/2026-10-31-ball-sampling-result.json).
+
+
 ## 31 October 2026 — Separate sampling spread from mean prediction error
 
 The [fixed-input diagnostic](BALL_SAMPLING_DIAGNOSTIC.md) is prepared for the retained parent checkpoint. Compare10/30 integration steps using matched noise and exact observations before choosing another intervention. Eight draws at12 anchors diagnose one exposed episode; sparse RMS statistics must not be confused with prior dense-window mean errors. No automatic sampler change or physics rollout.
