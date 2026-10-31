@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Per-step live replanning result verified
+
+- Bind all269 executed first actions and verify premature single-finger contact with no grasp.
+- Record13 jaw-command transitions and confounds in the historical prefix4 comparison; retain existing defaults.
+- Preserve existing-data timing-improvement scope; export saved camera review without another simulation.
+
 ## 2026-10-31 — Distinguish fixed orientation targets from executed tilt
 
 - Verify constant expert orientation labels despite changing measured wrist tilt.

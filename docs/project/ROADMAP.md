@@ -1,5 +1,13 @@
 # Research roadmap
 
+## 31 October 2026 — Per-step replanning does not establish a grasp improvement
+
+The retained-parent prefix1 trial `20261031_163409_608214` completes269 intervals/807 callbacks without a safety abort. All269 consumed commands equal the first action of the corresponding current-frame model response. Raw artifact and checkpoint hashes verify. Independent grasp fails: first contact126 versus teacher162 (0.6s earlier), six right-contact intervals, zero left/bilateral contact. The first sustained closure request begins125; earlier transient jaw requests bring the total to13 transitions, versus one teacher closure at144. Ball position first differs by more than1mm from the source at127. EE difference from the same-time expert at first contact is21.73mm; this is not measured ball clearance.
+
+The historical prefix4 run of the same checkpoint has nine jaw transitions and no finger contact. Checkpoint, nominal seeds, camera protocol and scene/physics signatures match, but runtime hashes differ and initial RGB MAE differs by1.10/255 external and5.13/255 wrist at identical initial robot state. This is a descriptive comparison, not an isolated causal estimate of prefix length. More frequent feedback has not solved this case; do not promote prefix1 or infer that shorter is universally worse.
+
+The user prefers retaining current demonstrations and improving descent/closure timing, without expert redesign or new collection. Keep that scope. Stop extending the replanning-frequency sweep; next inspect learned precontact decisions and vertical requests on saved observations before choosing a targeted correction. No new training, physical parameters, jaw thresholds or fixed-time delays are introduced. Saved RGB is exported to a verified269-frame two-view slow-motion video without rerendering. [Verified result](../../results/summaries/2026-10-31-ball-prefix1-live-result.json).
+
 ## 31 October 2026 — Expert tilt requires a controller-side audit
 
 Follow-up orientation inspection refines the position-only conclusion below. In the selected successful demonstration, measured EE/pinch local-z tilt relative to world downward changes from about40.21 degrees at frame80 to2.50 degrees at143. Yet all64 target quaternions at80..143 are exactly identical and direct local z downward. Thus replacing those orientation labels with a fixed target would change nothing in this window. This measurement concerns tilt, not yaw, and does not establish that every authored task has the same issue.

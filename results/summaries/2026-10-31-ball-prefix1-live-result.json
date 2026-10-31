@@ -1,0 +1,100 @@
+{
+  "scope": "One exposed training-case prefix1 live rollout; not a causal prefix comparison or success-rate estimate",
+  "run": "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/closed_loop_runs/20261031_163409_608214",
+  "completed_frames": 269,
+  "physics_callbacks": 807,
+  "runtime_safety_passed": true,
+  "independent_grasp": {
+    "schema": "capstone_grasp_evidence_v1",
+    "status": "fail",
+    "official_benchmark_success": null,
+    "criteria": {
+      "minimum_bilateral_duration_s": 0.25,
+      "final_hold_duration_s": 0.25,
+      "minimum_lift_m": 0.05,
+      "maximum_relative_position_jitter_m": 0.02,
+      "minimum_precontact_speed_m_s": 0.05,
+      "motion_requirement": "linear",
+      "minimum_precontact_angular_speed_rad_s": 0.1,
+      "maximum_final_relative_spin_rad_s": 0.5,
+      "require_lift": true
+    },
+    "checks": {
+      "continuous_bilateral_contact": false,
+      "final_bilateral_hold": false,
+      "sustained_lift": false,
+      "relative_position_retention": false,
+      "bilateral_nonzero_impulses": false,
+      "object_moving_before_first_contact": true,
+      "no_grasp_assistance": true
+    },
+    "measurements": {
+      "frames": 269,
+      "sample_hz": 60.00000000000021,
+      "bilateral_frames": 0,
+      "longest_bilateral_duration_s": 0.0,
+      "first_contact_frame": 126,
+      "first_bilateral_frame": null,
+      "minimum_final_lift_from_first_bilateral_m": null,
+      "final_relative_position_jitter_m": 0.029203074071562064,
+      "object_speed_before_first_contact_m_s": 0.1667148768901825,
+      "object_angular_speed_before_first_contact_rad_s": null,
+      "final_relative_spin_p95_rad_s": null
+    },
+    "scope": "independent engineering check on recorded states; not full geometry/physics-generalization certification"
+  },
+  "jaw_transition_frames": [
+    102,
+    103,
+    109,
+    110,
+    112,
+    113,
+    116,
+    118,
+    119,
+    120,
+    121,
+    124,
+    125
+  ],
+  "teacher_closure_frame": 144,
+  "teacher_first_contact_frame": 162,
+  "source_and_action_bindings_verified": 269,
+  "comparison_to_historical_parent_prefix4": {
+    "jaw_transitions": {
+      "historical_prefix4": 9,
+      "prefix1": 13
+    },
+    "matched_configuration": {
+      "checkpoint_hashes": true,
+      "seed": true,
+      "attempt_offset": true,
+      "model_seed": true,
+      "camera_protocol": true,
+      "task_sha256": true,
+      "physics_sha256": true,
+      "runtime_hashes": false
+    },
+    "initial_observations": {
+      "state_max_abs_difference": 0.0,
+      "rgb_mae_255": {
+        "opst_cam": 1.09798828125,
+        "wrist_cam": 5.12583984375
+      }
+    },
+    "limit": "Runtime hashes and initial RGB differ; do not attribute all observed differences solely to prefix length."
+  },
+  "decision": "Do not promote prefix1. Preserve existing data/model/controller. Investigate premature approach/descent and unstable jaw decisions from saved observations before another execution or training change; do not substitute expert timing as unassisted learned success.",
+  "source_hashes": {
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/closed_loop_runs/20261031_163409_608214/report.json": "8cfee112a22685f01783ce1ca1d5e114a9ac40c2ec33287c48b504fe7fd44bd0",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/closed_loop_runs/20261031_163409_608214/run_config.json": "6f14e510818d0c0b1d916a4bb273985695b369c190e1251838e580d4c6729f58",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/closed_loop_runs/20261031_163409_608214/live_observations.hdf5": "8587707a37a77c3b778bd77733c511308fcd94d466ef490e79c5df206936a34b"
+  },
+  "live_artifact_hashes": {
+    "worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/replay.hdf5": "1f7d2f29d1db51ddf5f6e63c45dc4b1e29632536bed67e3ee74a72606c39568c",
+    "worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/meta.json": "8b5e7bbca59ffe5b37412e4035d6589b28297ada804a2350b1ed2d62ffa396f8",
+    "live_observations.hdf5": "8587707a37a77c3b778bd77733c511308fcd94d466ef490e79c5df206936a34b",
+    "policy_timing.json": "777922c25de27aee8e84fb4ff2830e84ca553950b3b5e88d6b6f20e0904d24ed"
+  }
+}
