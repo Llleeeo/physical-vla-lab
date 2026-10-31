@@ -1,5 +1,9 @@
 # Results and limitations
 
+## 31 October 2026 — Sampling diagnostic implementation
+
+The [fixed-input sampling diagnostic](BALL_SAMPLING_DIAGNOSTIC.md) is implemented. CPU checks cover the noise-copy requirement, actual denoiser count, configuration restoration and empirical error decomposition. GPU sampling remains pending; this adds no evidence of improved predictions or learned grasp success.
+
 ## 31 October 2026 — Precision training completed; parent retained
 
 Run `20261031_144208_499175` completes1,000 additional optimizer steps and samples all269 training frames. All ten saved generated streams reproduce their reported metrics exactly; all four checkpoint selections correctly reject. The selected weights are byte-identical to the3,000-step parent. No new rollout has been run or is justified by an unchanged checkpoint.

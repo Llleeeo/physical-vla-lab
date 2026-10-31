@@ -1,5 +1,9 @@
 # Research roadmap
 
+## 31 October 2026 — Separate sampling spread from mean prediction error
+
+The [fixed-input diagnostic](BALL_SAMPLING_DIAGNOSTIC.md) is prepared for the retained parent checkpoint. Compare10/30 integration steps using matched noise and exact observations before choosing another intervention. Eight draws at12 anchors diagnose one exposed episode; sparse RMS statistics must not be confused with prior dense-window mean errors. No automatic sampler change or physics rollout.
+
 ## 31 October 2026 — Precision training completed; parent retained
 
 Run `20261031_144208_499175` completes1,000 additional optimizer steps and samples all269 training frames. All ten saved generated streams reproduce their reported metrics exactly; all four checkpoint selections correctly reject. The selected weights are byte-identical to the3,000-step parent. No new rollout has been run or is justified by an unchanged checkpoint.

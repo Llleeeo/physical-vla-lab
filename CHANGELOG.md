@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-31 — Fixed-input sampling diagnostic prepared
+
+Add paired10/30-step, eight-draw inference checks at12 fixed expert-observation anchors. Protect shared initial noise from upstream in-place mutation; audit actual solver counts and restore runtime settings. Separate empirical XYZ bias/spread and report decoder/mode errors. GPU results pending; no training or controller change.
+
 ## 2026-10-31 — Precision training completed; no checkpoint promoted
 
 - Recompute all saved prediction metrics and four rejected selections; verify selected weights equal the parent exactly.

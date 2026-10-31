@@ -1,6 +1,6 @@
 # Physical VLA Lab
 
-Latest training: [precision-oriented refinement](docs/project/BALL_PRECISION_TRAINING.md) completed with modest prediction improvement; no candidate passed the predeclared gates, so the parent checkpoint is retained. Sampling variability and systematic prediction error remain unresolved.
+Latest training: [precision-oriented refinement](docs/project/BALL_PRECISION_TRAINING.md) completed with modest prediction improvement; no candidate passed the predeclared gates, so the parent checkpoint is retained. Sampling variability and systematic prediction error remain unresolved; a [matched fixed-input sampling diagnostic](docs/project/BALL_SAMPLING_DIAGNOSTIC.md) is prepared (GPU results pending).
 
 Latest development: the height intervention still failed, with early contact preceding the intervention. The [fixed-command smoothing comparison](docs/project/BALL_SMOOTHING_DIAGNOSTIC.md) also fails: premature finger contact advances from frame120 to97. This filter is not adopted; no successful learned ball grasp is established.
 
