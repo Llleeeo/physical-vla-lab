@@ -1,8 +1,20 @@
 # Contact-stage drive control
 
-Status: **31 October 2026 — CPU validated, physical result pending.**
+Status: **31 October 2026 — intervention verified; full execution and grasp failed.**
 
-## Verified observations
+## Observed result — 31 October
+
+The user run `20261031_113437_096788_single_drive` verifies the intervention and initial state, but completes only213/319 intervals (214 issued commands,641 physics callbacks). Independent raw reanalysis confirms all214 issued action/jaw fields match the decoded prefix. The full interface gate remains false because execution is incomplete.
+
+The follower drive is passive at the observed native checkpoints and the authored mimic relationship is retained. First contact moves from166 to175, and bilateral contact from170 to182 (200ms later). Comparing the old fixed absolute-time window alone would mix contact phases. In each run's first150ms after bilateral contact, joint5 maximum absolute velocity changes from2.032 to0.637rad/s, and maximum finite-difference acceleration from328.58 to34.91rad/s². These are descriptive measurements from one exposed pair; the outer command phase and available active gripping authority differ.
+
+Later oscillation still triggers a native safety abort: joint5 reaches-2.62471rad/s against the2.61rad/s limit, while the prior model prediction was-0.76953rad/s. Required braking conflicts with acceleration/jerk constraints. Bilateral contact lasts0.533s, but observed post-contact lift peaks at only2.241mm and sustained lift fails. The successful float64 reference only first exceeds5mm lift at frame234, beyond this new abort; this run does not establish a failed long-term lift controller or a dropped object after successful lifting.
+
+[Raw-verified result](../../results/summaries/2026-10-31-single-drive-result.json). Original reports and raw data are preserved. No learned-policy success, official benchmark success, robustness estimate or production configuration change follows.
+
+**Decision:** single-drive alone is not an adequate fix; retain it as an exposed diagnostic and keep defaults unchanged. Next inspect the continuing one-step model/physical response mismatch during sustained contact, separating commanded torque, disturbance compensation and contact correction. No additional simulation, rendering or parameter sweep has been launched.
+
+## Prior verified observations
 
 The initialized float32 surrogate and successful float64 control both develop alternating finger and wrist velocities after contact. In the same recorded 2.84–2.99 s window, joint5 maximum absolute velocities are 2.825 and 2.047 rad/s; maximum absolute sample-to-sample accelerations are about339.47 and376.48 rad/s² respectively. These are measured finite differences, not requested accelerations or continuous-time impact estimates. This window stops before the failed run's later post-abort records.
 
@@ -37,4 +49,4 @@ Rollback: use the original `scripts/run_hgwind_initialized_contract.py` entry. I
 
 If the case improves, verify repeatability and small action-error tolerance before adopting it or converting more data. If it does not, retain the failure and use it to reject this intervention; do not automatically launch a parameter sweep.
 
-Validation: 369 portable CPU checks pass (69 focused), SDK Python3.10 parses the changed runtime files, and actual-source single-drive CPU preflight passes. Legacy float32/float64 entries retain dual-drive settings. Physical result pending.
+Validation: 369 portable CPU checks pass (69 focused), SDK Python3.10 parses the changed runtime files, and actual-source single-drive CPU preflight passes. Legacy float32/float64 entries retain dual-drive settings. Physical outcome is reported above.

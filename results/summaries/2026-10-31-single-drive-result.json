@@ -1,0 +1,137 @@
+{
+  "schema": "physical-vla-lab.single-drive-result.v1",
+  "date": "2026-10-31",
+  "run": "20261031_113437_096788_single_drive",
+  "intervention_verified": true,
+  "initialization_verified": true,
+  "issued_prefix_inputs_match": true,
+  "issued_commands": 214,
+  "requested_intervals": 319,
+  "completed_intervals": 213,
+  "physics_callbacks": 641,
+  "full_execution": false,
+  "runtime_safety_passed": false,
+  "independent_grasp_evidence": {
+    "schema": "capstone_grasp_evidence_v1",
+    "status": "fail",
+    "official_benchmark_success": null,
+    "criteria": {
+      "minimum_bilateral_duration_s": 0.25,
+      "final_hold_duration_s": 0.25,
+      "minimum_lift_m": 0.05,
+      "maximum_relative_position_jitter_m": 0.02,
+      "minimum_precontact_speed_m_s": 0.05,
+      "motion_requirement": "linear",
+      "minimum_precontact_angular_speed_rad_s": 0.1,
+      "maximum_final_relative_spin_rad_s": 0.5,
+      "require_lift": true
+    },
+    "checks": {
+      "continuous_bilateral_contact": true,
+      "final_bilateral_hold": true,
+      "sustained_lift": false,
+      "relative_position_retention": true,
+      "bilateral_nonzero_impulses": true,
+      "object_moving_before_first_contact": true,
+      "no_grasp_assistance": true
+    },
+    "measurements": {
+      "frames": 214,
+      "sample_hz": 60.00000000000021,
+      "bilateral_frames": 32,
+      "longest_bilateral_duration_s": 0.5333333333333314,
+      "first_contact_frame": 175,
+      "first_bilateral_frame": 182,
+      "minimum_final_lift_from_first_bilateral_m": -4.246830940246582e-07,
+      "final_relative_position_jitter_m": 0.001972745724736349,
+      "object_speed_before_first_contact_m_s": 0.16573773324489594,
+      "object_angular_speed_before_first_contact_rad_s": null,
+      "final_relative_spin_p95_rad_s": null
+    },
+    "scope": "independent engineering check on recorded states; not full geometry/physics-generalization certification"
+  },
+  "motion_after_bilateral_contact": {
+    "20261031_105421_302664": {
+      "first_contact_frame": 166,
+      "first_contact_time_s": 2.7666666666666666,
+      "first_bilateral_frame": 170,
+      "first_bilateral_time_s": 2.8333333333333335,
+      "comparison_window_s": [
+        2.8333333333333335,
+        2.9833333333333334
+      ],
+      "samples": 27,
+      "joint5_max_abs_velocity_rad_s": 2.031717538833618,
+      "joint5_max_abs_secant_acceleration_rad_s2": 328.58290502507657,
+      "post_bilateral_max_observed_lift_mm": 0.041954219341278076,
+      "first_post_bilateral_5mm_lift_frame": null,
+      "first_post_bilateral_50mm_lift_frame": null
+    },
+    "20261031_111112_768943_float64": {
+      "first_contact_frame": 166,
+      "first_contact_time_s": 2.7666666666666666,
+      "first_bilateral_frame": 170,
+      "first_bilateral_time_s": 2.8333333333333335,
+      "comparison_window_s": [
+        2.8333333333333335,
+        2.9833333333333334
+      ],
+      "samples": 27,
+      "joint5_max_abs_velocity_rad_s": 2.046839475631714,
+      "joint5_max_abs_secant_acceleration_rad_s2": 376.47949849398157,
+      "post_bilateral_max_observed_lift_mm": 59.73280715942383,
+      "first_post_bilateral_5mm_lift_frame": 234,
+      "first_post_bilateral_50mm_lift_frame": 287
+    },
+    "20261031_113437_096788_single_drive": {
+      "first_contact_frame": 175,
+      "first_contact_time_s": 2.9166666666666665,
+      "first_bilateral_frame": 182,
+      "first_bilateral_time_s": 3.033333333333333,
+      "comparison_window_s": [
+        3.033333333333333,
+        3.183333333333333
+      ],
+      "samples": 27,
+      "joint5_max_abs_velocity_rad_s": 0.6369760036468506,
+      "joint5_max_abs_secant_acceleration_rad_s2": 34.9132249245943,
+      "post_bilateral_max_observed_lift_mm": 2.2406392097473145,
+      "first_post_bilateral_5mm_lift_frame": null,
+      "first_post_bilateral_50mm_lift_frame": null
+    }
+  },
+  "terminal_joint5": {
+    "measured_velocity_rad_s": -2.6247124671936035,
+    "predicted_velocity_rad_s": -0.769530258607104,
+    "previous_model_acceleration_rad_s2": -14.999999999997236,
+    "hard_speed_limit_rad_s": 2.61
+  },
+  "interpretation": "Follower-drive intervention is valid; early contact-aligned wrist motion is smaller, but later safety abort and absent sustained lift remain. Contact timing shifts and active grip authority changes. Not an adequate fix; one exposed pair does not establish general causality or robustness.",
+  "next_proposal": "Keep original defaults. Inspect contact-stage one-step model residual against commanded torque, disturbance compensation and contact correction before choosing another runtime change. No further simulation or parameter sweep launched.",
+  "learned_policy_evaluated": false,
+  "training_eligible": false,
+  "official_benchmark_success": null,
+  "new_gpu_by_agent": false,
+  "render": false,
+  "source_hashes": {
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/report.json": "88129cf76c1fe1a79d49b8470f20607f9c7703d0040c0abfbd740f3d1e8b24b2",
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/meta.json": "17395f43c39624f4d6505a0797bbeaade58be44922ee63ef059470a4e092d879",
+    "data/derived/hgwind_initialized_contract/20261031_105421_302664/worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/replay.hdf5": "25e6eaf1a8e95092ffae9ba9751524854ecddd0d36fa19e1aa602557bec2e9c0",
+    "data/derived/hgwind_initialized_contract/20261031_111112_768943_float64/report.json": "4e9adaedb71657fd30f970d649c12a3df65d927437ff3e9fa5c721d4fbbf1f59",
+    "data/derived/hgwind_initialized_contract/20261031_111112_768943_float64/worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/meta.json": "8ea8cdf634ed4819600463cf4a3f2db87d9a0fb393b12bcd9ab845f053bcb020",
+    "data/derived/hgwind_initialized_contract/20261031_111112_768943_float64/worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/replay.hdf5": "a71c7cd82715b618b7069829bb40350000725355480a3cf2e74580a10943a6d9",
+    "data/derived/hgwind_initialized_contract/20261031_113437_096788_single_drive/report.json": "6c2346a7d6c266f1855b56056b5695c651bd71a61f01628a899897fbf50d9006",
+    "data/derived/hgwind_initialized_contract/20261031_113437_096788_single_drive/worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/meta.json": "9f97b897cd2d5005b33922c460ad0429afc73bd4563cc1c95f0a25954f16fa8e",
+    "data/derived/hgwind_initialized_contract/20261031_113437_096788_single_drive/worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/replay.hdf5": "da6f1b28c7bff57045d855b64d9936fdaf39593e9e6ecd8a29dd55e4d9057d27",
+    "data/derived/hgwind_initialized_contract/20261031_113437_096788_single_drive/plan.json": "56096ef754cbae767b19443018ad113e12bb0bc9db899b5e6cb487cfd4c62cd3",
+    "data/derived/hgwind_initialized_contract/20261031_113437_096788_single_drive/initialization_report.json": "3a55b8807769d1f396b85e48d2d67c0e4b4e1b56b5f12e04a088df6b836c325b",
+    "data/derived/hgwind_initialized_contract/20261031_113437_096788_single_drive/mimic_drive_comparison.json": "c1a0ed9bffb5e86f4c3c86ce91a54c62439ce844afdff8b5b97eda02be47f17f",
+    "data/derived/hgwind_initialized_contract/20261031_113437_096788_single_drive/actions.npy": "4a1ad757932e15f57cad3aff8910727cb5fd28966d2de11d81759a99dfac9986",
+    "data/derived/hgwind_initialized_contract/20261031_113437_096788_single_drive/cartesian_packet_execution.json": "915cc9a1aa4dd85bf39bae90ed40f1f930085b4103fb76fc15008e155e55bc37",
+    "data/derived/hgwind_initialized_contract/20261031_113437_096788_single_drive/packet_requests.json": "69988f396ad159e82969a303d76ce1302176eed2b10d70f39fc274861a0f8703",
+    "data/derived/hgwind_initialized_contract/20261031_113437_096788_single_drive/gripper_gain_control.json": "6d17f101a1247cf1d541a9586cafe514ef822a7314258b59936f80ee4a4de4e3",
+    "data/derived/hgwind_initialized_contract/20261031_113437_096788_single_drive/gripper_drive_trace.jsonl": "1951f885aea94642e133a8f37c2020209b118b2a6ed7ea4e8d556ca95ed74318",
+    "data/derived/hgwind_initialized_contract/20261031_113437_096788_single_drive/setup_force_control_audit.json": "e9e98505c769550e1bc5f86bedcdacdd4f36200fdc1da225f9f47cadfb58f1f1",
+    "data/derived/hgwind_initialized_contract/20261031_113437_096788_single_drive/simulation.log": "ef477fee6d8c24b00cd63b3bde8fd866b0a0e8eea65071d996b13413ee9512d5"
+  }
+}

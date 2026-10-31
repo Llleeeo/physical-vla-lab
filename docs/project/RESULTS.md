@@ -2,9 +2,9 @@
 
 Snapshot: **2026-10-31, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
-## Contact-stage follow-up: single-drive control pending
+## Single-drive control: early motion reduced, full grasp still fails
 
-[Read-only raw inspection](../../results/summaries/2026-10-31-contact-drive-inspection.json) finds large alternating wrist velocities in both precision conditions. The float32 abort follows a measured joint5 velocity -2.825 rad/s versus model-predicted -0.957 rad/s. The restored drive state powers both fingers while retaining an authored mimic follower. This is a candidate contributor, not a demonstrated cause. A [one-attempt single-drive control](MIMIC_DRIVE_CONTROL.md) now preserves float32 actions, leader gains, scene and arm limits while disabling only follower native stiffness/damping. Active gripping authority changes; physical outcome pending. No VLA inference or training.
+The [single-drive run](MIMIC_DRIVE_CONTROL.md#observed-result--31-october) verifies the intervention and all214 issued decoded fields, but completes213/319 intervals before a joint5 velocity/braking-feasibility abort. Bilateral contact lasts0.533s; sustained lift fails. Contact is delayed200ms, so reanalysis uses each run's first150ms after bilateral contact: maximum absolute joint5 velocity2.032→0.637rad/s and secant acceleration328.58→34.91rad/s². Later measured velocity-2.625rad/s still differs from model-predicted-0.770rad/s. This one exposed pair does not establish a robust fix or mechanism. Keep default settings; inspect the remaining contact-stage response mismatch. [Source-hashed result](../../results/summaries/2026-10-31-single-drive-result.json).
 
 ## Matched precision result: float64 reference grasps successfully
 

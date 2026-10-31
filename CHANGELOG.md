@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-31 — Single-drive result inspected
+
+- Verify exact float32 actions, runtime fingerprints, initial setup, follower-drive intervention, all214 issued action/jaw fields and independent raw contact/lift evidence. Execution reaches213/319 intervals before a joint5 speed/braking-feasibility abort; grasp fails without sustained lift.
+- Contact is delayed; compare the first150ms after bilateral contact rather than only absolute time. Early joint5 motion is smaller, but later measured/model velocity mismatch remains. Keep defaults unchanged; single-drive alone is insufficient. Save source-hashed evidence and analysis script. No new GPU/render/training or runtime edits.
+
 ## 2026-10-31 — Single-drive mimic control prepared
 
 - Raw native records show alternating contact-stage velocities in both precision conditions and a large measured/model velocity mismatch before the float32 abort. Driving both fingers while retaining the mimic follower is a candidate contributor, not a proven cause.

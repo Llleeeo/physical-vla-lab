@@ -41,4 +41,4 @@ UR10e simulation requires its own robot/gripper model, reachable-workspace check
 
 ## Current bounded control — 31 October
 
-Inspect the [single-drive mimic control](MIMIC_DRIVE_CONTROL.md) before further controller changes: same float32 actions, passive follower gain only, no automatic retries/render. Existing single float64 success does not establish robust contact control. Both full grasp retention and reduced sensitivity must be verified before production use or training.
+The [single-drive mimic control](MIMIC_DRIVE_CONTROL.md#observed-result--31-october) is verified but still aborts after213/319 intervals without sustained lift. Early contact-aligned motion is smaller; a later large measured/model velocity mismatch remains. Keep default settings and inspect contact-stage torque/feedback response before another intervention. No automatic retries or rendering. Both full grasp retention and error tolerance remain required before production use or training.

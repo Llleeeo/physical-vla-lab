@@ -6,7 +6,7 @@ This project connects RoboPhys simulation, expert demonstrations, synchronized v
 
 This is an independent research integration, not the upstream RoboPhys benchmark or an official DynamicVLA release.
 
-**Current next experiment:** [single-drive mimic control](docs/project/MIMIC_DRIVE_CONTROL.md), CPU validated and awaiting one simulation. Contact-stage wrist oscillation also occurs in the successful float64 case; follower-drive coupling is a hypothesis, not a proven cause.
+**Latest result:** the [single-drive mimic control](docs/project/MIMIC_DRIVE_CONTROL.md#observed-result--31-october) verifies the intervention and reduces early contact-aligned wrist motion in one exposed pair, but still aborts after213/319 intervals with no sustained lift. It is not an adequate fix; original defaults remain. Next inspect contact-stage model/physical response mismatch; no learned-policy success is claimed.
 
 ## Current status — 31 October 2026
 
