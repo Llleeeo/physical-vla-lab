@@ -27,7 +27,8 @@ TEACHER=ROOT/'data/derived/hgwind_effort_probes/20261029_220130_402255_joint_onl
 SURROGATE=ROOT/'data/derived/hgwind_action_contract_v1/20261029_220618_809794_traj_00018'
 
 
-def prepare(run,frames,prefix,camera_protocol="legacy",diagnostic_vertical=False,approach_guard=False,approach_follow=False,near_capture=False,capture_depth_mm=0,capture_window=False):
+def prepare(run,frames,prefix,camera_protocol="legacy",diagnostic_vertical=False,approach_guard=False,approach_follow=False,near_capture=False,capture_depth_mm=0,capture_window=False,model_seed=90000):
+    require(type(model_seed) is int and 0<=model_seed<=2**32-270,'Model seed outside supported range')
     require(not capture_window or (near_capture and capture_depth_mm==5),'Capture window requires --near-capture --capture-depth-mm 5')
     require(not near_capture or approach_follow,'Near capture requires --approach-follow')
     require(capture_depth_mm in (0,5) and (not capture_depth_mm or near_capture),'Depth requires near capture')
@@ -48,7 +49,7 @@ def prepare(run,frames,prefix,camera_protocol="legacy",diagnostic_vertical=False
           'original_depth_helper','original_depth_bias_m','robot_posture_configuration']
     cfg={k:prior[k] for k in keys}
     cfg.update(schema='physical-vla-lab.ball-live-policy.v1',output=str(out),worker_output=str(out/'worker_output'),
-        frames=frames,prefix=prefix,model_seed=90000,control_hz=60,physics_hz=180,
+        frames=frames,prefix=prefix,model_seed=model_seed,control_hz=60,physics_hz=180,
         instruction=meta['instruction'],pinch_offset_local_m=meta['pinch_offset_local_m'],
         camera_config_digest=meta['camera_config_digest'],cameras=meta['cameras'],history_offsets=[-2,0],
         source_actions_used_for_control=False,learned_policy_evaluated=True,heldout_evaluation=False,
@@ -147,6 +148,7 @@ def command(cfg,lab):
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--run',action='store_true');p.add_argument('--frames',type=int,default=8)
     p.add_argument('--prefix',type=int,choices=[1,4],default=4);p.add_argument('--run-dir',type=Path,default=DEFAULT_RUN)
+    p.add_argument('--model-seed',type=int,default=90000,help='Action sampling seed; scene seed and initial state unchanged')
     p.add_argument('--check-load',action='store_true',help='Also strictly reload model on CPU during preflight')
     p.add_argument('--camera-protocol',choices=['legacy','formal-temporal'],default='legacy')
     p.add_argument('--diagnostic-vertical',action='store_true',help='Recorded target z on frames138..179; diagnostic only, not learned-policy success')
@@ -155,7 +157,7 @@ def main():
     p.add_argument('--near-capture',action='store_true',help='Opt-in clipped-ball localization and continuous follow recovery')
     p.add_argument('--capture-depth-mm',type=int,choices=[0,5],default=0,help='Separate aligned-only depth ablation; requires near capture')
     p.add_argument('--capture-window',action='store_true',help='Finite geometric capture dwell; explicit hybrid controller, requires 5 mm depth')
-    a=p.parse_args();cfg,lab,repo=prepare(a.run_dir.resolve(),a.frames,a.prefix,a.camera_protocol,a.diagnostic_vertical,a.approach_guard,a.approach_follow,a.near_capture,a.capture_depth_mm,a.capture_window)
+    a=p.parse_args();cfg,lab,repo=prepare(a.run_dir.resolve(),a.frames,a.prefix,a.camera_protocol,a.diagnostic_vertical,a.approach_guard,a.approach_follow,a.near_capture,a.capture_depth_mm,a.capture_window,a.model_seed)
     env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1',HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1')
     model_check=[str(ROOT/'.venv_dynamicvla/bin/python'),str(ROOT/'scripts/hgwind_policy_server.py'),'--preflight',str(a.run_dir.resolve())]
     if a.check_load:model_check.append('--check-load')
@@ -167,6 +169,7 @@ def main():
     if a.approach_follow:print('VISUAL_FOLLOW near_region_m=0.08 causal_RGB_velocity=true base_height_rule=retained jaw_rule_unchanged=true pure_VLA=false',flush=True)
     if a.near_capture:print('NEAR_CAPTURE clipped_RGB=true recovery_hold=true extra_depth_mm='+str(a.capture_depth_mm)+' native_limits=unchanged jaw=unchanged',flush=True)
     if a.capture_window:print('CAPTURE_WINDOW geometry_triggered=true maximum_frames=42 extra_depth_mm=5 jaw=unchanged grasp_confirmation=false',flush=True)
+    print('MODEL_SAMPLING_SEED '+str(a.model_seed),flush=True)
     print('CAMERA_PROTOCOL '+a.camera_protocol+' physics_and_model_unchanged=true',flush=True)
     print('SIMULATION_MODE synchronous_pause_during_inference; engineering_check_only; real_time=false',flush=True)
     print('COMMAND '+shlex.join(cmd),flush=True)

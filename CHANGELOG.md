@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Freeze hybrid capture configuration for five repeats
+
+- Verify complete269-frame capture-window trial:37 bilateral frames, longest0.433s, no safety abort, final grasp fails.
+- Add explicit model sampling seed and a sequential five-run coordinator with matched configuration checks, all-outcome summaries and60fps saved-RGB videos.
+- One original-seed repeat plus four different seeds tests exposed-case repeatability; no new controller, force, friction or training changes. Physics batch pending.
+
 ## 2026-10-31 — Diagnose premature lift; prepare explicit deeper capture
 
 - Record zero bilateral contact and a joint6 abort in the depth0 near-capture run. Preserve the failed original numerical-audit report and complete its corrected analysis.

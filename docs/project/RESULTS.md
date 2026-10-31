@@ -1,5 +1,13 @@
 # Results and limitations
 
+## 31 October 2026 — Capture window completes but loses grasp
+
+Run184624 completes269/269 intervals and807 physics callbacks with no safety abort. First contact160, first bilateral163,37 bilateral frames in total and longest continuous span163–188 (0.433s). Final bilateral hold, sustained lift and relative retention fail. The model requests closure continuously from148 through268. This is an exposed VLA plus RGB controller result; integration passes, grasp does not. No independent-policy or held-out success is claimed.
+
+Freeze this configuration for five sequential repeats: sampling seeds90000 (same as reference),190000,290000,390000,490000. Scene seed, initial-condition selection, model weights, camera protocol and all controller rules stay fixed. Report every attempt, including aborts and missing/incomplete results; exclude the already observed reference from the new five-run denominator. Each saved RGB stream is exported at60fps. These runs estimate variation on one development condition, not population/generalization success.
+
+Run `data/derived/hf_pilot_render_repo/.venv/bin/python scripts/repeat_hgwind_closed_loop.py --run`. Without `--run`, it performs CPU scene/model/configuration checks only. Summary and per-seed logs go under the selected training run’s `repeat_batches/`; videos remain beside each individual rollout. Results pending. [Evidence](../../results/summaries/2026-10-31-ball-repeat-prepared.json).
+
 ## 31 October 2026 — Near-capture depth0 still fails
 
 Run182809 completes185/269 intervals: contact L144/R151,185, no bilateral contact, joint6 speed2.8281rad/s exceeds2.61. Raw-model upward target and reactivated approach floor explain the visible early lift; these do not prove the entire motor-abort cause. A separate geometry-triggered dwell/depth5mm candidate passes saved-input checks; new physics pending. [Protocol and evidence](BALL_VISUAL_APPROACH.md).
