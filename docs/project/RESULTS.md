@@ -1,5 +1,11 @@
 # Results and limitations
 
+## 31 October 2026 — Visual XY following: CPU preview only
+
+The default-off `--approach-follow` experiment uses seven past accepted RGB ball positions to estimate velocity and replaces horizontal target/motion references only within an 80 mm near region. Original height protection, orientation, masks and jaw decoding remain. The objective is to extend the alignment window; this is explicitly a hybrid VLA plus visual controller.
+
+The saved 269-frame stream passes raw-prediction binding, old-guard reconstruction and all new native command decodes. On the same saved inputs, assistance activates for 115 frames (first 93, last 207) and other channels remain exact. Strict CPU model and actual scene preflight pass. This is not a counterfactual physical rollout, and no improved grasp is established. [Protocol](BALL_VISUAL_APPROACH.md) · [Evidence](../../results/summaries/2026-10-31-ball-visual-follow-preflight.json).
+
 ## 31 October 2026 — Visual approach trial: no finger impact, no grasp
 
 The optional filter completes 269 intervals / 807 native callbacks without a safety abort. All raw model responses, unchanged jaw scores, filter decisions and native execution pass the corrected audit. Independent grasp fails: zero left, right or bilateral contact intervals. Unaligned height protection runs for 220 intervals, alignment passes for 9 (134–142, 0.15 s), and missing-view pose hold runs for the final 40 (229–268).

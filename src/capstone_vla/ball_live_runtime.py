@@ -17,7 +17,8 @@ from .live_policy_protocol import atomic_npz, wait_file, history_pair
 from .pilot_dataset import CAMERAS
 from .posture_anchor import initialize_anchor
 from .ball_vertical_diagnostic import apply_height, validate_plan
-from .ball_approach_guard import ApproachGuard, robot_corners
+from .ball_approach_guard import robot_corners
+from .ball_approach_follow import make_approach_guard
 from .ball_visual_geometry import locate_ball
 
 
@@ -30,7 +31,7 @@ class LiveExecutor(PacketStreamExecutor):
         self.vertical=config.get("vertical_diagnostic")
         self.approach_plan=config.get('approach_guard')
         require(not (self.vertical and self.approach_plan),'Cannot combine approach and recorded-height interventions')
-        self.approach=ApproachGuard(self.approach_plan) if self.approach_plan is not None else None
+        self.approach=make_approach_guard(self.approach_plan)
         self.approach_events=[]
         if self.vertical is not None:validate_plan(self.vertical,config["frames"])
 

@@ -15,7 +15,7 @@ from capstone_vla.cartesian_packets import audit_packets
 from capstone_vla.grasp_evidence import GraspEvidenceCriteria,evaluate_grasp
 from capstone_vla.hf_archive import sha256
 from capstone_vla.ball_vertical_diagnostic import audit_height, validate_provenance
-from capstone_vla.ball_approach_guard import ApproachGuard
+from capstone_vla.ball_approach_follow import make_approach_guard
 from capstone_vla.ball_visual_geometry import locate_ball
 
 
@@ -58,7 +58,7 @@ def analyze(out,exit_code):
         scope='Exposed training-case synchronous live integration; not a benchmark success-rate estimate')
     try:
         diagnostic=validate_provenance(cfg)
-        approach_plan=cfg.get('approach_guard');guard=ApproachGuard(approach_plan) if approach_plan else None
+        approach_plan=cfg.get('approach_guard');guard=make_approach_guard(approach_plan)
         if guard is not None:
             if diagnostic:raise ValueError('Combined approach/height intervention')
             result.update(visual_guidance=True,policy_postprocessing=True,unmodified_model_actions=False,
@@ -151,7 +151,8 @@ def analyze(out,exit_code):
                 result['approach_audit']=dict(verified=True,raw_model_responses_bound=True,jaw_scores_unchanged=True,
                     visual_valid_frames=sum(e['vision_valid'] for e in guard_events),
                     modes={mode:sum(e['mode']==mode for e in guard_events) for mode in set(e['mode'] for e in guard_events)},
-                    first_changed_frame=next((e['frame'] for e in guard_events if e['changed_channels']),None))
+                    first_changed_frame=next((e['frame'] for e in guard_events if e['changed_channels']),None),
+                    visual_follow_frames=sum(e.get('follow',{}).get('active',False) for e in guard_events))
             adjusted=normalization_audit_copy(payload,packets)
             audit=audit_packets(adjusted,packets,rows,n)
             audit['learned_policy_evaluated']=not diagnostic

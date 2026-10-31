@@ -1,0 +1,52 @@
+{
+  "schema": "physical-vla-lab.visual-follow-preflight.v1",
+  "status": "CPU_READY_PHYSICS_PENDING",
+  "physics_launched": false,
+  "default_enabled": false,
+  "pure_vla": false,
+  "simulator_target_state_used_for_control": false,
+  "strict_cpu_model_preflight_passed": true,
+  "scene_preflight_passed": true,
+  "focused_cpu_tests_passed": 24,
+  "preview": {
+    "frames": 269,
+    "active_frames": 115,
+    "first_active_frame": 93,
+    "last_active_frame": 207,
+    "reasons": {
+      "warming_up": 6,
+      "poor_velocity_fit": 28,
+      "outside_near_region": 80,
+      "near_visual_follow": 115,
+      "invalid_vision": 40
+    },
+    "native_decode_rejections": 0,
+    "original_height_and_jaw_preserved": true,
+    "raw_model_responses_bound": true,
+    "scope": "Frozen-observation command preview; future motion/images and grasp cannot be inferred"
+  },
+  "follow_settings": {
+    "schema": "physical-vla-lab.visual-follow.v1",
+    "history_frames": 7,
+    "maximum_horizontal_distance_m": 0.08,
+    "maximum_fit_residual_m": 0.004,
+    "maximum_ball_speed_m_s": 0.5,
+    "control_hz": 60
+  },
+  "preview_report_sha256": "adbc73976ef247d06c6f12fbbf606c15716c6399b2f317d2e08722ebd7782a2e",
+  "source_hashes": {
+    "live_observations.hdf5": "28401f821294cdbf7496b810b9795e97058ec794ececec0f957be036d7152f72",
+    "approach_guard_events.json": "0079df7995cd8f4f6f52a78708c31d4046e373a6814d845ddb24925d5efffe92",
+    "run_config.json": "8e129acdfbb00c8ccaf802b7d6045f57573977456036009861eb9a219d3fee6e",
+    "report.json": "ebd3b7c007e97aee7db4929fda84b6f44710d65261a2c1d8645afb5c90e742d2"
+  },
+  "implementation_hashes": {
+    "src/capstone_vla/ball_approach_follow.py": "eb4635ccba55efb13b9a3396902fefb7df024c6a8c62c2676fd6e7b6593b7279",
+    "src/capstone_vla/ball_approach_guard.py": "e34a6db91afec376e087785755ee5e06f8c471f01806bf9649339cd4e897e8d6",
+    "src/capstone_vla/ball_live_runtime.py": "02f386979a328dfea5b603530956089a186d7d334410e8591dcc9b61a644baa7",
+    "scripts/run_hgwind_closed_loop.py": "bf3cc75efdaf93afe740ff0527424db9be1a9e573c5e408dc5788e47ab1a0bf3",
+    "scripts/analyze_hgwind_closed_loop.py": "b5e3ba0e2973e868e269b5fde576ca06884d6c3f3b19ec0d5861dfde4f642680",
+    "scripts/check_hgwind_approach_follow.py": "6b01eccfe6c8f2cb7c39f731320b127ec4c1c38b6088c93e4dbadad6c1b79d86",
+    "tests/test_ball_approach_follow.py": "eaeb1718b9cf10d2e86bdb7c158b9fa674e319465795c138c0a62784fb305159"
+  }
+}

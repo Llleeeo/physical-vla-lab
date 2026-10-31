@@ -1,5 +1,9 @@
 # Research roadmap
 
+## 31 October 2026 — Extend alignment before changing descent release
+
+A seven-frame constant-relative-velocity extrapolation gives false future-alignment predictions on the existing stream because the hand subsequently changes motion. The next bounded experiment therefore adds near-ball RGB XY following while retaining the current height and jaw rules. Check whether the measured alignment window lengthens enough for descent, whether early single-finger contact returns, and whether independent grasp passes. Report hybrid assistance explicitly; do not claim retraining or unassisted-policy improvement. CPU preview is complete; user-run GPU trial is pending. [Command and scope](BALL_VISUAL_APPROACH.md).
+
 ## 31 October 2026 — Approach filter avoids contact but misses descent window
 
 The first guarded rollout has no finger contact and still fails grasp. Only 0.15 s is geometrically aligned; fingers remain above the ball before protection re-engages. Later wrist-view loss causes a hold. Preserve this negative outcome and the unchanged 0.5 jaw decoding. Next quantify relative ball/hand motion and vertical response time before proposing interception-aware release; do not blindly relax margins or launch training. The floating-point post-run audit error is repaired without a physics rerun. [Result](RESULTS.md).

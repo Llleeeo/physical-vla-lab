@@ -59,3 +59,27 @@ During the permitted descent window, the lowest recorded finger bounding corner 
 The original `INCOMPLETE` report was a verifier error: exact equality of recomputed floating geometry rejected roundoff (maximum action difference 7.22e-16). The revised audit uses absolute tolerance 1e-12 for floating geometry/actions, while decisions, original model responses, jaw values and untouched channels remain exact. Only the explicitly identified legacy analyzer revision can be superseded; other runtime hashes still must match. The original report is retained. No simulation rerun was needed. A 269-frame, 4x-slow two-view video is exported from the actual saved RGB.
 
 This is one exposed VLA-plus-visual-controller trial, not evidence of general grasp improvement. Keep the guard optional. Next inspect interception/vertical response time within the alignment window before changing clearance or adding more training. [Source-hashed evidence](../../results/summaries/2026-10-31-ball-visual-approach-live-result.json).
+
+## Optional near-ball horizontal following — CPU ready, live result pending
+
+The next experiment adds `--approach-follow` to `--approach-guard`. It aims to extend horizontal alignment while the existing height rule permits descent. It deliberately does **not** implement an earlier timed descent release. Inspecting the frozen rollout showed that linear extrapolation of recent *relative hand motion* can predict alignment that never occurs, because later VLA hand commands change. For example, at frame 126 a seven-frame linear fit and a hypothetical 0.05 s + clearance / 0.1 m/s descent horizon predict about 3.45 mm horizontal offset; the actual saved relative position at the corresponding frame 146 is about 17.6 mm. This is a diagnostic of that prediction on a frozen stream, not a prediction of a changed rollout.
+
+The declared alternative is VLA plus local visual XY assistance:
+
+- Collect seven consecutive accepted RGB ball positions (0.1 s span at 60 Hz). Fit velocity using centered least squares. Require maximum 3D fit residual <=4 mm and fitted speed <=0.5 m/s. Missing/jumping observations and the existing reacquisition hold clear the history. These are engineering rejection settings, not guaranteed perception bounds.
+- Enable only when the measured horizontal finger-midpoint to visual-ball offset is <=80 mm. This explicit near region keeps distant approach with the learned policy. It is not a proven optimal capture range.
+- Set the XY pinch target so the *desired finger midpoint*, accounting for proposed orientation and the current pinch-to-midpoint offset, follows the visually estimated current ball center. Set horizontal target velocity and optional velocity reference to the fitted ball velocity, and horizontal acceleration feedforward to zero. Preserve all masks, native speed constraints and all remaining action channels relative to the height-only guard.
+- Apply the original height guard and 0.5 jaw decode unchanged. There is no forced closure, reopening delay, hidden grasp phase or future expert lookup. Poor velocity fit or being outside the near region falls back to the original height-only behavior; missing localization still holds the latched pose.
+
+The feature explicitly replaces some learned horizontal commands. Any eventual success is a hybrid-controller result, not evidence that the original policy learned better interception. Fit rejection can switch the assistance off, and the model's jaw instability may still prevent grasp. Velocity estimation uses RGB only; live target state is not accessed.
+
+`check_hgwind_approach_follow.py` replays saved observations, rebuilds perception, binds raw predictions, verifies the original guard decisions and checks that only eight horizontal channels can differ. On all 269 saved frames, native command decoding succeeds with no rejected actions. Assistance is active on 115 frames, first 93 and last 207; height, orientation, masks and jaw outputs remain exactly those of the old guard on these *same* observations. Actual trajectories, future images and alignment-window duration after intervention are unknown. This preview neither executes a model nor runs physics.
+
+```bash
+data/derived/hf_pilot_render_repo/.venv/bin/python scripts/run_hgwind_closed_loop.py \
+  --run-dir data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430 \
+  --frames 269 --prefix 1 --camera-protocol legacy \
+  --approach-guard --approach-follow --run
+```
+
+Remove `--approach-follow` to restore the height-only experiment; remove both switches to restore the unfiltered VLA route. Keep raw/filtered actions, vision history and native contact checks. Acceptance for the next run is longer physical alignment permitting descent without premature unilateral impact, followed by independent grasp evaluation. No new live improvement has been demonstrated. [CPU evidence](../../results/summaries/2026-10-31-ball-visual-follow-preflight.json).

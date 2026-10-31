@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Optional near-ball visual following prepared
+
+- Add causal RGB velocity estimation and a bounded near-region XY assist to extend alignment for descent; retain original height and jaw rules.
+- Reject naive future-hand extrapolation as insufficient on the saved stream. This experiment changes horizontal tracking, not descent timing directly.
+- Verify all 269 saved-frame command decodes and exact preservation of other channels; 115 frames activate assistance in the offline preview. Strict CPU model/scene checks pass; physics remains pending.
+
 ## 2026-10-31 — Verify visual approach outcome and repair roundoff audit
 
 - Complete the existing 269-frame result audit without rerunning physics; preserve the original incomplete report.
