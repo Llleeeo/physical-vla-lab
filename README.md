@@ -6,7 +6,7 @@ This project connects RoboPhys simulation, expert demonstrations, synchronized v
 
 This is an independent research integration, not the upstream RoboPhys benchmark or an official DynamicVLA release.
 
-**Latest result:** [offline ball predictions](docs/project/BALL_DEVELOPMENT_TRAINING.md#verified-offline-result-and-bounded-next-experiment) after 200 training steps have mean position error127.05mm and gripper accuracy79.18% on the training episode. Pose improves, but frequent predicted gripper switching and motion-reference errors remain. A matched2,000-step fit passes CPU preflight; improvement, learned grasp and generalization remain unverified.
+**Latest result:** a [matched 2,000-step ball fit](docs/project/BALL_DEVELOPMENT_TRAINING.md#observed-2000-step-result) improves offline first-action position error from 127.05 to 46.42 mm and gripper accuracy from 79.18% to 97.03%. Early target errors and closure timing remain unresolved. This is a training-episode diagnostic; learned grasp and generalization remain unverified.
 
 ## Current status — 31 October 2026
 

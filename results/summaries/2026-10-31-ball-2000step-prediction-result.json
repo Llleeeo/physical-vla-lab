@@ -1,0 +1,534 @@
+{
+  "date": "2026-10-31",
+  "purpose": "matched development fit comparison, same episode and noise",
+  "source_hashes": {
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_115841_081174/offline_predictions/20261031_120646_484791/report.json": "72e8f16942fff60aadb0039413e5f086ead6ad619ca7b4226fdbbb4ee39afc26",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_121355_529372/offline_predictions/20261031_121834_695770/report.json": "484e377d7b30bd7a23c2eb457a5458d7c6aa5cf3845b2907ebc1dabc6917bb67",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_121355_529372/offline_predictions/20261031_121834_695770/predictions.hdf5": "e555b3f15ac23b532b67e99fd58e50c83d193a8bfc2fe36bc7f1b62eb7df7d80",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_121355_529372/report.json": "c38a50cc4e861037b33a9245bda607b1b861b0dfc8f40d60cde571a93226f425",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_121355_529372/run_config.json": "97ad837dae2f28df8c659d290aa61adfb7e08b9e7b040540d79520a10f85feac",
+    "data/derived/hgwind_traj18_development_20261031/dataset.json": "ba66f929cf97b6e5f8f4130adce40b0f9e9398f63397cb0e5a09a31f6d560fe2",
+    "data/derived/hgwind_traj18_development_20261031/arrays.npz": "d8087d27afc25ae7060a80fa392c34650494630c1476a0724da8f056f43931b0"
+  },
+  "verification": {
+    "all_prediction_source_hashes_checked": true,
+    "all_prefix_metrics_recomputed": true,
+    "pretrained_outputs_metrics_unchanged": true,
+    "configuration_change_only_steps": true,
+    "first200_training_steps_exact_samples_losses": true
+  },
+  "comparisons": {
+    "200": {
+      "phases": {
+        "startup": {
+          "frames": [
+            0,
+            30
+          ],
+          "position": {
+            "count": 30,
+            "mean": 194.66217065809107,
+            "median": 188.384423500046,
+            "p95": 363.3526660526752
+          },
+          "gripper": {
+            "correct": 27,
+            "total": 30,
+            "accuracy": 0.9,
+            "target_true_count": 0,
+            "predicted_true_finite_count": 3
+          }
+        },
+        "approach": {
+          "frames": [
+            30,
+            144
+          ],
+          "position": {
+            "count": 114,
+            "mean": 112.5164121298724,
+            "median": 95.33448263631519,
+            "p95": 227.9361056435654
+          },
+          "gripper": {
+            "correct": 94,
+            "total": 114,
+            "accuracy": 0.8245614035087719,
+            "target_true_count": 0,
+            "predicted_true_finite_count": 20
+          }
+        },
+        "closure_to_contact": {
+          "frames": [
+            144,
+            162
+          ],
+          "position": {
+            "count": 18,
+            "mean": 134.58073831168,
+            "median": 124.44469211465098,
+            "p95": 236.23085622844897
+          },
+          "gripper": {
+            "correct": 7,
+            "total": 18,
+            "accuracy": 0.3888888888888889,
+            "target_true_count": 18,
+            "predicted_true_finite_count": 7
+          }
+        },
+        "contact_onward": {
+          "frames": [
+            162,
+            269
+          ],
+          "position": {
+            "count": 107,
+            "mean": 122.3017158585486,
+            "median": 104.65582570076396,
+            "p95": 285.1236672408198
+          },
+          "gripper": {
+            "correct": 85,
+            "total": 107,
+            "accuracy": 0.794392523364486,
+            "target_true_count": 107,
+            "predicted_true_finite_count": 85
+          }
+        }
+      },
+      "prefix_metrics": {
+        "1": {
+          "position": {
+            "count": 269,
+            "mean": 127.04636798893355,
+            "median": 106.14457337627074,
+            "p95": 290.68836721754224
+          },
+          "angle": {
+            "count": 269,
+            "mean": 6.185003869624829,
+            "median": 5.3886836908288,
+            "p95": 14.59600179131933
+          },
+          "gripper": {
+            "correct": 213,
+            "total": 269,
+            "accuracy": 0.79182156133829,
+            "target_true_count": 125,
+            "predicted_true_finite_count": 115
+          },
+          "vector_error": {
+            "target_linear_velocity": {
+              "unit": "m/s",
+              "scope": "raw_prediction_on_target_enabled_frames",
+              "count": 269,
+              "mean": 0.12231296681834687,
+              "median": 0.08578148339399615,
+              "p95": 0.4119924170635244
+            },
+            "target_linear_acceleration": {
+              "unit": "m/s^2",
+              "scope": "raw_prediction_on_target_enabled_frames",
+              "count": 185,
+              "mean": 2.555546612913513,
+              "median": 2.02221594090201,
+              "p95": 7.381249978936064
+            },
+            "linear_velocity_reference": {
+              "unit": "m/s",
+              "scope": "raw_prediction_on_target_enabled_frames",
+              "count": 170,
+              "mean": 0.14877332509468563,
+              "median": 0.09820695333302017,
+              "p95": 0.5342954875635908
+            }
+          },
+          "transition_count": 78
+        },
+        "4": {
+          "position": {
+            "count": 269,
+            "mean": 141.45060929094225,
+            "median": 126.26131014232398,
+            "p95": 298.86007492470736
+          },
+          "angle": {
+            "count": 269,
+            "mean": 6.077543499280494,
+            "median": 4.949957610427023,
+            "p95": 14.047275633368786
+          },
+          "gripper": {
+            "correct": 225,
+            "total": 269,
+            "accuracy": 0.8364312267657993,
+            "target_true_count": 125,
+            "predicted_true_finite_count": 111
+          },
+          "vector_error": {
+            "target_linear_velocity": {
+              "unit": "m/s",
+              "scope": "raw_prediction_on_target_enabled_frames",
+              "count": 269,
+              "mean": 0.12070159272370586,
+              "median": 0.0806897707067797,
+              "p95": 0.39801592764613164
+            },
+            "target_linear_acceleration": {
+              "unit": "m/s^2",
+              "scope": "raw_prediction_on_target_enabled_frames",
+              "count": 185,
+              "mean": 2.623787002848539,
+              "median": 2.0551408871207792,
+              "p95": 7.978428140365581
+            },
+            "linear_velocity_reference": {
+              "unit": "m/s",
+              "scope": "raw_prediction_on_target_enabled_frames",
+              "count": 170,
+              "mean": 0.14421751495816537,
+              "median": 0.0876301269709811,
+              "p95": 0.5510133494521074
+            }
+          },
+          "transition_count": 68
+        },
+        "20": {
+          "position": {
+            "count": 269,
+            "mean": 138.22776946414726,
+            "median": 112.73825610127383,
+            "p95": 328.47244575336384
+          },
+          "angle": {
+            "count": 269,
+            "mean": 5.523245407833911,
+            "median": 4.408733464029453,
+            "p95": 13.487351561876851
+          },
+          "gripper": {
+            "correct": 218,
+            "total": 269,
+            "accuracy": 0.8104089219330854,
+            "target_true_count": 125,
+            "predicted_true_finite_count": 96
+          },
+          "vector_error": {
+            "target_linear_velocity": {
+              "unit": "m/s",
+              "scope": "raw_prediction_on_target_enabled_frames",
+              "count": 269,
+              "mean": 0.11732384925504383,
+              "median": 0.07887957506834506,
+              "p95": 0.37258957824083483
+            },
+            "target_linear_acceleration": {
+              "unit": "m/s^2",
+              "scope": "raw_prediction_on_target_enabled_frames",
+              "count": 185,
+              "mean": 2.6395266001254236,
+              "median": 1.9392691728291445,
+              "p95": 8.335046924500633
+            },
+            "linear_velocity_reference": {
+              "unit": "m/s",
+              "scope": "raw_prediction_on_target_enabled_frames",
+              "count": 170,
+              "mean": 0.14474985965709283,
+              "median": 0.0943591535669719,
+              "p95": 0.49468985830813816
+            }
+          },
+          "transition_count": 57
+        }
+      }
+    },
+    "2000": {
+      "phases": {
+        "startup": {
+          "frames": [
+            0,
+            30
+          ],
+          "position": {
+            "count": 30,
+            "mean": 163.0159368766323,
+            "median": 138.8941729628317,
+            "p95": 287.0279839276175
+          },
+          "gripper": {
+            "correct": 30,
+            "total": 30,
+            "accuracy": 1.0,
+            "target_true_count": 0,
+            "predicted_true_finite_count": 0
+          }
+        },
+        "approach": {
+          "frames": [
+            30,
+            144
+          ],
+          "position": {
+            "count": 114,
+            "mean": 45.06495595202381,
+            "median": 38.75733164224549,
+            "p95": 87.88076977454955
+          },
+          "gripper": {
+            "correct": 106,
+            "total": 114,
+            "accuracy": 0.9298245614035088,
+            "target_true_count": 0,
+            "predicted_true_finite_count": 8
+          }
+        },
+        "closure_to_contact": {
+          "frames": [
+            144,
+            162
+          ],
+          "position": {
+            "count": 18,
+            "mean": 25.45974667045742,
+            "median": 22.54235787393883,
+            "p95": 50.478027192539756
+          },
+          "gripper": {
+            "correct": 18,
+            "total": 18,
+            "accuracy": 1.0,
+            "target_true_count": 18,
+            "predicted_true_finite_count": 18
+          }
+        },
+        "contact_onward": {
+          "frames": [
+            162,
+            269
+          ],
+          "position": {
+            "count": 107,
+            "mean": 18.695729765765805,
+            "median": 16.597631151393124,
+            "p95": 38.30491395692126
+          },
+          "gripper": {
+            "correct": 107,
+            "total": 107,
+            "accuracy": 1.0,
+            "target_true_count": 107,
+            "predicted_true_finite_count": 107
+          }
+        }
+      },
+      "prefix_metrics": {
+        "1": {
+          "position": {
+            "count": 269,
+            "mean": 46.418593345111,
+            "median": 28.781388477389367,
+            "p95": 187.17492296044182
+          },
+          "angle": {
+            "count": 269,
+            "mean": 2.0217265191269904,
+            "median": 1.4602741680938012,
+            "p95": 5.262279277069545
+          },
+          "gripper": {
+            "correct": 261,
+            "total": 269,
+            "accuracy": 0.9702602230483272,
+            "target_true_count": 125,
+            "predicted_true_finite_count": 133
+          },
+          "vector_error": {
+            "target_linear_velocity": {
+              "unit": "m/s",
+              "scope": "raw_prediction_on_target_enabled_frames",
+              "count": 269,
+              "mean": 0.07738815695208633,
+              "median": 0.022373835724628043,
+              "p95": 0.5235188438351227
+            },
+            "target_linear_acceleration": {
+              "unit": "m/s^2",
+              "scope": "raw_prediction_on_target_enabled_frames",
+              "count": 185,
+              "mean": 1.3397911178641093,
+              "median": 0.39287128099536206,
+              "p95": 7.395586427325173
+            },
+            "linear_velocity_reference": {
+              "unit": "m/s",
+              "scope": "raw_prediction_on_target_enabled_frames",
+              "count": 170,
+              "mean": 0.11216027679838322,
+              "median": 0.02686736062699528,
+              "p95": 0.666634924097655
+            }
+          },
+          "transition_count": 1
+        },
+        "4": {
+          "position": {
+            "count": 269,
+            "mean": 44.73747597056594,
+            "median": 24.99176561991048,
+            "p95": 146.70617334222345
+          },
+          "angle": {
+            "count": 269,
+            "mean": 1.8355072451079455,
+            "median": 1.3948775519333716,
+            "p95": 4.4580807818028445
+          },
+          "gripper": {
+            "correct": 263,
+            "total": 269,
+            "accuracy": 0.9776951672862454,
+            "target_true_count": 125,
+            "predicted_true_finite_count": 131
+          },
+          "vector_error": {
+            "target_linear_velocity": {
+              "unit": "m/s",
+              "scope": "raw_prediction_on_target_enabled_frames",
+              "count": 269,
+              "mean": 0.08098247428259334,
+              "median": 0.021200733023550782,
+              "p95": 0.43991450454639314
+            },
+            "target_linear_acceleration": {
+              "unit": "m/s^2",
+              "scope": "raw_prediction_on_target_enabled_frames",
+              "count": 185,
+              "mean": 1.3663915434801617,
+              "median": 0.3367709736971907,
+              "p95": 7.4095900852184275
+            },
+            "linear_velocity_reference": {
+              "unit": "m/s",
+              "scope": "raw_prediction_on_target_enabled_frames",
+              "count": 170,
+              "mean": 0.11896762999144136,
+              "median": 0.027677482257199848,
+              "p95": 0.6207206258743861
+            }
+          },
+          "transition_count": 5
+        },
+        "20": {
+          "position": {
+            "count": 269,
+            "mean": 42.041327644315814,
+            "median": 21.893488287496275,
+            "p95": 162.18383620638556
+          },
+          "angle": {
+            "count": 269,
+            "mean": 1.6631297174329325,
+            "median": 1.1342121192118224,
+            "p95": 4.5511020563269255
+          },
+          "gripper": {
+            "correct": 265,
+            "total": 269,
+            "accuracy": 0.9851301115241635,
+            "target_true_count": 125,
+            "predicted_true_finite_count": 129
+          },
+          "vector_error": {
+            "target_linear_velocity": {
+              "unit": "m/s",
+              "scope": "raw_prediction_on_target_enabled_frames",
+              "count": 269,
+              "mean": 0.07664913255192288,
+              "median": 0.02051191859321843,
+              "p95": 0.4473305869573794
+            },
+            "target_linear_acceleration": {
+              "unit": "m/s^2",
+              "scope": "raw_prediction_on_target_enabled_frames",
+              "count": 185,
+              "mean": 1.271964588149065,
+              "median": 0.30286747082450993,
+              "p95": 6.741127808720083
+            },
+            "linear_velocity_reference": {
+              "unit": "m/s",
+              "scope": "raw_prediction_on_target_enabled_frames",
+              "count": 170,
+              "mean": 0.1109296996740738,
+              "median": 0.026111191686650843,
+              "p95": 0.5025119101641703
+            }
+          },
+          "transition_count": 1
+        }
+      }
+    }
+  },
+  "upper_target_jumps_over_100mm": [
+    {
+      "frame": 1,
+      "distance_mm": 409.713203092935
+    },
+    {
+      "frame": 8,
+      "distance_mm": 386.2199609039238
+    },
+    {
+      "frame": 18,
+      "distance_mm": 368.38052050066534
+    },
+    {
+      "frame": 20,
+      "distance_mm": 246.14985476104766
+    },
+    {
+      "frame": 25,
+      "distance_mm": 291.64203518736895
+    },
+    {
+      "frame": 27,
+      "distance_mm": 202.65875218071648
+    },
+    {
+      "frame": 31,
+      "distance_mm": 211.46841871700298
+    },
+    {
+      "frame": 33,
+      "distance_mm": 135.42875317606348
+    },
+    {
+      "frame": 35,
+      "distance_mm": 130.54200633056365
+    },
+    {
+      "frame": 36,
+      "distance_mm": 128.3151709661211
+    },
+    {
+      "frame": 40,
+      "distance_mm": 103.76806990801725
+    },
+    {
+      "frame": 41,
+      "distance_mm": 123.74001033195678
+    }
+  ],
+  "first_action_closure": {
+    "expert_frame": 144,
+    "predicted_frame": 136,
+    "advance_ms": 133.33333333333334
+  },
+  "interpretation": "Upper target error is not measured robot tracking error. Startup target jumps already exist in captured teacher; they do not alone prove a label defect or model failure mechanism. Prefix4 has five jaw transitions; prefix1 has one. Single sampled noise realization per observation, not a repeated robustness result.",
+  "next": "Audit startup target-generation/control response before further training or changing labels; then prepare bounded live feedback integration.",
+  "heldout_evaluation": false,
+  "simulation_rollout": false,
+  "task_success_verified": false
+}

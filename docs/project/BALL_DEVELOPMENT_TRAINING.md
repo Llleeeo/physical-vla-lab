@@ -1,8 +1,20 @@
 # Ball development training bridge
 
-Status: 31 October 2026 — 200-step fine-tuning and offline generated-action prediction verified. Predictions remain inaccurate; a matched 2,000-step training run is prepared. Learned closed-loop grasp remains unverified.
+Status: 31 October 2026 — matched 2,000-step training and offline predictions verified; startup target prediction and closure timing remain unresolved. Learned grasp is unverified.
+
+## Observed 2,000-step result
+
+The matched 2,000-step fit reduces fixed-probe flow MSE from the 200-step value 2.0003 to 0.3066. Only the step budget changes; the first 200 sampled batches, losses and gradient norms match exactly. Strict CPU checkpoint reload passes. Offline first-action mean position error improves 127.05→46.42 mm, p95 290.69→187.17 mm, mean orientation error 6.19→2.02 degrees, and gripper accuracy 79.18→97.03%. Thresholded first-action jaw transitions drop 78→1, but closure is frame136 versus expert144, 133.3ms early. Prefix4 still has five transitions; this is not a guarantee for queued execution.
+
+Errors are concentrated early: first30-frame mean163.02mm, frames30–143 mean45.06mm, closure-to-contact mean25.46mm, and contact-onward mean18.70mm. All25 worst frames occur within frames0–35. Captured expert upper targets themselves contain12 consecutive-frame position jumps over100mm, all before frame42; the measured robot pinch path is smoother. These are high-level targets, not actual robot displacement. The jumps are present in the teacher capture and do not alone prove a label defect, cause of model error, or poor source grasp.
+
+All source/archive hashes and raw prefix metrics were rechecked; the adapted pretrained baseline reproduces prior metrics exactly. Motion-reference mean errors improve over200 steps, but tail errors do not uniformly improve. No labels were smoothed, removed or replaced. This is one exposed training episode with one fixed noise realization per observation, not held-out success or learned closed-loop control.
+
+**Next:** audit startup target generation and downstream control response before further training or action-label changes, then prepare bounded live-feedback integration. Do not immediately increase steps again or discard the startup frames. Preserve current controller and safety settings. [Source-hashed comparison](../../results/summaries/2026-10-31-ball-2000step-prediction-result.json).
 
 ## Verified offline result and bounded next experiment
+
+Historical 200-step result and experiment plan; the completed 2,000-step result is above.
 
 Raw prediction archive, input/checkpoint/source hashes and all prefix metrics were independently rechecked. The 200-step model's first-action mean position error is 127.05 mm (p95 290.69 mm), down from 495.93 mm under the adapted pretrained baseline; mean orientation error is 6.19 degrees. These are expert-target prediction errors, not measured robot tracking errors. Before closure, between closure and first teacher contact, and from contact onward, mean position errors are 129.63, 134.58 and 122.30 mm respectively. The error is not confined to contact.
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Longer ball fit improves predictions; startup limitation isolated
+
+- Verify identical configuration except training duration and identical first200 training updates. Fixed probe mean2.0003→0.3066; strict CPU reload passes.
+- Recompute offline first-action error127.05→46.42mm, orientation6.19→2.02degrees, gripper79.18→97.03%, transitions78→1. Closure is133.3ms early; prefix4 retainsfive transitions. Largest errors are in startup, where captured upper targets already jump. Preserve this distinction from measured motion.
+- Save a local comparison plot and publish hashed aggregate evidence. No runtime/model/controller changes or agent GPU jobs; next audit startup target semantics. [Result](docs/project/BALL_DEVELOPMENT_TRAINING.md#observed-2000-step-result).
+
 ## 2026-10-31 — Ball predictions verified; bounded longer fit prepared
 
 - Recompute raw offline metrics and verify archive/source hashes: first-action mean position error127.05mm, p95290.69mm, gripper accuracy79.18%,78 predicted transitions versus one expert transition. Errors span approach and contact; velocity/acceleration errors do not uniformly improve. Decoder acceptance does not imply physical feasibility.
