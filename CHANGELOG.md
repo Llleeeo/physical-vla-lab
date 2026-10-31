@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Live absolute29 ball-policy integration prepared
+
+- Add isolated simulator/model entries using live calibrated RGB and the same measured state30/preprocessing as training. Consume model absolute29 chunks through the existing native packet/effort controller; no online expert decisions or recorded action fallback.
+- Preserve live inputs, model chunks, consumed commands, timing and raw physics evidence; audit input/output binding and motor-boundary execution separately from task grasp. Default eight intervals; synchronous inference pause, no real-time claim.
+- 389 CPU tests pass. Actual preprocessing and strict checkpoint reload match on CPU; real scene/native patch checks pass. GPU rollout is pending, not a learned grasp result. [Protocol and command](docs/project/BALL_LIVE_POLICY.md).
+
 ## 2026-10-31 — Ball startup target mechanism and native-request audit
 
 - Bind captured targets to float32 labels and startup telemetry; verify dataset/prediction hashes and frozen control sources. Initial rebounds and dynamic braking standoff contribute to large expert target jumps; these are not measured robot displacements.

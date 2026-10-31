@@ -115,3 +115,7 @@ Prediction preparation: 380 portable CPU checks pass, including 11 focused data/
 ## Startup target audit completed
 
 The [CPU audit](BALL_STARTUP_TARGET_AUDIT.md) binds raw captured targets to training labels and identifies rebound/braking-clearance contributions. Native nominal-request comparison still shows0.569m/s mean startup discrepancy for the2,000-step model. Retain the checkpoint and interface; prepare live29D integration next. No label smoothing, extra training, controller retuning or new physical rollout was performed.
+
+## Live integration prepared
+
+The new [absolute29 live adapter](BALL_LIVE_POLICY.md) is CPU checked against the actual training preprocessing and strict checkpoint reload. It uses current simulator images and measured robot state, with no expert action fallback. The next user-run check is eight control intervals; learned grasp remains unverified.

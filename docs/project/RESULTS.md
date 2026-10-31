@@ -2,13 +2,19 @@
 
 Snapshot: **2026-10-31, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Live29D ball policy: implementation prepared, physics result pending
+
+The [live integration](BALL_LIVE_POLICY.md) now connects calibrated real-time simulator RGB and measured state30 to the 2,000-step DynamicVLA checkpoint and the existing native packet controller. Nine new CPU regressions cover queue semantics, invalid requests, input history and expert-decision exclusion; 389 portable checks pass. Five actual recorded observations produce exactly the training preprocessing, and the model strictly reloads on CPU. The real scene/patch preflight passes.
+
+The next user-run command executes eight control intervals on the exposed training case. No new GPU simulation or learned grasp is claimed. Full timing/motor evidence and independent grasp evaluation are separate gates. [Preparation summary](../../results/summaries/2026-10-31-ball-live-policy-preparation.json).
+
 ## Ball startup audit: target semantics and remaining response error
 
 A [source-checked CPU audit](BALL_STARTUP_TARGET_AUDIT.md) identifies initial falling/rebounds and dynamic pregrasp braking clearance as contributors to the expert's large startup targets. At frame18 the safe standoff is about363mm while the ball is about30mm high; this is an upper target, not a one-frame displacement. The targets already occur in the teacher and match the training labels.
 
 At recorded robot states, the 2,000-step model's first actions differ from the expert's native bounded nominal translation requests by a mean0.569m/s in frames0–41 (p951.470m/s). This excludes collision projection, orientation, IK/effort and actual dynamics. The200-step model produces19 native-request semantic rejections; the2,000-step model produceszero across269 first actions. Structural decoder acceptance was insufficient to establish controller validity.
 
-**Next:** prepare bounded live RGB/state30/absolute29 integration using the current checkpoint and unchanged controller. The new live adapter is not yet validated; do not interpret this audit as learned grasp or justification for smoothing labels. [Hashed evidence](../../results/summaries/2026-10-31-ball-startup-target-audit.json).
+**Follow-up:** live RGB/state30/absolute29 integration is now implemented and CPU checked (above), with the physical run pending; do not interpret this audit as learned grasp or justification for smoothing labels. [Hashed evidence](../../results/summaries/2026-10-31-ball-startup-target-audit.json).
 
 ## Ball 2,000-step comparison: improved fit, startup errors remain
 

@@ -48,4 +48,4 @@ Prepare one bounded live integration on the already exposed case:
 3. First execute eight control intervals to check live preprocessing, timing, request consumption and logging. A short check cannot assess the whole startup or grasp. If it passes, evaluate the full episode with independent contact/lift/retention evidence and retain every outcome.
 4. Separate observation mismatch, invalid commands, controller tracking and learned grasp failure. Record the synchronous inference pause; it is not a real-time latency evaluation.
 
-The new 29D live adapter is **not implemented or validated by this audit**. The older 7D egg-task live adapter cannot be reused unchanged. No learned ball grasp, held-out generalization or disturbance robustness result is established.
+The new 29D live adapter was **not implemented or validated by this audit**. A subsequent [implementation milestone](BALL_LIVE_POLICY.md) now passes CPU checks; its physical run remains pending. The older 7D egg-task live adapter cannot be reused unchanged. No learned ball grasp, held-out generalization or disturbance robustness result is established.

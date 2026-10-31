@@ -1,0 +1,58 @@
+{
+  "schema": "physical-vla-lab.ball-live-policy-preparation.v1",
+  "date": "2026-10-31",
+  "status": "cpu_verified_physical_run_pending",
+  "episode": "local/traj_00018",
+  "training_steps": 2000,
+  "action_dim": 29,
+  "state_dim": 30,
+  "absolute_actions": true,
+  "history_offsets": [
+    -2,
+    0
+  ],
+  "control_hz": 60,
+  "physics_hz": 180,
+  "first_requested_frames": 8,
+  "executed_chunk_prefix": 4,
+  "source_actions_used_for_control": false,
+  "online_task_or_skill_decisions": false,
+  "object_truth_in_policy_inputs": false,
+  "real_time_evaluated": false,
+  "heldout_evaluation": false,
+  "tests": {
+    "portable_cpu": 389,
+    "affected_group": 75,
+    "new_live_regressions": 9,
+    "actual_preprocessing_frames": [
+      0,
+      1,
+      2,
+      4,
+      268
+    ],
+    "actual_preprocessing_exact": true,
+    "strict_cpu_checkpoint_load": true,
+    "normalizers_exact": true,
+    "actual_scene_and_patch_preflight": true,
+    "config_serialization": true,
+    "python310_grammar_files": 6
+  },
+  "gpu_started_by_agent": false,
+  "simulation_started_by_agent": false,
+  "learned_grasp_verified": false,
+  "limits": [
+    "Preparation checks only; no live physics result yet.",
+    "Exposed training episode; remaining offline startup error is not resolved.",
+    "Synchronous inference pause; no real-time speed or robustness claim."
+  ],
+  "source_hashes": {
+    "scripts/run_hgwind_closed_loop.py": "416d1deaa5660c9daaca8379ff2f6f755f7893d953c7ac9b99800e70b0df73e6",
+    "scripts/hgwind_policy_server.py": "aeb05b5fb2e3a97099d143cfb1895ef6db2675ec296db4dc1635c14114148795",
+    "scripts/sim/run_hgwind_policy_worker.py": "6382e981f131dbc118a7068a29096ca2fa639f364004fc8d7a5e7bb622e68647",
+    "scripts/analyze_hgwind_closed_loop.py": "66254cfbc1f77be486fdff277504bb7d014746cd2d2b7894d6b28231fe521ece",
+    "src/capstone_vla/ball_live_protocol.py": "d8c0a2c199f2d0b3e96e6add63e518afda2acd607aade25727c6c842c92d3328",
+    "src/capstone_vla/ball_live_runtime.py": "077bd21cb4a7fa9b7a4ef236ced987426481c8463deb05f02320aeda399f095f",
+    "tests/test_ball_live_policy.py": "0f822d0d2c97f4f11ad0a6013ba56b25407b65dac5c4ecf9b709dd19f911ecc4"
+  }
+}
