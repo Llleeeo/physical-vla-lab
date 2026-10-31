@@ -2,6 +2,14 @@
 
 Snapshot: **2026-10-31, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Ball startup audit: target semantics and remaining response error
+
+A [source-checked CPU audit](BALL_STARTUP_TARGET_AUDIT.md) identifies initial falling/rebounds and dynamic pregrasp braking clearance as contributors to the expert's large startup targets. At frame18 the safe standoff is about363mm while the ball is about30mm high; this is an upper target, not a one-frame displacement. The targets already occur in the teacher and match the training labels.
+
+At recorded robot states, the 2,000-step model's first actions differ from the expert's native bounded nominal translation requests by a mean0.569m/s in frames0–41 (p951.470m/s). This excludes collision projection, orientation, IK/effort and actual dynamics. The200-step model produces19 native-request semantic rejections; the2,000-step model produceszero across269 first actions. Structural decoder acceptance was insufficient to establish controller validity.
+
+**Next:** prepare bounded live RGB/state30/absolute29 integration using the current checkpoint and unchanged controller. The new live adapter is not yet validated; do not interpret this audit as learned grasp or justification for smoothing labels. [Hashed evidence](../../results/summaries/2026-10-31-ball-startup-target-audit.json).
+
 ## Ball 2,000-step comparison: improved fit, startup errors remain
 
 The matched 2,000-step fit reduces fixed-probe flow MSE from the 200-step value 2.0003 to 0.3066. Only the step budget changes; the first 200 sampled batches, losses and gradient norms match exactly. Strict CPU checkpoint reload passes. Offline first-action mean position error improves 127.05→46.42 mm, p95 290.69→187.17 mm, mean orientation error 6.19→2.02 degrees, and gripper accuracy 79.18→97.03%. Thresholded first-action jaw transitions drop 78→1, but closure is frame136 versus expert144, 133.3ms early. Prefix4 still has five transitions; this is not a guarantee for queued execution.
@@ -10,7 +18,7 @@ Errors are concentrated early: first30-frame mean163.02mm, frames30–143 mean45
 
 All source/archive hashes and raw prefix metrics were rechecked; the adapted pretrained baseline reproduces prior metrics exactly. Motion-reference mean errors improve over200 steps, but tail errors do not uniformly improve. No labels were smoothed, removed or replaced. This is one exposed training episode with one fixed noise realization per observation, not held-out success or learned closed-loop control.
 
-**Next:** audit startup target generation and downstream control response before further training or action-label changes, then prepare bounded live-feedback integration. Do not immediately increase steps again or discard the startup frames. Preserve current controller and safety settings. [Source-hashed comparison](../../results/summaries/2026-10-31-ball-2000step-prediction-result.json).
+**Follow-up:** the startup target and nominal-response audit is now complete (above); bounded live-feedback integration remains next. Do not immediately increase steps again or discard the startup frames. Preserve current controller and safety settings. [Source-hashed comparison](../../results/summaries/2026-10-31-ball-2000step-prediction-result.json).
 
 ## Ball offline predictions: adaptation improves pose, fit remains poor
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Ball startup target mechanism and native-request audit
+
+- Bind captured targets to float32 labels and startup telemetry; verify dataset/prediction hashes and frozen control sources. Initial rebounds and dynamic braking standoff contribute to large expert target jumps; these are not measured robot displacements.
+- Compare generated first actions through the native nominal translation function at recorded states. The 2,000-step model still differs by 0.569 m/s on average in the first42 frames. Its269 first actions have zero nominal rejects; the200-step model has19 inconsistent relative-speed/reference requests despite structural decoding acceptance.
+- Publish a reproducible CPU analysis and scoped phase results. No training, labels, controller parameters or scene changes. Next prepare bounded live29D integration; no new live adapter or learned grasp is claimed. [Audit](docs/project/BALL_STARTUP_TARGET_AUDIT.md).
+
 ## 2026-10-31 — Longer ball fit improves predictions; startup limitation isolated
 
 - Verify identical configuration except training duration and identical first200 training updates. Fixed probe mean2.0003→0.3066; strict CPU reload passes.

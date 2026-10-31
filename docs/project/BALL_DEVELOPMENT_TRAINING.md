@@ -111,3 +111,7 @@ Rollback: stop using these new training/data entry points. Existing simulation, 
 374 portable CPU checks pass, including22 focused checks. The real CPU model load confirms exact new normalizers, state input2×32, action input2×20×32,154 instruction tokens and gradients only on valid29D targets; CUDA remains uninitialized. Those preparation checks preceded the user-run training reported above. [Source-hashed preparation](../../results/summaries/2026-10-31-ball-development-preparation.json).
 
 Prediction preparation: 380 portable CPU checks pass, including 11 focused data/metric checks. Actual trained-checkpoint CPU reload passes strictly with exact normalizers; GPU prediction was subsequently run by the user and independently verified above.
+
+## Startup target audit completed
+
+The [CPU audit](BALL_STARTUP_TARGET_AUDIT.md) binds raw captured targets to training labels and identifies rebound/braking-clearance contributions. Native nominal-request comparison still shows0.569m/s mean startup discrepancy for the2,000-step model. Retain the checkpoint and interface; prepare live29D integration next. No label smoothing, extra training, controller retuning or new physical rollout was performed.
