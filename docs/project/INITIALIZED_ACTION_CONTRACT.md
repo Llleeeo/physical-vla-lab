@@ -10,6 +10,25 @@ The original `initialization_report.json` is preserved. Its `interface=false` re
 
 The338 portable CPU checks and actual scene/entry preflight were preparation evidence. The command below describes the already completed run; repeating it without a new controlled change is not the next experiment.
 
+## Matched precision control prepared — 31 October
+
+A single original-double-precision label control is now implemented and CPU checked. The physical result is pending. It keeps the existing decoder, initialized fresh60 process, scene, fixed gains, posture, callbacks and safety limits. It reconstructs the original numeric labels before float32 rounding, with the same quaternion hemisphere choices as the failed float32 run. Casting all319×29 values back to float32 must reproduce that run's action array exactly; widening previously rounded float32 values is rejected.
+
+```bash
+cd /home/robophys/Capstone_Project_Yuan_Haoming
+
+data/derived/hf_pilot_render_repo/.venv/bin/python \
+  scripts/run_hgwind_initialized_contract.py --precision-control --run
+```
+
+One attempt, maximum319 intervals, no rendering or automatic retries. Allow approximately1–2minutes for startup and rollout. The default command without `--precision-control` retains the float32 path.
+
+New outputs end in `_float64`. Both `contract.json` and the analysis identify the precision diagnostic; this does not change the model's declared float32 action contract. Runtime admission verifies the pinned failed baseline and reconstructs original labels again before starting physics. Actual entry assembly and decoder loading are checked on CPU; the assembled collector hash equals the failed baseline.353 portable CPU tests and SDK Python3.10 parsing pass, including unchanged default-entry checks.
+
+The final `PRECISION_CONTROL` line reports initialization, completed intervals, issued-prefix input matching, independent grasp and the combined result. `precision_comparison.json` retains these distinctions when execution is truncated. `initialization_report.json` and the existing full-stream interface gates are preserved. A complete pass supports precision sensitivity in this exposed case, not reliability under model prediction errors or a general remedy. A failure requires comparing the first divergent native states and controls before changing parameters. This experiment does not train or evaluate a VLA.
+
+Rollback: omit `--precision-control`. The new module, tests and optional runner/admission/reporting branches can be reverted without editing the frozen RoboPhys sources, saved runs or SDK.
+
 ## Command
 
 ```bash

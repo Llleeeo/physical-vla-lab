@@ -18,6 +18,8 @@ The [passive gripper-drive pair](docs/project/GRIPPER_DRIVE_DIAGNOSTIC.md#observ
 
 The initialized29D surrogate now verifies startup force/gain alignment but stops after179 complete intervals (180 recorded frames) of319. All180 issued command-boundary fields and jaw targets match the decoded action prefix; full-stream interface flags remain false because the run aborts. First contact166 and bilateral contact170 match the successful teacher. EE error exceeds0.01mm at172 and grows from0.0031mm at171 to4.3217mm at179. Native safety rejects the next command after joint5 reaches-2.8248rad/s against the2.61rad/s limit; required braking also conflicts with acceleration/jerk bounds. Independent grasp fails without sustained lift. This is an expert-labelled interface diagnostic, not learned-policy inference. [Verified result](results/summaries/2026-10-31-initialized-contract-result.json).
 
+A [matched original-double-precision control](docs/project/INITIALIZED_ACTION_CONTRACT.md#matched-precision-control-prepared--31-october) is prepared: the same decoder and controller execute319×29 labels that round exactly back to the failed float32 input.353 CPU checks and real entry/scene preflight pass. One user-run simulation is pending; this diagnostic does not establish model robustness.
+
 | Workstream | Verified progress | Remaining work |
 |---|---|---|
 | Franka action interface | Recorded-tool FK verified across all 40 ball episodes; explicit Cartesian request execution grasps successfully on one exposed seed without online task/skill decisions | Live policy action contract and learned dynamic grasping |

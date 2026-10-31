@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-31 — One matched precision diagnostic prepared
+
+- Add opt-in `--precision-control`, reconstruct original float64 labels and preserve baseline quaternion hemispheres; require exact roundtrip to the pinned failed float32 stream. Verify source/controller/patch hashes and original-label reconstruction again at runtime. Default float32 execution remains unchanged.
+- Label diagnostic precision in outputs and report issued-prefix validity separately from full execution/grasp.353 CPU checks, SDK Python3.10 parsing and actual default/diagnostic entry assembly and label loading pass. Physical outcome pending; no GPU, rendering or training by agent.
+
 ## 2026-10-31 — Initialized surrogate failure localized after bilateral contact
 
 - Verify both initialization interventions and recompute raw contact evidence. All180 issued action/jaw inputs match the decoded prefix; full319-frame execution fails after179 intervals. Contact timing matches the successful teacher, followed by rapid motion divergence and a joint5 velocity/braking-feasibility abort.

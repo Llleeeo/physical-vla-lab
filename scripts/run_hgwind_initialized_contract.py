@@ -16,7 +16,7 @@ DEFAULT_REFERENCE=ROOT/'data/derived/hgwind_history_diagnostics/20261030_022121_
 SUMMARY=ROOT/'results/summaries/2026-10-30-gripper-gain-reapplication-result.json'
 
 
-def prepare():
+def prepare(precision_control=False):
     from prepare_hgwind_teacher_contract import prepare_teacher
     from capstone_vla.hgwind_expert_trace import patch_collector as native_patch
     from capstone_vla.cartesian_packets import patch_packet_collector
@@ -33,7 +33,7 @@ def prepare():
         'Need exactly reproduced fresh60 initialization')
     plan,actions,model,diag,lab=prepare_teacher(reference/'attempt_00060')
     stamp=datetime.now(ZoneInfo('Asia/Hong_Kong')).strftime('%Y%m%d_%H%M%S_%f')
-    out=ROOT/'data/derived/hgwind_initialized_contract'/stamp
+    out=ROOT/'data/derived/hgwind_initialized_contract'/(stamp+('_float64' if precision_control else ''))
     plan.update(output=str(out),worker_output=str(out/'worker_output'),action_vectors=str(out/'actions.npy'),
         initialized_contract=SCHEMA,history_attempts=[60],fresh_control=True,stage_load_barrier=True,
         trace_gripper_drives=True,history_cases={'60':{'output':str(out)}},inotify_preflight=admission,
@@ -58,28 +58,42 @@ def prepare():
     validate(plan)
     diag.update(initialized_contract=SCHEMA,one_attempt=True,force_omission_explicit=True,
         native_finger_gain_reapplication_explicit=True,render=False,initialization_gpu_result_pending=True)
+    if precision_control:
+        from capstone_vla.action_precision_control import prepare as prepare_precision
+        actions=prepare_precision(plan,actions,diag)
     return plan,actions,model,diag,lab
+
+
+def finish_audit(plan):
+    result=audit(plan)
+    if plan.get('precision_control'):
+        from capstone_vla.action_precision_control import audit as precision_audit
+        comparison=precision_audit(plan,result)
+        result['combined_passed']=bool(result['combined_passed'] and not comparison['errors']
+            and comparison['issued_prefix_inputs_match'])
+    return result
 
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--run',action='store_true')
+    parser.add_argument('--precision-control',action='store_true',help='One matched float64 label diagnostic; not model training')
     parser.add_argument('--finish',type=Path,help='Reanalyze initialization only; never launch simulation')
     args=parser.parse_args()
     if args.finish:
         require(not args.run,'--finish cannot launch physics')
         out=args.finish.resolve();out.relative_to(ROOT/'data/derived/hgwind_initialized_contract')
-        result=audit(json.loads((out/'plan.json').read_text()))
+        result=finish_audit(json.loads((out/'plan.json').read_text()))
         return 0 if result['combined_passed'] else 2
     from run_hgwind_action_contract import run_prepared
-    prepared=prepare()
+    prepared=prepare(precision_control=args.precision_control)
     try:code=run_prepared(*prepared,run=args.run)
     except Exception:
-        if args.run and Path(prepared[0]['output']).exists():audit(prepared[0])
+        if args.run and Path(prepared[0]['output']).exists():finish_audit(prepared[0])
         raise
     if not args.run:return code
     if code==130:return code
-    result=audit(prepared[0])
+    result=finish_audit(prepared[0])
     return code or (0 if result['combined_passed'] else 2)
 
 

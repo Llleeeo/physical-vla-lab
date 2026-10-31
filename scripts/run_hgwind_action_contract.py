@@ -172,7 +172,11 @@ def run_prepared(plan,actions,model_cfg,diagnostics,lab,run=False):
     out.mkdir(parents=True,exist_ok=False)
     np.save(out/'actions.npy',actions,allow_pickle=False)
     plan['action_vectors_sha256']=sha256(out/'actions.npy')
-    for name,value in [('plan.json',plan),('contract.json',specification()),
+    contract_spec=specification()
+    if plan.get('precision_control'):
+        contract_spec.update(action_dtype='float64',precision_diagnostic=True,
+            model_training_eligible=False,base_model_action_dtype='float32')
+    for name,value in [('plan.json',plan),('contract.json',contract_spec),
         ('model_config.json',model_cfg),('preflight.json',diagnostics)]:
         (out/name).write_text(json.dumps(value,indent=2,allow_nan=False)+'\n')
     cohort=json.loads((ROOT/'data/derived/hgwind_40_camera_v2_20261028/render_manifest.json').read_text())
@@ -206,7 +210,8 @@ def run_prepared(plan,actions,model_cfg,diagnostics,lab,run=False):
     if not find_probe_episodes(out/'worker_output'):
         print('CONTRACT_RUNTIME_FAILED log='+str(out/'simulation.log'));return code or 1
     report=analyze(out)
-    print('NEXT stop_after_integrated_gate; inspect_result_then_validate_3_to_5_distinct_episodes',flush=True)
+    print('NEXT inspect_matched_precision_result_before_further_runs' if plan.get('precision_control')
+        else 'NEXT stop_after_integrated_gate; inspect_result_then_validate_3_to_5_distinct_episodes',flush=True)
     return code or (0 if report['ball_action_contract_passed'] else 1)
 
 

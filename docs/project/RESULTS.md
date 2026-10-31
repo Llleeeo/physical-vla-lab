@@ -10,7 +10,7 @@ Read-only recomputation checks the original raw HDF5 contact evidence, pinned so
 
 Through the observed prefix, nonnumeric settings/callbacks/posture match teacher inputs; numeric differences are small float representation changes (maximum position-component difference0.000237mm), with equivalent quaternion sign changes. That excludes a large input-field discrepancy in this prefix, but does not identify a unique cause of contact divergence. The native fifth-joint limit remains2.61rad/s and has not been relaxed.
 
-**Next proposed control:** preserve initialized packet execution and use original double-precision upper labels with the same quaternion hemisphere convention. This tests sensitivity to float32 conversion without changing gains, force, safety limits or scene. It is not implemented or physically tested yet. An exact-label replay success would still not establish robustness to learned-policy errors.
+**Next proposed control:** preserve initialized packet execution and use original double-precision upper labels with the same quaternion hemisphere convention. This tests sensitivity to float32 conversion without changing gains, force, safety limits or scene. It is now implemented with353 passing CPU checks, SDK parsing and actual native-entry/label-loading preflight. Physical efficacy is pending. An exact-label replay success would still not establish robustness to learned-policy errors.
 
 [Source-hashed result](../../results/summaries/2026-10-31-initialized-contract-result.json). No new simulator/render job or runtime code change by agent. The previously passed338 CPU checks belong to interface preparation; this milestone rechecks existing artifacts.
 

@@ -102,6 +102,9 @@ def install(plan):
     from . import hgwind_startup_trace as force
     from .setup_force_control import install as install_force
     validate(plan)
+    if plan.get('precision_control'):
+        from .action_precision_control import verify_runtime
+        verify_runtime(plan)
     runtime=InitializedRuntime(plan,trace.packet_decision,force)
     force.configure(Path(plan['output'])/'pre_attempt_force_calls.jsonl')
     install_force(plan)

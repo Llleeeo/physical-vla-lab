@@ -248,6 +248,10 @@ def analyze(output):
             'Fixed 9/8 gains, live-initialized declared robot posture, always-on non-target collision callbacks and unchanged native hard limits.',
             'A single exposed initial condition; validate 3-5 different development episodes before cohort conversion/training.',
             'Original collector/FSM labels remain untouched; independent contact/lift/retention checks decide this engineering gate.']
+        if plan.get('precision_control'):
+            report['action_numeric_precision']='float64_diagnostic'
+            report['limits'][0]='Original float64 expert labels through the same29D decoder; precision diagnostic only, not model training or learned-policy success.'
+            report['limits'][3]='One matched exposed precision comparison; interpret against pinned float32 run before further experiments.'
         print('BALL_ACTION_CONTRACT_PASSED '+str(report['ball_action_contract_passed']),flush=True)
     (output/'report.json').write_text(json.dumps(report,indent=2)+'\n')
     print('HGWIND_EFFORT_PROBE_COMPLETED '+json.dumps({k:report[k] for k in ['mode','reference','tracking','tracking_branch_verified','recorded_frames','completed_frames','full_source_length_completed','initial_state_match','motion_tracking_passed','native_expert_reference_passed','control_reference_replay_passed','live_kinematics_component_passed','task_feedforward_ablation_passed','cartesian_target_capture_verified','cartesian_feedback_replay_passed','packet_controller_probe_passed','packet_fixed_gains_probe_passed','packet_measured_posture_probe_passed','packet_latched_posture_probe_passed','expert_early_success','baseline_ready_for_cartesian']}))

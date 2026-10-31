@@ -1,0 +1,45 @@
+{
+  "schema": "physical-vla-lab.precision-control-preparation.v1",
+  "date": "2026-10-31",
+  "implemented": true,
+  "physical_result_pending": true,
+  "baseline": "20261031_105421_302664",
+  "source": "local/traj_00001",
+  "action_shape": [
+    319,
+    29
+  ],
+  "source_dtype": "float64",
+  "baseline_dtype": "float32",
+  "float32_roundtrip_exact": true,
+  "quaternion_hemispheres": "same as baseline",
+  "same_decoder": true,
+  "same_native_patch_sha256": "456d743d650c7e36c0d124b1606721bae2c69860a70f4279db1f804f900bcc63",
+  "float64_action_array_sha256": "4aa4a2290ce4d394c9abba32d121d1afaac19eb974c6eab04ebd0d3199528e0e",
+  "baseline_float32_action_array_sha256": "a39ee3e406b3b03e632bfc5fecceda0a114981dd131d598346ba4eab9aea3bdc",
+  "maximum_attempts": 1,
+  "learned_policy_evaluated": false,
+  "training_eligible": false,
+  "new_gpu_by_agent": false,
+  "render": false,
+  "validation": {
+    "portable_cpu_checks": 353,
+    "sdk_python": "3.10.15; six changed Python files parsed",
+    "actual_entry_assembly": "passed both default and float64",
+    "actual_packet_loading": "float64 decoded packets exact; no downcast",
+    "real_teacher_scene_preflight": "passed"
+  },
+  "source_hashes": {
+    "src/capstone_vla/action_precision_control.py": "061a93b566bb64e0f75b24b79fc65d628a8d636a41ad1498f8b540d4929bfbd6",
+    "src/capstone_vla/initialized_contract.py": "c44b25ad62ff37072aff686e657509c7f9605ba75e5e855a7a02f86dc6208ef1",
+    "scripts/run_hgwind_initialized_contract.py": "2b501d3c0d8df69d5b53179dab06f3124525ef9a9616b28a9c5cafb7f35f94d6",
+    "scripts/run_hgwind_action_contract.py": "3404df3458a2b8dff5b6b002d61313bc9a804925f6b935733f80ca137900aaf6",
+    "scripts/analyze_hgwind_effort_probe.py": "b7957859fba8210f09021de9e7c0dd464dc5b86806f9295ffddc9e3d3289fd18",
+    "tests/test_action_precision_control.py": "1e0ffd9b9ce9c1948e0e19fe4c6c6a526cc2cda1f473c8c413647a0e72f08fcc"
+  },
+  "limitations": [
+    "One exposed case, no measured precision efficacy yet",
+    "Float64 diagnosis is not a model contract change or a remedy for policy errors",
+    "Explicit diagnostic startup force omission and gain reapplication retain training exclusion"
+  ]
+}
