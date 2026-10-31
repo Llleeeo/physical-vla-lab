@@ -1,5 +1,9 @@
 # Research roadmap
 
+## 31 October 2026 — Test temporal loss emphasis against equal-budget training
+
+The [executed-prefix ablation](BALL_PREFIX_ABLATION.md) is prepared. Compare500-step uniform and prefix4-weight continuations with paired training draws, then evaluate parent and both final models on the same eight full-episode probes. This isolates temporal weighting from extra optimization; no startup oversampling or additional objective changes. Review pose/jaw/mode and startup regressions before any deployment. GPU results pending.
+
 ## 31 October 2026 — Shared noise does not reliably improve the full stream
 
 All eight seed pairs complete (16 full269-frame expert-input streams). Source/config/array hashes verify and every stream metric recomputes exactly in the original model environment. Prior generated references match with maximum difference0.

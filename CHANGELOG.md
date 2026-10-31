@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-31 — Matched executed-prefix training ablation prepared
+
+Add two matched500-step continuations from the same parent: uniform temporal weights versus4x first-four weights, with valid-weight normalization. Match batches and explicit flow noise/time hashes; preserve all29 channels and later-horizon supervision. Save both final candidates and evaluate all eight fixed seeds without promotion or physics.
+
 ## 2026-10-31 — Shared-noise comparison verified; no adoption
 
 - Verify all16 complete prediction streams and source hashes; shared noise worsens mean near-contact position and jaw switching while barely changing increment error.

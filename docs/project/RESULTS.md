@@ -1,5 +1,9 @@
 # Results and limitations
 
+## 31 October 2026 — Executed-prefix ablation implementation
+
+The [matched training pair](BALL_PREFIX_ABLATION.md) has portable weight/mask tests and actual CPU forward/backward checks. Weight1 matches existing valid29 loss; masked/padded dimensions receive zero synthetic gradient, and prefix gradient ratio is4. No GPU training or improved generated actions are claimed yet.
+
 ## 31 October 2026 — Shared noise does not reliably improve the full stream
 
 All eight seed pairs complete (16 full269-frame expert-input streams). Source/config/array hashes verify and every stream metric recomputes exactly in the original model environment. Prior generated references match with maximum difference0.
