@@ -1,5 +1,13 @@
 # Research roadmap
 
+## 31 October 2026 — Expert tilt requires a controller-side audit
+
+Follow-up orientation inspection refines the position-only conclusion below. In the selected successful demonstration, measured EE/pinch local-z tilt relative to world downward changes from about40.21 degrees at frame80 to2.50 degrees at143. Yet all64 target quaternions at80..143 are exactly identical and direct local z downward. Thus replacing those orientation labels with a fixed target would change nothing in this window. This measurement concerns tilt, not yaw, and does not establish that every authored task has the same issue.
+
+Native source inspection shows separate upper orientation targets, axis/roll objectives, translation/orientation solver priorities, projection and bounded joint commands feeding a coupled operational-space task. The recorded `operational_orientation_task=false` alone does not imply orientation is disabled: the active coupled-pose branch constructs a six-dimensional task. Do not attribute the observed tilt to a single flag without tracing executed angular references and measured motion.
+
+Prioritize that read-only controller audit and feasibility of a more direct fixed-attitude expert before more model fitting. The previously prepared two-run repeatability pair is deferred, not executed or deleted. A fixed-attitude alternative must first succeed through unchanged physical contact and safety checks, and only then supply new consistent demonstrations; it is not a quaternion-label edit or a learned-policy success claim. [Updated evidence](../../results/summaries/2026-10-31-ball-servo-live-result.json).
+
 ## 31 October 2026 — Candidate live grasp fails; freeze a repeatability control
 
 The servo candidate completes 269 intervals and 807 physics callbacks with unchanged safety limits and matching initial robot/object state. Independent grasp fails: one right-finger contact interval at frame 115, no left or bilateral contact. Ball position first differs by more than 1 mm from the teacher at 116. Jaw commands switch nine times (108–133); the teacher switches once at 144 and first contacts at 162. At first live contact the EE is 36.94 mm from the same-time expert EE and closure is requested. This supports another premature-contact failure, not a safety-threshold failure or demonstrated benefit from the 5.13% offline near-contact nominal-velocity improvement.

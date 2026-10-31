@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-31 — Distinguish fixed orientation targets from executed tilt
+
+- Verify constant expert orientation labels despite changing measured wrist tilt.
+- Prioritize native angular-command audit before fixed-attitude expert changes; defer the prepared repeat pair.
+
 ## 2026-10-31 — Candidate grasp failure verified; repeatability plan fixed
 
 - Verify latest live contact chronology and artifact hashes; distinguish integration pass from failed grasp.

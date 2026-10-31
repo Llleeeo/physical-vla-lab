@@ -131,7 +131,7 @@
       }
     }
   },
-  "decision": "Do not promote servo candidate. Freeze retained parent and run exactly two fresh identical-config live trials; preserve all outcomes. No training, height intervention, expert jaw substitution, smoothing or safety change.",
+  "decision": "Do not promote servo candidate. Fixed-seed repeat pair remains prepared; prioritize auditing measured expert tilt under constant orientation targets in response to the demonstrated representation/control concern. No training, runtime or safety change.",
   "repeat_plan": {
     "fresh_runs": 2,
     "frames_each": 269,
@@ -165,7 +165,8 @@
       "strict_model_reload": true,
       "preprocessing_exact": true,
       "cuda_initialized": false
-    }
+    },
+    "execution_status": "prepared_but_deferred_pending_orientation_control_audit"
   },
   "expert_motion_readonly_audit": {
     "payload_sha256": "d8087d27afc25ae7060a80fa392c34650494630c1476a0724da8f056f43931b0",
@@ -225,5 +226,25 @@
     },
     "scope": "Cartesian position of this training demonstration only; excludes orientation, joint oscillation, and other episodes. Path length versus displacement alone cannot establish smoothness. Upper targets are not executed positions.",
     "interpretation": "Near closure measured position path is much more direct than upper target path. Upper-goal learnability and coupled action semantics warrant investigation; causality for learned failure is not established."
+  },
+  "expert_orientation_readonly_audit": {
+    "scope": "Selected successful training demonstration; EE/pinch local-z direction versus world downward, distinct from yaw about that axis",
+    "target_quaternion_frames80_through143_exact_constant": true,
+    "target_wxyz": [
+      -0.0,
+      0.6902517080307007,
+      -0.7235693335533142,
+      -0.0
+    ],
+    "measured_tilt_degrees": {
+      "80": 40.21074654325338,
+      "119": 19.66155625156996,
+      "120": 18.822801206816383,
+      "143": 2.4969224241709274,
+      "144": 2.2503707967261257,
+      "162": 0.30082371728292173
+    },
+    "interpretation": "A constant upper orientation target does not ensure constant measured orientation. This does not establish whether tilt is caused by solver weighting, geometry projections, dynamic limits, or tracking dynamics.",
+    "next_priority": "Inspect native projected angular requests and measured orientation before any fixed-attitude expert experiment. Do not simply overwrite quaternion labels or relax safety."
   }
 }
