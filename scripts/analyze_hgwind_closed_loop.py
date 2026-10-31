@@ -17,6 +17,7 @@ from capstone_vla.hf_archive import sha256
 from capstone_vla.ball_vertical_diagnostic import audit_height, validate_provenance
 from capstone_vla.ball_approach_follow import make_approach_guard
 from capstone_vla.ball_visual_geometry import locate_ball
+from capstone_vla.ball_near_capture import locate_for_plan
 
 
 # The sole superseded analyzer is retained in Git commit 3fadd5a. Its runtime
@@ -134,8 +135,8 @@ def analyze(out,exit_code):
                         audit_height(raw,actions[i],i,cfg['vertical_diagnostic'],cfg['frames'])
                     elif guard is not None:
                         np.testing.assert_array_equal(obs['model_action'][i],raw)
-                        detection=locate_ball([obs[name][i] for name in camera_order],obs['camera_pose_world'][i],
-                            [optics[name] for name in camera_order])
+                        detection=locate_for_plan([obs[name][i] for name in camera_order],obs['camera_pose_world'][i],
+                            [optics[name] for name in camera_order],camera_order,approach_plan)
                         expected_action,event=guard.apply(raw,i,obs['state'][i,14:21],obs['robot_finger_points'][i],
                             obs['robot_finger_corners'][i],detection)
                         np.testing.assert_allclose(actions[i],expected_action,rtol=0,atol=APPROACH_AUDIT_ATOL)

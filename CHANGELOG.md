@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Repair near-capture perception and goal recovery
+
+- Record brief bilateral contact followed by native motion-limit abort; no successful grasp claim.
+- Add opt-in clipped-sphere RGB localization, recovery hold/blend and separate0/5mm depth choice. Preserve old follow behavior, jaw threshold and native limits.
+- Verify saved-stream reconstruction,28 additional visual estimates and CPU regression/scene/model preflight; new physics outcome pending.
+
 ## 2026-10-31 — Optional near-ball visual following prepared
 
 - Add causal RGB velocity estimation and a bounded near-region XY assist to extend alignment for descent; retain original height and jaw rules.

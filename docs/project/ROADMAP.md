@@ -1,5 +1,9 @@
 # Research roadmap
 
+## 31 October 2026 — Complete the contact phase before further training
+
+Run the opt-in clipped-sphere/recovery repair with depth0 first; evaluate joint oscillation and sustained bilateral lift. A separate aligned-only5mm depth option is prepared for the user’s shallow-grasp concern. Do not raise native limits or treat visually captured ball as a completed grasp. Existing contact-stage oscillation predates reacquisition jumps, so the repair is not claimed to cure the low-level dynamics. No recollection or additional training is proposed. [Protocol](BALL_VISUAL_APPROACH.md).
+
 ## 31 October 2026 — Extend alignment before changing descent release
 
 A seven-frame constant-relative-velocity extrapolation gives false future-alignment predictions on the existing stream because the hand subsequently changes motion. The next bounded experiment therefore adds near-ball RGB XY following while retaining the current height and jaw rules. Check whether the measured alignment window lengthens enough for descent, whether early single-finger contact returns, and whether independent grasp passes. Report hybrid assistance explicitly; do not claim retraining or unassisted-policy improvement. CPU preview is complete; user-run GPU trial is pending. [Command and scope](BALL_VISUAL_APPROACH.md).

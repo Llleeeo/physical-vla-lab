@@ -1,0 +1,102 @@
+{
+  "status": "CPU_NEAR_CAPTURE_PREVIEW_PASS",
+  "source_frames": 168,
+  "source_incomplete": true,
+  "fallback_frames": [
+    135,
+    136,
+    137,
+    138,
+    140,
+    141,
+    142,
+    143,
+    144,
+    145,
+    146,
+    147,
+    148,
+    149,
+    150,
+    151,
+    152,
+    153,
+    154,
+    155,
+    156,
+    157,
+    158,
+    159,
+    160,
+    163,
+    164,
+    165
+  ],
+  "fallback_position_error_mm": {
+    "mean": 1.737304359771198,
+    "maximum": 3.2275531536806508
+  },
+  "original_commands_reconstructed": true,
+  "raw_predictions_bound": true,
+  "jaw_unchanged": true,
+  "native_decode_rejections": 0,
+  "continuity_only_recovered_goal_step_mm": {
+    "162": 0.0,
+    "167": 0.0
+  },
+  "candidates": [
+    {
+      "extra_depth_m": 0,
+      "active_frames": 61,
+      "hold_frames": 13,
+      "modes": {
+        "unaligned_height_floor": 117,
+        "aligned_pass": 49,
+        "missing_pose_hold": 2
+      }
+    },
+    {
+      "extra_depth_m": 0.005,
+      "active_frames": 61,
+      "hold_frames": 13,
+      "modes": {
+        "unaligned_height_floor": 117,
+        "aligned_pass": 49,
+        "missing_pose_hold": 2
+      }
+    }
+  ],
+  "physics_launched": false,
+  "grasp_result": null,
+  "scope": "Frozen-observation preview; truth used only for offline localization scoring, not control",
+  "source_hashes": {
+    "report.json": "432f7b99c1e93283a757f38615552fa2d5300fde00fe878abf1b7235b4a75f6c",
+    "run_config.json": "21d158205713cbb1f31c3dbdd4c94f98feef78e8ae5a22b25067071fabdb0c59",
+    "live_observations.hdf5": "bf1d58172049842d139af74c6edb1ea8aa2d5a7b08fbfc5cb00817de7c29ab47",
+    "approach_guard_events.json": "ebfd5c1389d7dcb7e44d8bf2effb17700cc97c3017a36a899d080730886b4de0",
+    "probe/replay.hdf5": "612a6a59e28f94b4d8860e4ffd09ec6b5040fd84025ebdd3778814a84777e577",
+    "probe/meta.json": "77829fb601868a0c4736a515c10fb988c9a31fc6c63a6c5a83ba235a02664708"
+  },
+  "implementation_hashes": {
+    "src/capstone_vla/ball_near_capture.py": "75bfd90ff97d585df16527cd901b7ac677527c70b95e4acaae1ec7e73d21920c",
+    "scripts/check_hgwind_near_capture.py": "0e4c5e8c4d1c57ce7a46385030c15aca2507ba0b3340adb093b9446d6fcd437f"
+  },
+  "date": "2026-10-31",
+  "learned_policy_scope": "Single exposed training episode; VLA plus explicit visual assistance",
+  "observed_live_result": {
+    "run": "20261031_180308_256823",
+    "status": "BALL_LIVE_INCOMPLETE",
+    "requested_frames": 269,
+    "recorded_frames": 168,
+    "completed_intervals": 167,
+    "first_contact_frame": 142,
+    "first_bilateral_frame": 158,
+    "bilateral_frames": 9,
+    "longest_bilateral_s": 0.1166666667,
+    "grasp_success": false,
+    "joint5_abort_velocity_rad_s": -2.822313070297241,
+    "joint5_lower_velocity_bound_rad_s": -2.61,
+    "interpretation": "Brief bilateral contact, no sustained lift; contact-stage velocity oscillation precedes raw goal reacquisition jumps, so jump removal is not a proven complete cure."
+  },
+  "next": "Run near-capture repair with extra depth0 first; separate5mm trial available. Native limits unchanged; no new physics run by agent."
+}

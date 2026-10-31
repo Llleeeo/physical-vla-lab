@@ -66,4 +66,7 @@ class FollowingApproachGuard(ApproachGuard):
 
 def make_approach_guard(plan):
     if plan is None:return None
+    if "near_capture" in plan:
+        from .ball_near_capture import NearCaptureGuard
+        return NearCaptureGuard(copy.deepcopy(plan))
     return FollowingApproachGuard(copy.deepcopy(plan)) if 'follow' in plan else ApproachGuard(plan)

@@ -20,6 +20,7 @@ from .ball_vertical_diagnostic import apply_height, validate_plan
 from .ball_approach_guard import robot_corners
 from .ball_approach_follow import make_approach_guard
 from .ball_visual_geometry import locate_ball
+from .ball_near_capture import locate_for_plan
 
 
 class LiveExecutor(PacketStreamExecutor):
@@ -115,8 +116,8 @@ class LiveExecutor(PacketStreamExecutor):
         if self.approach is not None:
             optics={c['name']:c for c in self.approach_plan['cameras']}
             require(set(optics)==set(self.camera_order),'Approach camera mismatch')
-            detection=locate_ball([images[n] for n in self.camera_order],poses,
-                [optics[n]['intrinsics'] for n in self.camera_order])
+            detection=locate_for_plan([images[n] for n in self.camera_order],poses,
+                [optics[n]['intrinsics'] for n in self.camera_order],self.camera_order,self.approach_plan)
             points=np.asarray(policy.expert.finger_segment_world(),float)
             corners=robot_corners(stage,self.approach_plan)
             action,event=self.approach.apply(action,index,state[14:21],points,corners,detection)

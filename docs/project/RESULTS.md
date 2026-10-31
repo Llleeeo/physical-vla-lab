@@ -1,5 +1,9 @@
 # Results and limitations
 
+## 31 October 2026 — Near-capture progress and unresolved contact stability
+
+Follow run180308 achieves first bilateral contact158 but aborts after167 completed intervals with joint5 speed-2.8223rad/s (bound-2.61); no sustained lift. Missing wrist localization and approximately10cm reacquisition goal jumps are verified. New opt-in RGB/recovery repair restores28 saved-frame estimates (mean1.737mm/max3.228mm offline error), removes the two raw-goal release jumps in frozen replay and preserves jaw commands. New physical grasp/stability result remains pending. [Details](BALL_VISUAL_APPROACH.md) · [Evidence](../../results/summaries/2026-10-31-ball-near-capture-preflight.json).
+
 ## 31 October 2026 — Visual XY following: CPU preview only
 
 The default-off `--approach-follow` experiment uses seven past accepted RGB ball positions to estimate velocity and replaces horizontal target/motion references only within an 80 mm near region. Original height protection, orientation, masks and jaw decoding remain. The objective is to extend the alignment window; this is explicitly a hybrid VLA plus visual controller.
