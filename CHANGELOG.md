@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Translation-objective result verified
+
+- Verify both 500-step checkpoints, paired training draws, and all 24 prediction streams.
+- Record modest nominal velocity improvement alongside worse near-contact position versus parent and unchanged jaw errors.
+- Retain the default; prepare a bounded exploratory candidate rollout without claiming grasp improvement.
+
 ## 2026-10-31 — Conditional translation training ablation prepared
 
 - Add a separate matched training pair with endpoint command supervision and unchanged full-action flow loss.

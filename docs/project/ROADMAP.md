@@ -1,5 +1,15 @@
 # Research roadmap
 
+## 31 October 2026 — Translation auxiliary improves command error modestly
+
+Run `20261031_155803_063005` completes both 500-step branches and all 24 full prediction streams. Both checkpoint inspectors, all source/checkpoint hashes, matched training indices/noise/time, and recomputed per-stream/aggregate metrics pass. The older partial `155643` directory is a separate incomplete run; it is not evidence of failure in this completed run.
+
+Across eight inference seeds, parent/uniform/servo startup nominal translation errors are 0.56375/0.56791/0.56191 m/s; near-contact errors are 0.06591/0.06589/0.06253 m/s; full-episode errors are 0.16496/0.16406/0.15956 m/s. Relative to parent, servo improves near-contact requests by 5.13% and full requests by 3.27%, in all eight pairs. Startup improves only 0.33% on average, with four better and four worse. These are pre-collision requested-velocity errors on expert states, not observed robot tracking.
+
+Near-contact position target error is 20.28/21.96/20.97 mm: servo improves against equal-budget uniform training but is 3.41% worse than parent in every seed. Mean jaw errors remain 4.5 frames and transitions remain 2; native decoder and command rejection counts are zero. Thus the auxiliary has a consistent but small effect on its related command metric, without resolving the startup or jaw issues. No grasp improvement or generalization is established.
+
+Keep both candidate checkpoints and the current default. Next run one bounded 269-interval exploratory servo-candidate rollout with the existing prefix4/legacy camera protocol and unchanged controller limits, without any expert action substitution. Review early contact, closure timing and independent grasp evidence. Earlier live runs had initial-RGB variation; a single new rollout cannot establish a causal improvement over a historical run or a success rate. Do not launch further training merely because the auxiliary metric decreased. [Verified evidence](../../results/summaries/2026-10-31-ball-servo-ablation-result.json).
+
 ## 31 October 2026 — Conditional translation training comparison prepared
 
 The [new training comparison](BALL_SERVO_ABLATION.md) retains uniform 29D flow supervision and tests an auxiliary first-four translation-command term against an equal-budget uniform continuation. Teacher cap/reference/masks define the conditional training context; evaluation uses all predicted fields. Future measured robot states are offline supervision only. Two independent 500-step branches use paired training draws and eight matched full-stream inference probes. Both candidates are retained without automatic promotion; GPU training and physical outcomes remain pending.
