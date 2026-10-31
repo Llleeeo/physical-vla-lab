@@ -1,5 +1,21 @@
 # Results and limitations
 
+## 31 October 2026 — Candidate live grasp fails; freeze a repeatability control
+
+The servo candidate completes 269 intervals and 807 physics callbacks with unchanged safety limits and matching initial robot/object state. Independent grasp fails: one right-finger contact interval at frame 115, no left or bilateral contact. Ball position first differs by more than 1 mm from the teacher at 116. Jaw commands switch nine times (108–133); the teacher switches once at 144 and first contacts at 162. At first live contact the EE is 36.94 mm from the same-time expert EE and closure is requested. This supports another premature-contact failure, not a safety-threshold failure or demonstrated benefit from the 5.13% offline near-contact nominal-velocity improvement.
+
+The earlier retained-parent near miss also has nine **command** transitions; visible jaw motion need not show nine complete opening/closing cycles. It has no finger contact and a previously measured 8.17 mm minimum pinch-center distance, followed by upward motion while the teacher descends. Neither this geometry nor its video proves height is the only cause. Historical live runs differ in initial RGB and are not a controlled causal comparison of checkpoints.
+
+Freeze the 3,000-step retained parent and run exactly two fresh 269-frame trials using the existing entry point, prefix4, legacy capture, model seed90000, scene seed202610280/attempt345 and identical native limits. No training, smoothing, recorded-height overlay or expert jaw substitution. Save every outcome; do not retry until success. Both fresh runs must match configuration/checkpoint/runtime hashes before comparison. The old run is a historical reference, subject to runtime-version checks, not assumed bit-identical.
+
+Compare initial RGB/state/action and the earliest divergence, then finger contact, actual finger motion, jaw requests and independent grasp. If the two fresh trials diverge, locate the earliest discrepancy before further model changes. If they repeat a near miss, inspect that stable geometry before a saved-command vertical-control intervention. If both instead hit early, prioritize that repeatable error over the earlier attractive video. Two repeats cannot estimate generalization or establish rendering as the sole cause. CPU preflight is required; GPU runs remain user-run and pending. [Source-hashed evidence and fixed plan](../../results/summaries/2026-10-31-ball-servo-live-result.json).
+
+### Expert motion versus supervised upper targets
+
+A read-only audit of the selected successful demonstration separates upper goals from measured pinch positions. On frames80–119, maximum per-frame target displacement is21.39mm versus4.08mm measured pinch displacement. On120–143, measured path length is74.65mm versus74.62mm endpoint displacement; on144–162 these are42.49/42.41mm. Thus this part of the measured Cartesian approach is nearly direct while upper targets vary more. This does not assess orientation, individual-joint oscillation, startup or other demonstrations, and path directness alone does not establish smoothness.
+
+Complex expert upper targets and the coupled29D output are a credible learnability hypothesis; successful expert execution is not proof of an easy policy learning interface. No controlled comparison yet separates representation, limited demonstration coverage, image shift and model optimization. Do not smooth labels or reduce29D to pose/gripper without showing the resulting controller can execute the demonstration. Retain the bounded repeatability pair as the immediate execution control; use these position facts to prioritize representation/supervision review over more loss-weight sweeps. Strict retained-parent model reload and image/state preprocessing preflight pass on CPU; no GPU trial launched.
+
 ## 31 October 2026 — Translation auxiliary improves command error modestly
 
 Run `20261031_155803_063005` completes both 500-step branches and all 24 full prediction streams. Both checkpoint inspectors, all source/checkpoint hashes, matched training indices/noise/time, and recomputed per-stream/aggregate metrics pass. The older partial `155643` directory is a separate incomplete run; it is not evidence of failure in this completed run.

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Candidate grasp failure verified; repeatability plan fixed
+
+- Verify latest live contact chronology and artifact hashes; distinguish integration pass from failed grasp.
+- Correct visible-motion versus jaw-command transition interpretation for the retained-parent near miss.
+- Fix two identical-config parent trials before further training or controller interventions; GPU execution pending.
+
 ## 2026-10-31 — Translation-objective result verified
 
 - Verify both 500-step checkpoints, paired training draws, and all 24 prediction streams.

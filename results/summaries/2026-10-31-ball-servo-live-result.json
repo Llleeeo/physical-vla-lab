@@ -1,0 +1,229 @@
+{
+  "scope": "Two historical exposed-training-case rollouts, not a matched causal model comparison or a success-rate estimate",
+  "cases": {
+    "retained_parent": {
+      "run": "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/closed_loop_runs/20261031_134508_202376",
+      "chronology": {
+        "first_live_contact_frame": null,
+        "first_teacher_contact_frame": 162,
+        "first_teacher_bilateral_frame": 163,
+        "live_bilateral_frames": 0,
+        "live_left_contact_frames": 0,
+        "live_right_contact_frames": 0,
+        "live_jaw_transitions": [
+          112,
+          113,
+          115,
+          117,
+          118,
+          119,
+          127,
+          128,
+          131
+        ],
+        "teacher_jaw_transitions": [
+          144
+        ],
+        "first_ball_position_difference_above_1mm_frame": 166,
+        "ee_difference_at_first_contact_mm": null,
+        "jaw_requested_closed_at_first_contact": null,
+        "finger_positions_at_first_contact_m": null
+      },
+      "initial_camera_comparison": {
+        "opst_cam": {
+          "initial_position_difference_mm": 7.158904146811085e-05,
+          "initial_orientation_difference_deg": 2.4148365394514667e-06,
+          "initial_rgb_mae_255": 9.053098958333333,
+          "live_mean_255": 112.90290581597222,
+          "training_mean_255": 104.74965494791667
+        },
+        "wrist_cam": {
+          "initial_position_difference_mm": 0.00039243978702841836,
+          "initial_orientation_difference_deg": 5.7476153469947745e-05,
+          "initial_rgb_mae_255": 18.775144314236112,
+          "live_mean_255": 127.96855902777777,
+          "training_mean_255": 109.21072374131944
+        }
+      },
+      "completed_frames": 269,
+      "runtime_safety_passed": true,
+      "independent_grasp": "fail",
+      "source_sha256": {
+        "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/closed_loop_runs/20261031_134508_202376/report.json": "005460bdb61d461b30377ded2e4945417eb8331263ecce53ec166aeff503622d",
+        "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/closed_loop_runs/20261031_134508_202376/run_config.json": "70d9ae9596b89e9c9abffeaf0b9c656878243456cfbcc17a52302e2078be4635",
+        "data/collected/hgwind_overnight_20261027_230043/local/Trajectory/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/traj_00018/replay.hdf5": "31aaf78161c0136235b2d6a73d344708e14bdf045c6e61cdd7819d6d3cad1e77",
+        "data/collected/hgwind_overnight_20261027_230043/local/Trajectory/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/traj_00018/meta.json": "deaae44fa7190db692864b33b8b60ef35491820d8d0e22203b1084e756924125",
+        "data/derived/hgwind_traj18_development_20261031/arrays.npz": "d8087d27afc25ae7060a80fa392c34650494630c1476a0724da8f056f43931b0",
+        "data/derived/hgwind_traj18_development_20261031/dataset.json": "ba66f929cf97b6e5f8f4130adce40b0f9e9398f63397cb0e5a09a31f6d560fe2",
+        "scripts/diagnose_hgwind_live_failure.py": "0ff3529dc8c53d0793f57c786dffc0deff78f3d191395a0bca3b560e96fdfab5"
+      },
+      "live_artifacts_sha256": {
+        "worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/replay.hdf5": "062df2470ed68f35a1294b273f0ff452cabfb5c6a6c384b40222080ab4f4eee6",
+        "worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/meta.json": "9f9d41b6531a5b8dcac03071260daa34102479087f1bb09a3d3a13571f2def4b",
+        "live_observations.hdf5": "9619e7da23611c2fa67b4e3d73619a9a871edc4ea66c2283b8f120cf47834af6",
+        "policy_timing.json": "18719161a300f4d146811dafa9ba042f213184d8c8d63e73d04f225668ce4eca"
+      }
+    },
+    "servo_candidate": {
+      "run": "data/derived/hgwind_traj18_development_20261031/servo_ablation_runs/20261031_155803_063005/servo/closed_loop_runs/20261031_160823_061474",
+      "chronology": {
+        "first_live_contact_frame": 115,
+        "first_teacher_contact_frame": 162,
+        "first_teacher_bilateral_frame": 163,
+        "live_bilateral_frames": 0,
+        "live_left_contact_frames": 0,
+        "live_right_contact_frames": 1,
+        "live_jaw_transitions": [
+          108,
+          109,
+          110,
+          119,
+          123,
+          124,
+          131,
+          132,
+          133
+        ],
+        "teacher_jaw_transitions": [
+          144
+        ],
+        "first_ball_position_difference_above_1mm_frame": 116,
+        "ee_difference_at_first_contact_mm": 36.939029693603516,
+        "jaw_requested_closed_at_first_contact": true,
+        "finger_positions_at_first_contact_m": [
+          0.034487053751945496,
+          0.03476870805025101
+        ]
+      },
+      "initial_camera_comparison": {
+        "opst_cam": {
+          "initial_position_difference_mm": 7.158904146811085e-05,
+          "initial_orientation_difference_deg": 2.4148365394514667e-06,
+          "initial_rgb_mae_255": 8.153793402777778,
+          "live_mean_255": 111.576171875,
+          "training_mean_255": 104.74965494791667
+        },
+        "wrist_cam": {
+          "initial_position_difference_mm": 0.00039243978702841836,
+          "initial_orientation_difference_deg": 5.7476153469947745e-05,
+          "initial_rgb_mae_255": 13.080333116319444,
+          "live_mean_255": 122.18009765625,
+          "training_mean_255": 109.21072374131944
+        }
+      },
+      "completed_frames": 269,
+      "runtime_safety_passed": true,
+      "independent_grasp": "fail",
+      "source_sha256": {
+        "data/derived/hgwind_traj18_development_20261031/servo_ablation_runs/20261031_155803_063005/servo/closed_loop_runs/20261031_160823_061474/report.json": "1f15f75c7cffa560cdab167b047fa67763caa1d2ea04c791754b58f0540073bb",
+        "data/derived/hgwind_traj18_development_20261031/servo_ablation_runs/20261031_155803_063005/servo/closed_loop_runs/20261031_160823_061474/run_config.json": "763b2a65c0c8142fb580420b3bcb68b07063735ddff038c8ef17896168043ec5",
+        "data/collected/hgwind_overnight_20261027_230043/local/Trajectory/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/traj_00018/replay.hdf5": "31aaf78161c0136235b2d6a73d344708e14bdf045c6e61cdd7819d6d3cad1e77",
+        "data/collected/hgwind_overnight_20261027_230043/local/Trajectory/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/traj_00018/meta.json": "deaae44fa7190db692864b33b8b60ef35491820d8d0e22203b1084e756924125",
+        "data/derived/hgwind_traj18_development_20261031/arrays.npz": "d8087d27afc25ae7060a80fa392c34650494630c1476a0724da8f056f43931b0",
+        "data/derived/hgwind_traj18_development_20261031/dataset.json": "ba66f929cf97b6e5f8f4130adce40b0f9e9398f63397cb0e5a09a31f6d560fe2",
+        "scripts/diagnose_hgwind_live_failure.py": "0ff3529dc8c53d0793f57c786dffc0deff78f3d191395a0bca3b560e96fdfab5"
+      },
+      "live_artifacts_sha256": {
+        "worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/replay.hdf5": "cbe6b510c516d7e156e9ea6e76d36383065f5f2a5daa32b3967cf5482487a93d",
+        "worker_output/1s1p/grasp_wind_driven_motion_1s1p_hgprgew/failed_00000/meta.json": "7ed683818417627134475fb56e92e3ac2eb7277c77647b83f3815e76203798ec",
+        "live_observations.hdf5": "2dc06b3b764f997bb24f20bee78d3b5c209781a23ad9f53e0d4c360a7dc29782",
+        "policy_timing.json": "83b25e484e0b8d31016acf34c60f6394023e4df9cab5e752fe1afbfc65387dae"
+      }
+    }
+  },
+  "decision": "Do not promote servo candidate. Freeze retained parent and run exactly two fresh identical-config live trials; preserve all outcomes. No training, height intervention, expert jaw substitution, smoothing or safety change.",
+  "repeat_plan": {
+    "fresh_runs": 2,
+    "frames_each": 269,
+    "parent": "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430",
+    "model_seed": 90000,
+    "scene_seed": 202610280,
+    "attempt_offset": 345,
+    "prefix": 4,
+    "camera_protocol": "legacy",
+    "vary_model_seed": false,
+    "source_actions_used": false,
+    "gpu_status": "not_started",
+    "purpose": "Measure run-to-run variation at fixed nominal reset and inference seeds, not variation across task conditions.",
+    "comparison": [
+      "checkpoint/runtime hashes",
+      "initial robot/object state",
+      "initial RGB and first action",
+      "first state/action divergence",
+      "first finger contact",
+      "jaw-command transitions and measured fingers",
+      "independent grasp and safety"
+    ],
+    "decision_rules": [
+      "If new runs do not match checkpoint/runtime/config hashes, do not treat them as a matched repeat pair.",
+      "If new matched trials diverge, inspect earliest image/input/action/physics divergence before changing training. Initial image changes alone do not prove rendering is the only cause.",
+      "If both reproduce a no-contact near miss, return to the saved-command executor for an isolated vertical-control diagnostic after checking the actual missed geometry.",
+      "If both instead repeat premature contact, prioritize the reproducible precontact error rather than the historical attractive video.",
+      "A rare success is retained and reported with failures; do not select a favorable run as proof of robustness."
+    ],
+    "cpu_preflight": {
+      "strict_model_reload": true,
+      "preprocessing_exact": true,
+      "cuda_initialized": false
+    }
+  },
+  "expert_motion_readonly_audit": {
+    "payload_sha256": "d8087d27afc25ae7060a80fa392c34650494630c1476a0724da8f056f43931b0",
+    "rows": {
+      "expert_upper_target": [
+        {
+          "start_frame": 80,
+          "stop_frame_exclusive": 120,
+          "path_mm": 150.99356452763493,
+          "endpoint_displacement_mm": 98.65893929960438,
+          "step_mean_mm": 3.871629859682947,
+          "step_max_mm": 21.39226398891149
+        },
+        {
+          "start_frame": 120,
+          "stop_frame_exclusive": 144,
+          "path_mm": 68.76671246885108,
+          "endpoint_displacement_mm": 47.25373375500269,
+          "step_mean_mm": 2.9898570638630906,
+          "step_max_mm": 5.102821648891349
+        },
+        {
+          "start_frame": 144,
+          "stop_frame_exclusive": 163,
+          "path_mm": 68.20460231970432,
+          "endpoint_displacement_mm": 43.921223839906574,
+          "step_mean_mm": 3.7891445733169067,
+          "step_max_mm": 12.259777900661735
+        }
+      ],
+      "expert_measured_pinch": [
+        {
+          "start_frame": 80,
+          "stop_frame_exclusive": 120,
+          "path_mm": 98.66416529702965,
+          "endpoint_displacement_mm": 92.22720910995231,
+          "step_mean_mm": 2.5298503922315296,
+          "step_max_mm": 4.079184980859746
+        },
+        {
+          "start_frame": 120,
+          "stop_frame_exclusive": 144,
+          "path_mm": 74.64532598816504,
+          "endpoint_displacement_mm": 74.61553426563147,
+          "step_mean_mm": 3.2454489560071758,
+          "step_max_mm": 4.321427989789787
+        },
+        {
+          "start_frame": 144,
+          "stop_frame_exclusive": 163,
+          "path_mm": 42.48622697837841,
+          "endpoint_displacement_mm": 42.41047412936215,
+          "step_mean_mm": 2.360345943243245,
+          "step_max_mm": 2.6034180832139935
+        }
+      ]
+    },
+    "scope": "Cartesian position of this training demonstration only; excludes orientation, joint oscillation, and other episodes. Path length versus displacement alone cannot establish smoothness. Upper targets are not executed positions.",
+    "interpretation": "Near closure measured position path is much more direct than upper target path. Upper-goal learnability and coupled action semantics warrant investigation; causality for learned failure is not established."
+  }
+}
