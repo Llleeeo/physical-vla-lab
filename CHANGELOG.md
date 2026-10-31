@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Optional RGB approach-distance filter prepared
+
+- Add default-off robot-finger height projection with coherent vertical motion references, latched missing-view pose hold and two-estimate reacquisition.
+- Keep the original 0.5 jaw decoding and raw model predictions. Runtime perception uses RGB; sphere size is an explicit static prior.
+- Verify scene geometry, strict CPU model load and regression checks. Independent grasp improvement remains untested; label this VLA plus visual control.
+
 ## 2026-10-31 — Withdraw jaw confirmation; inspect approach from RGB
 
 - Remove the0.8 confirmation flag/module and restore pre-experiment live runtime. Preserve all historical results.

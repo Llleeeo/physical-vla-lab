@@ -1,5 +1,11 @@
 # Results and limitations
 
+## 31 October 2026 — Visual approach guard: CPU preparation only
+
+An optional RGB-guided approach filter is implemented with unchanged original jaw decoding. It uses full robot finger bounds to set an unaligned height floor, removes conflicting downward feedforward, and holds a latched robot pose when localization is unavailable. Two consistent visual estimates release the hold. Static ball size is declared; live target position is estimated from RGB without simulator object-state access.
+
+Actual scene/optics/finger geometry and strict CPU checkpoint reload pass. The new controller has not been run in physics, so no collision reduction or grasp improvement is claimed. Missing views can stall the motion; midpoint alignment and a goal-height floor do not certify actual collision clearance. The result will be reported as VLA plus visual approach control. [Protocol](BALL_VISUAL_APPROACH.md) · [CPU preparation](../../results/summaries/2026-10-31-ball-visual-approach-preflight.json).
+
 ## 31 October 2026 — Original jaw decoding restored; RGB localization inspected
 
 The user rejects the0.8 intervention; all four live entry/runtime files are restored exactly to2478647 and the optional flag/module is removed. The standard0.5 action-codec threshold remains. Failed-run evidence is preserved.

@@ -1,5 +1,9 @@
 # Research roadmap
 
+## 31 October 2026 — Execute one bounded visual approach trial
+
+The optional approach filter and CPU preflight are ready. Run one 269-interval retained-parent trial with prefix 1, legacy cameras and `--approach-guard`. Keep jaw decoding at 0.5 and all native physics/actuator limits. Compare first contact geometry and independent grasp, and explicitly report visual holds and raw/filtered actions. Do not infer success from an integration pass or from nominal clearance alone. No further training or collection is needed for this experiment. [Implementation and limitations](BALL_VISUAL_APPROACH.md).
+
 ## 31 October 2026 — Withdraw0.8; develop visual approach protection
 
 The original jaw decoding is restored. The explicit next target is to prevent an open finger reaching the ball while the gripper midpoint remains misaligned. An offline RGB-only prototype now localizes all precontact frames in two exposed runs, but worst observed error exceeds12mm and later wrist-view loss reduces coverage. Do not equate ray consistency with accuracy or silently read simulator ball coordinates at runtime.

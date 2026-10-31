@@ -27,7 +27,7 @@ TEACHER=ROOT/'data/derived/hgwind_effort_probes/20261029_220130_402255_joint_onl
 SURROGATE=ROOT/'data/derived/hgwind_action_contract_v1/20261029_220618_809794_traj_00018'
 
 
-def prepare(run,frames,prefix,camera_protocol="legacy",diagnostic_vertical=False):
+def prepare(run,frames,prefix,camera_protocol="legacy",diagnostic_vertical=False,approach_guard=False):
     require(2<=frames<=269 and prefix in (1,4),'Frames must be2..269, prefix1 or4')
     prior,_,_,_,lab=prepare_teacher(TEACHER)
     passed=json.loads((SURROGATE/'report.json').read_text())
@@ -55,6 +55,9 @@ def prepare(run,frames,prefix,camera_protocol="legacy",diagnostic_vertical=False
         patch_sha256=hashlib.sha256(patch_collector(Path(prior['worker']).read_text()).encode()).hexdigest())
     require(camera_protocol in ('legacy','formal-temporal'), 'Unknown camera protocol')
     cfg['camera_protocol']=camera_protocol
+    if approach_guard:
+        require(not diagnostic_vertical and prefix==1 and camera_protocol=='legacy',
+            'Approach experiment requires prefix1/legacy and no recorded-height intervention')
     if camera_protocol=='formal-temporal':
         from capstone_vla.ball_camera_protocol import validated_clamps
         with h5py.File(meta['images'],'r') as image:
@@ -93,6 +96,7 @@ def prepare(run,frames,prefix,camera_protocol="legacy",diagnostic_vertical=False
            'src/capstone_vla/closed_loop.py','src/capstone_vla/live_policy_protocol.py',
            'src/capstone_vla/cartesian_target_replay.py','src/capstone_vla/cartesian_target_trace.py',
            'src/capstone_vla/task2_bridge.py','src/capstone_vla/franka.py']
+    names+=['src/capstone_vla/ball_approach_guard.py','src/capstone_vla/ball_visual_geometry.py']
     paths=[ROOT/n for n in names]+native+[manifest,Path(prior['task']),Path(prior['original_depth_helper']),
         Path(prior['source']),Path(prior['source']).with_name('meta.json'),SURROGATE/'report.json',dataset/'dataset.json']
     if diagnostic_vertical:paths.append(dataset/'arrays.npz')
@@ -106,6 +110,11 @@ def prepare(run,frames,prefix,camera_protocol="legacy",diagnostic_vertical=False
     stage=Usd.Stage.Open(prior['task']);records=select_policy_camera_records(stage)
     require({r['name'] for r in records}==set(meta['cameras']),'Missing calibrated policy camera')
     cfg['preflight_camera_records']=records
+    if approach_guard:
+        from capstone_vla.ball_approach_guard import calibration
+        source_meta=json.loads(Path(cfg['source']).with_name('meta.json').read_text())
+        cfg['approach_guard']=calibration(stage,records,source_meta['policy']['roles']['A'])
+        cfg['policy_postprocessing']=True
     return cfg,lab,repo
 
 
@@ -128,7 +137,8 @@ def main():
     p.add_argument('--check-load',action='store_true',help='Also strictly reload model on CPU during preflight')
     p.add_argument('--camera-protocol',choices=['legacy','formal-temporal'],default='legacy')
     p.add_argument('--diagnostic-vertical',action='store_true',help='Recorded target z on frames138..179; diagnostic only, not learned-policy success')
-    a=p.parse_args();cfg,lab,repo=prepare(a.run_dir.resolve(),a.frames,a.prefix,a.camera_protocol,a.diagnostic_vertical)
+    p.add_argument('--approach-guard',action='store_true',help='Experimental RGB-guided finger-height floor and missing-view pose hold; original jaw decoding')
+    a=p.parse_args();cfg,lab,repo=prepare(a.run_dir.resolve(),a.frames,a.prefix,a.camera_protocol,a.diagnostic_vertical,a.approach_guard)
     env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1',HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1')
     model_check=[str(ROOT/'.venv_dynamicvla/bin/python'),str(ROOT/'scripts/hgwind_policy_server.py'),'--preflight',str(a.run_dir.resolve())]
     if a.check_load:model_check.append('--check-load')
@@ -136,6 +146,7 @@ def main():
     cmd=command(cfg,lab)
     print(f'CPU_PREFLIGHT_OK source=local/traj_00018 frames={a.frames} prefix={a.prefix} absolute29=true state30=true live_RGB=true source_actions={a.diagnostic_vertical}',flush=True)
     if a.diagnostic_vertical:print('VERTICAL_DIAGNOSTIC channel=target_position_z frames=138..179 expert_reference=true standalone_policy=false',flush=True)
+    if a.approach_guard:print('VISUAL_APPROACH_GUARD RGB_only=true static_radius_m='+str(cfg['approach_guard']['ball_radius_m'])+' missing=pose_hold jaw_threshold=0.5 certified_collision_avoidance=false',flush=True)
     print('CAMERA_PROTOCOL '+a.camera_protocol+' physics_and_model_unchanged=true',flush=True)
     print('SIMULATION_MODE synchronous_pause_during_inference; engineering_check_only; real_time=false',flush=True)
     print('COMMAND '+shlex.join(cmd),flush=True)

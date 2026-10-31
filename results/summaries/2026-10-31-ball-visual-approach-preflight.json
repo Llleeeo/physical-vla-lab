@@ -1,0 +1,38 @@
+{
+  "schema": "physical-vla-lab.visual-approach-preflight.v1",
+  "date": "2026-10-31",
+  "status": "CPU_READY_PHYSICS_PENDING",
+  "physics_launched": false,
+  "grasp_improvement": null,
+  "default_enabled": false,
+  "jaw_threshold": 0.5,
+  "observation": "two RGB views plus calibrated cameras and robot geometry",
+  "static_prior_ball_radius_m": 0.022516662578662066,
+  "simulator_target_position_used_for_control": false,
+  "source_actions_used_for_control": false,
+  "protocol": {
+    "prefix": 1,
+    "frames": 269,
+    "camera_protocol": "legacy",
+    "checkpoint": "retained 3000-step development parent"
+  },
+  "scene_geometry_preflight_passed": true,
+  "strict_cpu_checkpoint_load_passed": true,
+  "focused_cpu_tests_passed": 29,
+  "limitations": [
+    "Exposed single training case",
+    "Not certified collision avoidance",
+    "Static size and orange appearance prior",
+    "Occlusion can stall motion",
+    "Actual contact/grasp not yet tested"
+  ],
+  "sources": {
+    "src/capstone_vla/ball_approach_guard.py": "e34a6db91afec376e087785755ee5e06f8c471f01806bf9649339cd4e897e8d6",
+    "src/capstone_vla/ball_visual_geometry.py": "b5f361c0dc2a7e053e1f8f3ce1db3868023c7d563f8c3ef8e08e4f6dca6b5841",
+    "src/capstone_vla/ball_live_runtime.py": "c86c115dc7cd29fcc6a01e71f35c8aaad0eaf9db7bd88a1fb27b6df6e253abf2",
+    "scripts/run_hgwind_closed_loop.py": "7fa17a7e618b21842c204109b773179bc7cf6fa9fface9706d78c5fd24f6d199",
+    "scripts/analyze_hgwind_closed_loop.py": "36291fdf6055aa9f7470bd6ba57177df68578a20b0bd46afe1e5c441e10dcbb8",
+    "scripts/sim/run_hgwind_policy_worker.py": "d6866954268769c9496c7f2cc2d205372cbb215872b3f5b884ee620fb548844c",
+    "tests/test_ball_approach_guard.py": "3244fcabbd8942fafda7088257d9b47dbf6441c2f3ca0796e77b0d5ef8ba06b5"
+  }
+}

@@ -15,6 +15,8 @@ from capstone_vla.cartesian_packets import audit_packets
 from capstone_vla.grasp_evidence import GraspEvidenceCriteria,evaluate_grasp
 from capstone_vla.hf_archive import sha256
 from capstone_vla.ball_vertical_diagnostic import audit_height, validate_provenance
+from capstone_vla.ball_approach_guard import ApproachGuard
+from capstone_vla.ball_visual_geometry import locate_ball
 
 
 def analyze(out,exit_code):
@@ -25,7 +27,13 @@ def analyze(out,exit_code):
         scope='Exposed training-case synchronous live integration; not a benchmark success-rate estimate')
     try:
         diagnostic=validate_provenance(cfg)
-        result.update(source_actions_used_for_control=diagnostic,standalone_policy_evaluation=not diagnostic,
+        approach_plan=cfg.get('approach_guard');guard=ApproachGuard(approach_plan) if approach_plan else None
+        if guard is not None:
+            if diagnostic:raise ValueError('Combined approach/height intervention')
+            result.update(visual_guidance=True,policy_postprocessing=True,unmodified_model_actions=False,
+                simulator_target_state_used=False,scope='Exposed VLA+RGB-guided approach filter; not unmodified-policy or certified collision avoidance')
+            guard_events=json.loads((out/'approach_guard_events.json').read_text())
+        result.update(source_actions_used_for_control=diagnostic,standalone_policy_evaluation=not diagnostic and guard is None,
             diagnostic_only=diagnostic)
         if diagnostic:
             result['scope']='Recorded-height intervention with live model feedback; any grasp is hybrid diagnostic success, not unassisted VLA success'
@@ -46,6 +54,8 @@ def analyze(out,exit_code):
         original=json.loads(Path(cfg['source']).with_name('meta.json').read_text())
         if meta['robot_limit_profile']['sha256']!=original['robot_limit_profile']['sha256']:raise ValueError('Native motion limits differ')
         payload=json.loads((out/'cartesian_packet_execution.json').read_text())
+        if guard is not None and (payload.get('approach_guard')!=approach_plan or tag.get('approach_guard')!=approach_plan):
+            raise ValueError('Approach provenance mismatch')
         packets=json.loads((out/'packet_requests.json').read_text())
         rows=json.loads((out/'live_control_references.json').read_text())
         timing=json.loads((out/'policy_timing.json').read_text())
@@ -69,6 +79,12 @@ def analyze(out,exit_code):
             np.testing.assert_allclose(actual['timestamp'][:],np.arange(n)/60,rtol=0,atol=1e-7)
             if any(len(obs[name])!=n for name in cfg['cameras']):raise ValueError('Missing live RGB')
             if len(timing)!=n:raise ValueError('Incomplete policy timing records')
+            if guard is not None:
+                if len(guard_events)!=n:raise ValueError('Incomplete approach decisions')
+                if json.loads(obs.attrs['approach_guard_json'])!=approach_plan:raise ValueError('Approach archive plan mismatch')
+                np.testing.assert_allclose(obs['robot_finger_points'][:],actual['obs/finger_segment_world'][:],rtol=0,atol=1e-5)
+                camera_order=json.loads(obs.attrs['camera_pose_order_json'])
+                optics={c['name']:c['intrinsics'] for c in approach_plan['cameras']}
             # Bind consumed commands to persisted model IPC responses, never source actions.
             for i,event in enumerate(timing):
                 origin=(i//cfg['prefix'])*cfg['prefix']
@@ -85,9 +101,23 @@ def analyze(out,exit_code):
                     if diagnostic:
                         np.testing.assert_array_equal(obs['model_action'][i],raw)
                         audit_height(raw,actions[i],i,cfg['vertical_diagnostic'],cfg['frames'])
+                    elif guard is not None:
+                        np.testing.assert_array_equal(obs['model_action'][i],raw)
+                        detection=locate_ball([obs[name][i] for name in camera_order],obs['camera_pose_world'][i],
+                            [optics[name] for name in camera_order])
+                        expected_action,event=guard.apply(raw,i,obs['state'][i,14:21],obs['robot_finger_points'][i],
+                            obs['robot_finger_corners'][i],detection)
+                        np.testing.assert_array_equal(actions[i],expected_action)
+                        if dict(event,detection=detection)!=guard_events[i]:raise ValueError('Approach decision mismatch')
                     else:np.testing.assert_array_equal(actions[i],raw)
                 expected=decoded_request(actions[i],i,anchor)
                 if i>=len(packets) or not native_inputs_match(packets[i]['inputs'],expected['inputs']):raise ValueError('Consumed action differs from native request')
+                if packets[i]['gripper_closed'] is not expected['gripper_closed']:raise ValueError('Consumed jaw differs from native request')
+            if guard is not None:
+                result['approach_audit']=dict(verified=True,raw_model_responses_bound=True,jaw_scores_unchanged=True,
+                    visual_valid_frames=sum(e['vision_valid'] for e in guard_events),
+                    modes={mode:sum(e['mode']==mode for e in guard_events) for mode in set(e['mode'] for e in guard_events)},
+                    first_changed_frame=next((e['frame'] for e in guard_events if e['changed_channels']),None))
             adjusted=normalization_audit_copy(payload,packets)
             audit=audit_packets(adjusted,packets,rows,n)
             audit['learned_policy_evaluated']=not diagnostic
@@ -115,7 +145,9 @@ def analyze(out,exit_code):
                     changed_frames=np.flatnonzero(actions[:,2]!=raw[:,2]).tolist(),
                     other_channels_exact=True,raw_model_responses_bound=True)
             if good:result['status']='BALL_VERTICAL_DIAGNOSTIC_PASS' if diagnostic else 'BALL_LIVE_INTEGRATION_PASS'
-        result['artifacts']={str(p.relative_to(out)):sha256(p) for p in [ep/'replay.hdf5',ep/'meta.json',out/'live_observations.hdf5',out/'policy_timing.json']}
+        artifacts=[ep/'replay.hdf5',ep/'meta.json',out/'live_observations.hdf5',out/'policy_timing.json']
+        if guard is not None:artifacts.append(out/'approach_guard_events.json')
+        result['artifacts']={str(p.relative_to(out)):sha256(p) for p in artifacts}
     except Exception as exc:
         result['analysis_error']=type(exc).__name__+': '+str(exc)
     (out/'report.json').write_text(json.dumps(result,indent=2,allow_nan=False)+'\n')

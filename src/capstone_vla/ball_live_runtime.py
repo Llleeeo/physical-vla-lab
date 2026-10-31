@@ -17,6 +17,8 @@ from .live_policy_protocol import atomic_npz, wait_file, history_pair
 from .pilot_dataset import CAMERAS
 from .posture_anchor import initialize_anchor
 from .ball_vertical_diagnostic import apply_height, validate_plan
+from .ball_approach_guard import ApproachGuard, robot_corners
+from .ball_visual_geometry import locate_ball
 
 
 class LiveExecutor(PacketStreamExecutor):
@@ -26,6 +28,10 @@ class LiveExecutor(PacketStreamExecutor):
         self.queue=ActionQueue(config['prefix'],config['frames']); self.history=[]
         self.camera=None; self.archive=None; self.timing=[]; self.closed=False
         self.vertical=config.get("vertical_diagnostic")
+        self.approach_plan=config.get('approach_guard')
+        require(not (self.vertical and self.approach_plan),'Cannot combine approach and recorded-height interventions')
+        self.approach=ApproachGuard(self.approach_plan) if self.approach_plan is not None else None
+        self.approach_events=[]
         if self.vertical is not None:validate_plan(self.vertical,config["frames"])
 
     def _open_camera(self, stage, sim, robot):
@@ -52,7 +58,11 @@ class LiveExecutor(PacketStreamExecutor):
         for name,shape in [('state',(30,)),('action',(29,)),('camera_pose_world',(2,7))]:
             self.archive.create_dataset(name,shape=(0,*shape),maxshape=(None,*shape),dtype='f8')
         self.archive.create_dataset('timestamp_s',shape=(0,),maxshape=(None,),dtype='f8')
-        if self.vertical is not None:
+        if self.approach is not None:
+            self.archive.create_dataset('robot_finger_points',shape=(0,2,3),maxshape=(None,2,3),dtype='f8')
+            self.archive.create_dataset('robot_finger_corners',shape=(0,2,8,3),maxshape=(None,2,8,3),dtype='f8')
+            self.archive.attrs['approach_guard_json']=json.dumps(self.approach_plan)
+        if self.vertical is not None or self.approach is not None:
             self.archive.create_dataset('model_action',shape=(0,29),maxshape=(None,29),dtype='f8')
             self.archive.attrs['vertical_diagnostic_json']=json.dumps(self.vertical)
 
@@ -100,8 +110,19 @@ class LiveExecutor(PacketStreamExecutor):
         if self.vertical is not None:action=apply_height(action,index,self.vertical,self.config["frames"])
         poses=np.asarray(self.camera.last_poses,float)
         require(poses.shape==(2,7) and np.isfinite(poses).all(),'Invalid live camera transforms')
-        values=dict(state=state,action=action,camera_pose_world=poses,timestamp_s=index/60,**images)
-        if self.vertical is not None:values["model_action"]=model_action
+        guard_values={}
+        if self.approach is not None:
+            optics={c['name']:c for c in self.approach_plan['cameras']}
+            require(set(optics)==set(self.camera_order),'Approach camera mismatch')
+            detection=locate_ball([images[n] for n in self.camera_order],poses,
+                [optics[n]['intrinsics'] for n in self.camera_order])
+            points=np.asarray(policy.expert.finger_segment_world(),float)
+            corners=robot_corners(stage,self.approach_plan)
+            action,event=self.approach.apply(action,index,state[14:21],points,corners,detection)
+            self.approach_events.append(dict(event,detection=detection))
+            guard_values=dict(robot_finger_points=points,robot_finger_corners=corners)
+        values=dict(state=state,action=action,camera_pose_world=poses,timestamp_s=index/60,**images,**guard_values)
+        if self.vertical is not None or self.approach is not None:values["model_action"]=model_action
         for name,value in values.items():
             ds=self.archive[name];ds.resize(index+1,axis=0);ds[index]=value
         self.archive.flush()
@@ -123,6 +144,10 @@ class LiveExecutor(PacketStreamExecutor):
         payload.update(learned_policy_evaluated=True,source_motion_and_gripper_stream_retained=False,
             source_numeric_controller_settings_retained=False,source_actions_used_for_control=False,
             synchronous_inference=True,real_time_evaluated=False)
+        if self.approach is not None:
+            payload.update(approach_guard=self.approach_plan,policy_postprocessing=True,
+                unmodified_model_actions=False,visual_guidance=True,simulator_target_state_used=False,
+                standalone_policy_evaluation=False)
         if self.vertical is not None:
             payload.update(learned_policy_evaluated=False,model_inference_used=True,
                 source_actions_used_for_control=True,vertical_diagnostic=self.vertical,
@@ -130,6 +155,9 @@ class LiveExecutor(PacketStreamExecutor):
         return payload
 
     def save_progress(self):
+        if self.approach is not None:
+            path=self.root/'approach_guard_events.json';tmp=path.with_suffix('.tmp')
+            tmp.write_text(json.dumps(self.approach_events,indent=2,allow_nan=False)+'\n');tmp.replace(path)
         for name,value in [('policy_timing.json',self.timing),('packet_requests.json',self.packets),
                            ('cartesian_packet_execution.json',self.payload())]:
             path=self.root/name;tmp=path.with_suffix('.tmp');tmp.write_text(json.dumps(value,indent=2,allow_nan=False)+'\n');tmp.replace(path)
