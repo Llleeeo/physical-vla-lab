@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Repair CPU test import isolation
+
+- Actions runs 71 and 72 failed during test collection with the same missing diagnostic-script import. Local checks had included an extra `scripts` search path.
+- Move the unchanged position-distance helper into a NumPy-only source module and import it from the diagnostic and its unit test. Keep CI search paths and checks intact.
+- Require the complete workflow suite in a clean tracked-file export before publication; all 404 CPU tests, dependency checks and staged publication audit pass.
+
 ## 2026-10-31 — Camera control reviewed; bounded refinement prepared
 
 - Verify 8 intervals/24 callbacks in optional formal camera mode, but no short-motion improvement; retain legacy default. Initial wrist image mismatch worsens.

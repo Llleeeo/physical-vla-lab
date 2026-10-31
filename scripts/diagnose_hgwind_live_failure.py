@@ -13,13 +13,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT/'src'), str(ROOT/'scripts')]
 from analyze_hgwind_effort_probe import control_contact_arrays
 from capstone_vla.hf_archive import sha256
+from capstone_vla.ball_input_metrics import position_change_mm
 
 DEFAULT = ROOT/'data/derived/hgwind_traj18_development_20261031/training_runs/20261031_121355_529372/closed_loop_runs/20261031_125333_149097'
 FRAMES = [0, 8, 20, 40, 60, 80, 100, 104]
-
-
-def position_change_mm(a, b):
-    return np.linalg.norm(np.asarray(a)-np.asarray(b), axis=-1)*1000.
 
 
 def transitions(values):

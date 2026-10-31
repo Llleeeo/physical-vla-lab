@@ -2,7 +2,7 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 from capstone_vla.ball_camera_protocol import CLAMP_KEYS, RESET_KEY, formal_capture, validated_clamps
-from diagnose_hgwind_live_failure import position_change_mm
+from capstone_vla.ball_input_metrics import position_change_mm
 
 
 def test_position_change_units():
