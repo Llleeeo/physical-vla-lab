@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-31 — Full-episode noise comparison prepared
+
+Add independent/shared Gaussian noise replanning across269 expert-input frames and eight predeclared seeds, retaining10 integration steps. Verify prior predictions, terminal padding and source provenance. Report boundary versus within-chunk increment errors, startup bias and jaw timing; no model/controller change or automatic promotion.
+
 ## 2026-10-31 — Sampling diagnostic verified; retain10 steps
 
 - Verify source hashes, exact repeatability and recomputed prediction metrics.

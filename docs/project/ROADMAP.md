@@ -1,5 +1,9 @@
 # Research roadmap
 
+## 31 October 2026 — Full-stream temporal-noise comparison prepared
+
+The [noise replanning diagnostic](BALL_NOISE_REPLANNING.md) is ready for a user-run GPU check. Compare all eight predeclared seed pairs over269 expert-observation frames, including boundary/within-chunk increments and startup/jaw error. This tests temporal sampling correlation; shared noise can preserve sample bias and relative-slot effects. No new optimizer steps or physics rollout. GPU results pending.
+
 ## 31 October 2026 — More denoising steps worsen this matched probe
 
 The fixed-input diagnostic completes at12 anchors with8 matched draws per condition. All recorded hashes verify and pooled position decompositions/action metrics recompute exactly. Identical-noise repeats and archived parent predictions match exactly (maximum difference0). This supports genuine noise sensitivity rather than nondeterminism for these checked calls.

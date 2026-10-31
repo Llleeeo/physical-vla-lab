@@ -1,5 +1,9 @@
 # Results and limitations
 
+## 31 October 2026 — Noise replanning implementation
+
+The [full-episode diagnostic](BALL_NOISE_REPLANNING.md) has CPU checks for provenance, exact model normalization, terminal padding, paired seeds and increment/jaw accounting. It reuses the verified10-step sampler and checks previous generated references during GPU execution. GPU results remain pending; no prediction or grasp improvement is established.
+
 ## 31 October 2026 — More denoising steps worsen this matched probe
 
 The fixed-input diagnostic completes at12 anchors with8 matched draws per condition. All recorded hashes verify and pooled position decompositions/action metrics recompute exactly. Identical-noise repeats and archived parent predictions match exactly (maximum difference0). This supports genuine noise sensitivity rather than nondeterminism for these checked calls.
