@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-31 — Matched float64 labels pass physical grasp
+
+- Independently verify 319 complete intervals/957 callbacks, full action-boundary and initialization gates, 2.483 s bilateral contact, 57.768 mm retained lift, 0.211 mm relative jitter and no assistance. All 15 core arrays through the first 180 frames match the successful teacher exactly.
+- Preserve the unused native FSM failure label; independent physical checks pass, official benchmark/VLA success remains unverified. One matched pair supports quantization sensitivity, not model robustness. Next inspect contact-stage control sensitivity before float32 training. Analysis/docs only; no GPU, rendering or runtime changes.
+
 ## 2026-10-31 — One matched precision diagnostic prepared
 
 - Add opt-in `--precision-control`, reconstruct original float64 labels and preserve baseline quaternion hemispheres; require exact roundtrip to the pinned failed float32 stream. Verify source/controller/patch hashes and original-label reconstruction again at runtime. Default float32 execution remains unchanged.

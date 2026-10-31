@@ -2,6 +2,18 @@
 
 Snapshot: **2026-10-31, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Matched precision result: float64 reference grasps successfully
+
+The matched float64-label run completes all 319 intervals and 957 physics callbacks safely. Initialization and full decoded motor-boundary audits pass. Independent raw HDF5 recomputation verifies 2.483 s continuous bilateral contact, at least 57.768 mm final lift, 0.211 mm relative-position jitter and no grasp assistance. All 15 core arrays match the successful teacher through the first 180 recorded frames, including the previous float32 failure window. Selected arm/EE/object state arrays first differ exactly at frame 217; this is not whole-episode exact replay.
+
+The pinned float32 run stops after 179 complete intervals on motion feasibility. The matched pair supports sensitivity to upper-label quantization in this exposed execution chain. It does not establish repeatability, tolerance to model errors or a general benefit from changing model precision. Source labels, decoder, quaternion hemispheres, initialization, fixed gains, posture, safety callbacks and collector patch were controlled; original float64 labels round exactly to the failed float32 input.
+
+The collector still prints `status=failed` and stores `failed_00000`: its unused native task FSM records `episode_timeout: Grasp not started` with zero skill steps. The packet executor intentionally bypasses online task/skill decisions. Preserve that original label and distinguish it from the independent contact/lift/retention pass; this is not official benchmark success or a VLA result.
+
+**Next:** inspect contact-stage feedback and effort response to small state/action differences, then establish stable float32 execution before cohort conversion or training. Float64 success is a diagnostic reference, not the deployment solution. No further simulation, rendering or controller tuning was launched for this analysis.
+
+[Source-hashed result](../../results/summaries/2026-10-31-precision-control-result.json). The 353 CPU checks belong to the implementation milestone; this result milestone recomputes raw evidence, boundary audits and input/dependency hashes.
+
 ## Initialized29D surrogate: initialization passes, contact-stage execution fails
 
 The initialized29D surrogate now verifies startup force/gain alignment but stops after179 complete intervals (180 recorded frames) of319. All180 issued command-boundary fields and jaw targets match the decoded action prefix; full-stream interface flags remain false because the run aborts. First contact166 and bilateral contact170 match the successful teacher. EE error exceeds0.01mm at172 and grows from0.0031mm at171 to4.3217mm at179. Native safety rejects the next command after joint5 reaches-2.8248rad/s against the2.61rad/s limit; required braking also conflicts with acceleration/jerk bounds. Independent grasp fails without sustained lift. This is an expert-labelled interface diagnostic, not learned-policy inference.
@@ -10,7 +22,7 @@ Read-only recomputation checks the original raw HDF5 contact evidence, pinned so
 
 Through the observed prefix, nonnumeric settings/callbacks/posture match teacher inputs; numeric differences are small float representation changes (maximum position-component difference0.000237mm), with equivalent quaternion sign changes. That excludes a large input-field discrepancy in this prefix, but does not identify a unique cause of contact divergence. The native fifth-joint limit remains2.61rad/s and has not been relaxed.
 
-**Next proposed control:** preserve initialized packet execution and use original double-precision upper labels with the same quaternion hemisphere convention. This tests sensitivity to float32 conversion without changing gains, force, safety limits or scene. It is now implemented with353 passing CPU checks, SDK parsing and actual native-entry/label-loading preflight. Physical efficacy is pending. An exact-label replay success would still not establish robustness to learned-policy errors.
+**Next proposed control:** preserve initialized packet execution and use original double-precision upper labels with the same quaternion hemisphere convention. This tests sensitivity to float32 conversion without changing gains, force, safety limits or scene. It is now implemented with353 passing CPU checks, SDK parsing and actual native-entry/label-loading preflight. The user-run physical result now passes; see the matched precision result above. An exact-label replay success would still not establish robustness to learned-policy errors.
 
 [Source-hashed result](../../results/summaries/2026-10-31-initialized-contract-result.json). No new simulator/render job or runtime code change by agent. The previously passed338 CPU checks belong to interface preparation; this milestone rechecks existing artifacts.
 

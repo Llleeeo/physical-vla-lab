@@ -10,9 +10,21 @@ The original `initialization_report.json` is preserved. Its `interface=false` re
 
 The338 portable CPU checks and actual scene/entry preflight were preparation evidence. The command below describes the already completed run; repeating it without a new controlled change is not the next experiment.
 
+## Matched precision result — 31 October
+
+The matched float64-label run completes all 319 intervals and 957 physics callbacks safely. Initialization and full decoded motor-boundary audits pass. Independent raw HDF5 recomputation verifies 2.483 s continuous bilateral contact, at least 57.768 mm final lift, 0.211 mm relative-position jitter and no grasp assistance. All 15 core arrays match the successful teacher through the first 180 recorded frames, including the previous float32 failure window. Selected arm/EE/object state arrays first differ exactly at frame 217; this is not whole-episode exact replay.
+
+The pinned float32 run stops after 179 complete intervals on motion feasibility. The matched pair supports sensitivity to upper-label quantization in this exposed execution chain. It does not establish repeatability, tolerance to model errors or a general benefit from changing model precision. Source labels, decoder, quaternion hemispheres, initialization, fixed gains, posture, safety callbacks and collector patch were controlled; original float64 labels round exactly to the failed float32 input.
+
+The collector still prints `status=failed` and stores `failed_00000`: its unused native task FSM records `episode_timeout: Grasp not started` with zero skill steps. The packet executor intentionally bypasses online task/skill decisions. Preserve that original label and distinguish it from the independent contact/lift/retention pass; this is not official benchmark success or a VLA result.
+
+**Next:** inspect contact-stage feedback and effort response to small state/action differences, then establish stable float32 execution before cohort conversion or training. Float64 success is a diagnostic reference, not the deployment solution. No further simulation, rendering or controller tuning was launched for this analysis.
+
+[Result and hashes](../../results/summaries/2026-10-31-precision-control-result.json).
+
 ## Matched precision control prepared — 31 October
 
-A single original-double-precision label control is now implemented and CPU checked. The physical result is pending. It keeps the existing decoder, initialized fresh60 process, scene, fixed gains, posture, callbacks and safety limits. It reconstructs the original numeric labels before float32 rounding, with the same quaternion hemisphere choices as the failed float32 run. Casting all319×29 values back to float32 must reproduce that run's action array exactly; widening previously rounded float32 values is rejected.
+A single original-double-precision label control is now implemented and CPU checked. The user-run physical result now passes as documented above; this command is retained for provenance, not an instruction for an unchanged retry. It keeps the existing decoder, initialized fresh60 process, scene, fixed gains, posture, callbacks and safety limits. It reconstructs the original numeric labels before float32 rounding, with the same quaternion hemisphere choices as the failed float32 run. Casting all319×29 values back to float32 must reproduce that run's action array exactly; widening previously rounded float32 values is rejected.
 
 ```bash
 cd /home/robophys/Capstone_Project_Yuan_Haoming
