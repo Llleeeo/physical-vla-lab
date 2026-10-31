@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-31 — Shared-noise comparison verified; no adoption
+
+- Verify all16 complete prediction streams and source hashes; shared noise worsens mean near-contact position and jaw switching while barely changing increment error.
+- Retain existing inference and reject best-seed selection. Record structural20-target/four-executed-action supervision counts as a hypothesis for a bounded training ablation, not a proven cause.
+
 ## 2026-10-31 — Full-episode noise comparison prepared
 
 Add independent/shared Gaussian noise replanning across269 expert-input frames and eight predeclared seeds, retaining10 integration steps. Verify prior predictions, terminal padding and source provenance. Report boundary versus within-chunk increment errors, startup bias and jaw timing; no model/controller change or automatic promotion.

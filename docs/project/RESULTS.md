@@ -1,5 +1,16 @@
 # Results and limitations
 
+## 31 October 2026 — Shared noise does not reliably improve the full stream
+
+All eight seed pairs complete (16 full269-frame expert-input streams). Source/config/array hashes verify and every stream metric recomputes exactly in the original model environment. Prior generated references match with maximum difference0.
+
+Across seeds, independent→shared near-contact position mean is20.28→21.57mm (3 improve,5 worsen); expert-relative increment mean is21.10→20.90mm, only0.95% lower on average. Boundary increment residual is23.89→23.34mm; within-chunk residual is20.17→20.09mm. Mean per-run full position p95 rises161.36→167.42mm, jaw errors4.50→4.625frames and jaw transitions2.0→2.5. Orientation p95 improves3.73→3.42degrees on average but worsens in3 pairs. Native decoder rejection is zero throughout. Startup0..39 position mean is141.62→144.50mm. These are predicted-command statistics, not robot motion.
+
+Do not adopt shared noise or select a favorable seed for a success claim. This particular correlation scheme is not a reliable fix. The evidence does not rule out other sampling methods or prove the cause of physical failure; stop extending this sampling sweep and retain the original10-step independent-noise behavior.
+
+A read-only supervision audit confirms uniform observation-anchor sampling with20 future targets, while live execution consumes four before replanning. Over one pass through all269 anchors, the first four relative offsets contribute1,070 of5,190 valid label occurrences (20.62%). Absolute action0 appears once, action19 twenty times. These are structural label counts, not exact optimizer-gradient weights, and long-horizon supervision is intentional rather than a code defect. Next proposed bounded training ablation emphasizes the executed prefix while preserving longer-horizon learning, and audits startup/near-contact, jaw and pose performance together. It is a hypothesis, not an established remedy; no new training or physics is launched here. [Source-hashed evidence](../../results/summaries/2026-10-31-ball-noise-replanning-result.json).
+
+
 ## 31 October 2026 — Noise replanning implementation
 
 The [full-episode diagnostic](BALL_NOISE_REPLANNING.md) has CPU checks for provenance, exact model normalization, terminal padding, paired seeds and increment/jaw accounting. It reuses the verified10-step sampler and checks previous generated references during GPU execution. GPU results remain pending; no prediction or grasp improvement is established.

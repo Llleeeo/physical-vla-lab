@@ -1,0 +1,176 @@
+{
+  "status": "verified_completed_offline_development",
+  "source_run": "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/noise_replanning_diagnostics/20261031_150546_311797",
+  "source_hashes": {
+    "report.json": "0662a2c73854eeda09ccb3e5057b9960dccd388c0df06728afe8d330976912c5",
+    "run_config.json": "b6e0037418ade2e2fcc71d9fd74d5426e26a2fa1bf9a021981b30870c6c00143",
+    "predictions.npz": "248ffec0d1049ca61f17273f20bc918bdddc0c83ee6adb4b68fe9137e5580e0e"
+  },
+  "paired_metrics": {
+    "approach_position_mean_mm": {
+      "independent_mean": 58.62282542511821,
+      "shared_mean": 60.6336435303092,
+      "shared_minus_independent": [
+        -5.515031516551971,
+        14.04440775513649,
+        1.6674883663654327,
+        8.621200919151306,
+        0.7712766528129578,
+        -4.005815833806992,
+        12.510187923908234,
+        -12.007169425487518
+      ],
+      "improved_seed_pairs": 3,
+      "unchanged_seed_pairs": 0,
+      "worsened_seed_pairs": 5
+    },
+    "precontact_80_119_mean_mm": {
+      "independent_mean": 20.281212529422145,
+      "shared_mean": 21.574969521823157,
+      "shared_minus_independent": [
+        3.551862015707375,
+        13.186612644370253,
+        -3.605285039157504,
+        0.597853360744022,
+        0.0010399105930929409,
+        -2.458818238892974,
+        4.87890218833725,
+        -5.802110902493435
+      ],
+      "improved_seed_pairs": 3,
+      "unchanged_seed_pairs": 0,
+      "worsened_seed_pairs": 5
+    },
+    "precontact_increment_error_mm": {
+      "independent_mean": 21.102118890523826,
+      "shared_mean": 20.901243571108182,
+      "shared_minus_independent": [
+        -4.392260748710633,
+        4.7820071798900905,
+        -0.6905322297647842,
+        8.164667575754319,
+        -3.5266789660051856,
+        -2.449691008013641,
+        -0.9154391256607504,
+        -2.57907523281456
+      ],
+      "improved_seed_pairs": 6,
+      "unchanged_seed_pairs": 0,
+      "worsened_seed_pairs": 2
+    },
+    "full_position_p95_mm": {
+      "independent_mean": 161.36322000036174,
+      "shared_mean": 167.4198506895588,
+      "shared_minus_independent": [
+        -27.477816818856667,
+        23.34243593401206,
+        15.818951829086473,
+        29.63019923211553,
+        4.041666432429281,
+        -25.198302531680014,
+        69.53465234863,
+        -41.23874091216001
+      ],
+      "improved_seed_pairs": 3,
+      "unchanged_seed_pairs": 0,
+      "worsened_seed_pairs": 5
+    },
+    "orientation_p95_deg": {
+      "independent_mean": 3.7288505526335998,
+      "shared_mean": 3.4195675185764416,
+      "shared_minus_independent": [
+        -0.27578174268917444,
+        -1.178936800818208,
+        0.6707576648411782,
+        0.7047636795953602,
+        -1.1308580182057706,
+        0.2067673039232356,
+        -0.24421440873840083,
+        -1.2267619503654825
+      ],
+      "improved_seed_pairs": 5,
+      "unchanged_seed_pairs": 0,
+      "worsened_seed_pairs": 3
+    },
+    "gripper_error_frames": {
+      "independent_mean": 4.5,
+      "shared_mean": 4.625,
+      "shared_minus_independent": [
+        -1,
+        1,
+        2,
+        0,
+        0,
+        0,
+        -1,
+        0
+      ],
+      "improved_seed_pairs": 2,
+      "unchanged_seed_pairs": 4,
+      "worsened_seed_pairs": 2
+    },
+    "gripper_transitions": {
+      "independent_mean": 2.0,
+      "shared_mean": 2.5,
+      "shared_minus_independent": [
+        0,
+        2,
+        0,
+        2,
+        0,
+        4,
+        -4,
+        0
+      ],
+      "improved_seed_pairs": 1,
+      "unchanged_seed_pairs": 4,
+      "worsened_seed_pairs": 3
+    },
+    "native_rejected_frames": {
+      "independent_mean": 0.0,
+      "shared_mean": 0.0,
+      "shared_minus_independent": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "improved_seed_pairs": 0,
+      "unchanged_seed_pairs": 8,
+      "worsened_seed_pairs": 0
+    }
+  },
+  "prior_reference_max_abs": 0.0,
+  "near_boundary_increment_error_mm": {
+    "independent": 23.891632226728184,
+    "shared": 23.33668948130271
+  },
+  "near_within_increment_error_mm": {
+    "independent": 20.17228111178904,
+    "shared": 20.089428267710005
+  },
+  "startup_position_mean_mm": {
+    "independent": 141.61902510405633,
+    "shared": 144.49843315259648
+  },
+  "verification": "All recorded source/config/array hashes verified; all16 complete stream metric dictionaries recomputed exactly in the original model environment. Native decoder rejects zero for all streams; no physical execution.",
+  "supervision_audit": {
+    "chunk_size": 20,
+    "execution_prefix": 4,
+    "valid_prefix_label_occurrences": 1070,
+    "all_valid_label_occurrences": 5190,
+    "prefix_fraction": 0.20616570327552985,
+    "action0_occurrences": 1,
+    "action19_occurrences": 20,
+    "interpretation": "Structural counts over one pass through all observation anchors; not measured optimizer-gradient contributions. Longer-horizon supervision is intentional and not itself a bug."
+  },
+  "decision": "Do not adopt shared noise or select best seed. Retain original10-step independent-noise inference. Next proposed bounded training ablation aligns supervision emphasis with the first four executed actions, while preserving later-horizon supervision and checking startup, near-contact, jaw and pose errors. Causality of supervision imbalance is unproven.",
+  "training": false,
+  "physics": false,
+  "heldout": false,
+  "task_success_verified": false
+}
