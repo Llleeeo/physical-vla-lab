@@ -2,6 +2,10 @@
 
 Snapshot: **2026-10-31, Asia/Hong_Kong**. These are development observations, not a benchmark leaderboard or a paper's final test results.
 
+## Current priority: one passing ball case through the model pipeline
+
+The development bridge for `local/traj_00018` now verifies269 synchronized60Hz frames, bit-exact successful float32 action labels, source/teacher/render state equality and calibrated30D robot state. Official pretrained weights load with action29/state30 on CPU; normalization, image/language preprocessing and loss-padding gradients pass. These are data/model-interface checks, not trained-policy results. GPU fine-tuning and live policy integration are pending. Use this deliberately selected passing case to advance the pipeline while retaining the following failures as known defects. [Details](BALL_DEVELOPMENT_TRAINING.md).
+
 ## Single-drive control: early motion reduced, full grasp still fails
 
 The [single-drive run](MIMIC_DRIVE_CONTROL.md#observed-result--31-october) verifies the intervention and all214 issued decoded fields, but completes213/319 intervals before a joint5 velocity/braking-feasibility abort. Bilateral contact lasts0.533s; sustained lift fails. Contact is delayed200ms, so reanalysis uses each run's first150ms after bilateral contact: maximum absolute joint5 velocity2.032→0.637rad/s and secant acceleration328.58→34.91rad/s². Later measured velocity-2.625rad/s still differs from model-predicted-0.770rad/s. This one exposed pair does not establish a robust fix or mechanism. Keep default settings; inspect the remaining contact-stage response mismatch. [Source-hashed result](../../results/summaries/2026-10-31-single-drive-result.json).

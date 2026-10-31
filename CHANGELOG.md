@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Passed ball case connected to development training
+
+- Prioritize a complete learned-policy pipeline using exposed `local/traj_00018`, whose expert and float32 surrogate already pass. Keep the other case's contact/safety defects unresolved; no controller limits or dynamics changed.
+- Add a source-hashed269-frame RGB/state30/absolute-action29 adapter and bounded pretrained fine-tuning entry. Verify teacher/source/render identity, causal frame mapping, calibrated pinch state, exact successful action labels, endpoint padding and model normalizers on CPU.
+- Existing official weights load with the new dimensions; image/language preprocessing and29-channel masked gradients pass without CUDA. GPU optimization, action prediction and learned simulator grasp remain pending. [Run and limitations](docs/project/BALL_DEVELOPMENT_TRAINING.md).
+
 ## 2026-10-31 — Single-drive result inspected
 
 - Verify exact float32 actions, runtime fingerprints, initial setup, follower-drive intervention, all214 issued action/jaw fields and independent raw contact/lift evidence. Execution reaches213/319 intervals before a joint5 speed/braking-feasibility abort; grasp fails without sustained lift.

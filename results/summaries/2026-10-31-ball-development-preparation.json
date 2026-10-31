@@ -1,0 +1,63 @@
+{
+  "schema": "physical-vla-lab.ball-development-preparation.v1",
+  "date": "2026-10-31",
+  "episode": "local/traj_00018",
+  "purpose": "deliberately_selected_passing_case_pipeline_integration",
+  "frames": 269,
+  "fps": 60,
+  "action_dim": 29,
+  "state_dim": 30,
+  "absolute_actions": true,
+  "source_teacher_and_render_core_arrays_exact": true,
+  "float32_labels_exact_to_passing_surrogate": true,
+  "pinch_calibration_offset_local_m": [
+    2.1923438424507983e-07,
+    -7.46441308355246e-07,
+    0.01229896477845013
+  ],
+  "RGB_source": "existing_original_60Hz_HDF5_opst_and_wrist",
+  "new_rendering": false,
+  "privileged_object_observation": false,
+  "upstream_commit": "434dc7105cf6d559018d15af5fecbcdad44f036e",
+  "official_pretrained_CPU_load_passed": true,
+  "normalizers_verified_exact": true,
+  "model_input_state_shape": [
+    2,
+    32
+  ],
+  "model_input_action_shape": [
+    2,
+    20,
+    32
+  ],
+  "language_token_count": 154,
+  "padding_gradient_check": "valid_first29_channels_only",
+  "portable_CPU_tests_passed": 374,
+  "focused_CPU_tests_passed": 22,
+  "CUDA_initialized": false,
+  "model_forward_executed": false,
+  "optimizer_steps_executed": 0,
+  "prepared_training_steps": 200,
+  "batch_size": 2,
+  "learning_rate": 0.0001,
+  "heldout_evaluation": false,
+  "learned_grasp_verified": false,
+  "live29D_policy_adapter_implemented": false,
+  "source_evidence_summary_sha256": "877af96293c76e5164bb6fc28f7e397a742e1a18738b6bad8c03ee8c4dfec927",
+  "dataset_manifest_sha256": "ba66f929cf97b6e5f8f4130adce40b0f9e9398f63397cb0e5a09a31f6d560fe2",
+  "source_hashes": {
+    "src/capstone_vla/hgwind_development_data.py": "78b008548670cc232f15e6036c2eefbed104225e02d4d687c632ac254f5e367d",
+    "scripts/prepare_hgwind_development.py": "1cab0f87653c0c2f138f07f7de6945ee1fac32c384420957482271e739ff5562",
+    "scripts/finetune_hgwind_development.py": "feaf1fae6f27b77558c97897bc01f519c2001d115fe2f465d2bef4395bad9afe",
+    "tests/test_hgwind_development_data.py": "b132178f66f0723fb9bdc0ac9fadb00ce532bc93fd9bd31a13264907e223c357",
+    "src/capstone_vla/ball_action_contract.py": "26c0c97e3a31f27935bdb7542f47fb8d92de9ba6d9778eb6d0212f3ad389ee1b",
+    "scripts/smoke_task2_pretrained.py": "184f1f611314154c015e814bacbcda2be1c981f4ffb4d91b3a9d41e3f1da78be",
+    "src/capstone_vla/pilot_dataset.py": "458ec70d77bbcb7ae445ef056e11394f9e510e630baec7c45fd9a9328882b26f"
+  },
+  "limitations": [
+    "One exposed episode only; no generalization or robustness estimate.",
+    "Other-case contact/safety issues remain unresolved; controller and limits unchanged.",
+    "Other stored ball trajectories lack the complete upper-command labels.",
+    "GPU optimization, sampled-action inspection and live model execution remain pending."
+  ]
+}
