@@ -1,5 +1,9 @@
 # Results and limitations
 
+## 31 October 2026 — Near-capture depth0 still fails
+
+Run182809 completes185/269 intervals: contact L144/R151,185, no bilateral contact, joint6 speed2.8281rad/s exceeds2.61. Raw-model upward target and reactivated approach floor explain the visible early lift; these do not prove the entire motor-abort cause. A separate geometry-triggered dwell/depth5mm candidate passes saved-input checks; new physics pending. [Protocol and evidence](BALL_VISUAL_APPROACH.md).
+
 ## 31 October 2026 — Near-capture progress and unresolved contact stability
 
 Follow run180308 achieves first bilateral contact158 but aborts after167 completed intervals with joint5 speed-2.8223rad/s (bound-2.61); no sustained lift. Missing wrist localization and approximately10cm reacquisition goal jumps are verified. New opt-in RGB/recovery repair restores28 saved-frame estimates (mean1.737mm/max3.228mm offline error), removes the two raw-goal release jumps in frozen replay and preserves jaw commands. New physical grasp/stability result remains pending. [Details](BALL_VISUAL_APPROACH.md) · [Evidence](../../results/summaries/2026-10-31-ball-near-capture-preflight.json).

@@ -113,7 +113,12 @@ class NearCaptureGuard(FollowingApproachGuard):
                 recovery.update(depth_shift_m=float(before-result[2]),sphere_bottom_proxy_floor_m=floor)
             if self.blending and self.previous_output is not None:
                 previous=self.previous_output;delta=result[:3]-previous[:3];distance=float(np.linalg.norm(delta))
-                if distance>SETTINGS['recovery_translation_step_m']:
+                if 'capture_window' in self.plan:
+                    # Vertical recovery must not consume the horizontal follow budget.
+                    xy=float(np.linalg.norm(delta[:2]));limit_xyz=SETTINGS['recovery_translation_step_m']
+                    result[:2]=previous[:2]+delta[:2]*min(1.,limit_xyz/max(xy,1e-12))
+                    result[2]=previous[2]+np.clip(delta[2],-limit_xyz,limit_xyz)
+                elif distance>SETTINGS['recovery_translation_step_m']:
                     result[:3]=previous[:3]+delta*SETTINGS['recovery_translation_step_m']/distance
                 qa=Rotation.from_quat(previous[[4,5,6,3]]);qb=Rotation.from_quat(result[[4,5,6,3]])
                 rv=(qa.inv()*qb).as_rotvec();angle=float(np.linalg.norm(rv));limit=np.radians(SETTINGS['recovery_rotation_step_deg'])

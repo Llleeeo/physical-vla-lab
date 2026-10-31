@@ -25,3 +25,13 @@ def test_only_named_legacy_analyzer_can_be_revised(tmp_path):
     other=tmp_path/'controller.py';other.write_text('unchanged')
     with pytest.raises(ValueError):module.verify_analysis_revision(other,module.LEGACY_APPROACH_ANALYZER_SHA256,{})
     with pytest.raises(ValueError):module.verify_analysis_revision(module.__file__,'not-an-approved-original',{})
+
+
+def test_nonlinear_fit_roundoff_only_with_explicit_near_capture_tolerance():
+    old={'valid':True,'velocity':[.01]};new=copy.deepcopy(old);new['velocity'][0]+=6e-12
+    with pytest.raises(ValueError):module.audit_approach_value(old,new)
+    module.audit_approach_value(old,new,atol=module.NEAR_CAPTURE_AUDIT_ATOL)
+    new['velocity'][0]+=.000001
+    with pytest.raises(ValueError):module.audit_approach_value(old,new,atol=module.NEAR_CAPTURE_AUDIT_ATOL)
+    with pytest.raises(ValueError):module.audit_approach_value(True,False,atol=module.NEAR_CAPTURE_AUDIT_ATOL)
+    module.verify_analysis_revision(module.__file__,module.NEAR_CAPTURE_ANALYZER_SHA256,{})

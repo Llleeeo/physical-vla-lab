@@ -1,0 +1,426 @@
+{
+  "status": "CPU_CAPTURE_WINDOW_PREVIEW_PASS",
+  "frames": 186,
+  "plan": {
+    "settings": {
+      "schema": "physical-vla-lab.visual-approach.v1",
+      "alignment_tolerance_m": 0.01,
+      "localization_margin_m": 0.015,
+      "surface_margin_m": 0.01,
+      "reaction_s": 0.12,
+      "control_hz": 60,
+      "jaw_threshold_unchanged": 0.5,
+      "missing_view": "latched_pose_hold",
+      "maximum_visual_jump_m": 0.04
+    },
+    "ball_radius_m": 0.022516662578662066,
+    "finger_bounds": [
+      {
+        "path": "/Root/Dynamics/franka/panda_leftfinger",
+        "local_corners_m": [
+          [
+            -0.012350458059981714,
+            -0.001553534071009845,
+            0.00013332432956858487
+          ],
+          [
+            -0.012350458059981714,
+            -0.001553534071009845,
+            0.05389989235497977
+          ],
+          [
+            -0.012350458059981714,
+            0.027815256645921615,
+            0.00013332432956858487
+          ],
+          [
+            -0.012350458059981714,
+            0.027815256645921615,
+            0.05389989235497977
+          ],
+          [
+            0.012351117287494329,
+            -0.001553534071009845,
+            0.00013332432956858487
+          ],
+          [
+            0.012351117287494329,
+            -0.001553534071009845,
+            0.05389989235497977
+          ],
+          [
+            0.012351117287494329,
+            0.027815256645921615,
+            0.00013332432956858487
+          ],
+          [
+            0.012351117287494329,
+            0.027815256645921615,
+            0.05389989235497977
+          ]
+        ]
+      },
+      {
+        "path": "/Root/Dynamics/franka/panda_rightfinger",
+        "local_corners_m": [
+          [
+            -0.012350459343743278,
+            -0.02781529258792621,
+            0.00013332450440617372
+          ],
+          [
+            -0.012350459343743278,
+            -0.02781529258792621,
+            0.05389996303400846
+          ],
+          [
+            -0.012350459343743278,
+            0.0015535340106355153,
+            0.00013332450440617372
+          ],
+          [
+            -0.012350459343743278,
+            0.0015535340106355153,
+            0.05389996303400846
+          ],
+          [
+            0.012351118571177766,
+            -0.02781529258792621,
+            0.00013332450440617372
+          ],
+          [
+            0.012351118571177766,
+            -0.02781529258792621,
+            0.05389996303400846
+          ],
+          [
+            0.012351118571177766,
+            0.0015535340106355153,
+            0.00013332450440617372
+          ],
+          [
+            0.012351118571177766,
+            0.0015535340106355153,
+            0.05389996303400846
+          ]
+        ]
+      }
+    ],
+    "cameras": [
+      {
+        "name": "wrist_cam",
+        "prim_path": "/Root/Dynamics/SensorRig/RobotCameras/wrist_cam/color",
+        "intrinsics": [
+          [
+            317.0431199837856,
+            0,
+            320
+          ],
+          [
+            0,
+            317.0431199837856,
+            240
+          ],
+          [
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      {
+        "name": "opst_cam",
+        "prim_path": "/Root/Dynamics/SensorRig/ManualEnvironmentCameras/opst_cam/color",
+        "intrinsics": [
+          [
+            317.0431199837856,
+            0,
+            320
+          ],
+          [
+            0,
+            317.0431199837856,
+            240
+          ],
+          [
+            0,
+            0,
+            1
+          ]
+        ]
+      }
+    ],
+    "follow": {
+      "schema": "physical-vla-lab.visual-follow.v1",
+      "history_frames": 7,
+      "maximum_horizontal_distance_m": 0.08,
+      "maximum_fit_residual_m": 0.004,
+      "maximum_ball_speed_m_s": 0.5,
+      "control_hz": 60
+    },
+    "near_capture": {
+      "settings": {
+        "schema": "physical-vla-lab.near-capture.v1",
+        "minimum_arc_degrees": 210.0,
+        "maximum_tangent_p90_m": 0.002,
+        "maximum_external_ray_gap_m": 0.005,
+        "maximum_range_m": 0.35,
+        "recovery_translation_step_m": 0.003,
+        "recovery_rotation_step_deg": 1.0,
+        "minimum_clearance_above_ball_bottom_m": 0.01
+      },
+      "extra_depth_m": 0.005
+    },
+    "capture_window": {
+      "schema": "physical-vla-lab.capture-window.v1",
+      "maximum_frames": 42,
+      "entry_horizontal_m": 0.01,
+      "entry_height_above_center_m": 0.012,
+      "exit_horizontal_radius_margin_m": 0.005,
+      "minimum_bottom_clearance_m": 0.01
+    }
+  },
+  "active_frames": [
+    130,
+    131,
+    132,
+    133,
+    134,
+    135,
+    137,
+    138,
+    139,
+    140,
+    141,
+    142,
+    143,
+    144,
+    145,
+    146,
+    150,
+    151,
+    152,
+    153,
+    154,
+    155,
+    156,
+    157,
+    158,
+    159,
+    160,
+    161,
+    162,
+    163,
+    164,
+    165,
+    166,
+    167,
+    168,
+    169,
+    170,
+    171
+  ],
+  "selected_frames": {
+    "132": {
+      "original_goal_z_m": 0.015561740845441818,
+      "candidate_goal_z_m": 0.010561740845441817,
+      "measured_z_m": 0.03351335600018501,
+      "window": {
+        "active": true,
+        "started_frame": 130,
+        "reason": "bounded_capture_dwell",
+        "extra_depth_m": 0.005,
+        "elapsed_frames": 2,
+        "maximum_frames": 42,
+        "capture_corridor_m": 0.017516662578662065,
+        "height_cap_m": 0.010561740845441817,
+        "sphere_bottom_proxy_floor_m": 0.007225372363644756,
+        "base_height_floor_suspended": false
+      }
+    },
+    "135": {
+      "original_goal_z_m": 0.06221636012196541,
+      "candidate_goal_z_m": 0.01037696316456184,
+      "measured_z_m": 0.0326433889567852,
+      "window": {
+        "active": true,
+        "started_frame": 130,
+        "reason": "bounded_capture_dwell",
+        "extra_depth_m": 0.005,
+        "elapsed_frames": 5,
+        "maximum_frames": 42,
+        "capture_corridor_m": 0.017516662578662065,
+        "height_cap_m": 0.01037696316456184,
+        "sphere_bottom_proxy_floor_m": 0.010073465406094769,
+        "base_height_floor_suspended": false
+      }
+    },
+    "140": {
+      "original_goal_z_m": 0.0298739064803483,
+      "candidate_goal_z_m": 0.010444392589890937,
+      "measured_z_m": 0.02986631914973259,
+      "window": {
+        "active": true,
+        "started_frame": 130,
+        "reason": "bounded_capture_dwell",
+        "extra_depth_m": 0.005,
+        "elapsed_frames": 10,
+        "maximum_frames": 42,
+        "capture_corridor_m": 0.017516662578662065,
+        "height_cap_m": 0.01037696316456184,
+        "sphere_bottom_proxy_floor_m": 0.010444392589890937,
+        "base_height_floor_suspended": false
+      }
+    },
+    "144": {
+      "original_goal_z_m": 0.07007499600294251,
+      "candidate_goal_z_m": 0.01037696316456184,
+      "measured_z_m": 0.02903386764228344,
+      "window": {
+        "active": true,
+        "started_frame": 130,
+        "reason": "bounded_capture_dwell",
+        "extra_depth_m": 0.005,
+        "elapsed_frames": 14,
+        "maximum_frames": 42,
+        "capture_corridor_m": 0.017516662578662065,
+        "height_cap_m": 0.01037696316456184,
+        "sphere_bottom_proxy_floor_m": 0.008965634775022914,
+        "base_height_floor_suspended": true
+      }
+    },
+    "145": {
+      "original_goal_z_m": 0.06974968893034719,
+      "candidate_goal_z_m": 0.01037696316456184,
+      "measured_z_m": 0.029721111059188843,
+      "window": {
+        "active": true,
+        "started_frame": 130,
+        "reason": "bounded_capture_dwell",
+        "extra_depth_m": 0.005,
+        "elapsed_frames": 15,
+        "maximum_frames": 42,
+        "capture_corridor_m": 0.017516662578662065,
+        "height_cap_m": 0.01037696316456184,
+        "sphere_bottom_proxy_floor_m": 0.009196545467182196,
+        "base_height_floor_suspended": true
+      }
+    },
+    "150": {
+      "original_goal_z_m": 0.034180667299177174,
+      "candidate_goal_z_m": 0.010604447383844723,
+      "measured_z_m": 0.03718416020274162,
+      "window": {
+        "active": true,
+        "started_frame": 130,
+        "reason": "bounded_capture_dwell",
+        "extra_depth_m": 0.005,
+        "elapsed_frames": 20,
+        "maximum_frames": 42,
+        "capture_corridor_m": 0.017516662578662065,
+        "height_cap_m": 0.01037696316456184,
+        "sphere_bottom_proxy_floor_m": 0.010604447383844723,
+        "base_height_floor_suspended": false
+      }
+    },
+    "160": {
+      "original_goal_z_m": 0.04647369164881736,
+      "candidate_goal_z_m": 0.01037696316456184,
+      "measured_z_m": 0.054727740585803986,
+      "window": {
+        "active": true,
+        "started_frame": 130,
+        "reason": "bounded_capture_dwell",
+        "extra_depth_m": 0.005,
+        "elapsed_frames": 30,
+        "maximum_frames": 42,
+        "capture_corridor_m": 0.017516662578662065,
+        "height_cap_m": 0.01037696316456184,
+        "sphere_bottom_proxy_floor_m": 0.010164271719960021,
+        "base_height_floor_suspended": false
+      }
+    },
+    "170": {
+      "original_goal_z_m": 0.07269554382213442,
+      "candidate_goal_z_m": 0.012662218664810283,
+      "measured_z_m": 0.06399378180503845,
+      "window": {
+        "active": true,
+        "started_frame": 130,
+        "reason": "bounded_capture_dwell",
+        "extra_depth_m": 0.005,
+        "elapsed_frames": 40,
+        "maximum_frames": 42,
+        "capture_corridor_m": 0.017516662578662065,
+        "height_cap_m": 0.01037696316456184,
+        "sphere_bottom_proxy_floor_m": 0.012662218664810283,
+        "base_height_floor_suspended": true
+      }
+    },
+    "174": {
+      "original_goal_z_m": 0.06943179169743391,
+      "candidate_goal_z_m": 0.06943179169743391,
+      "measured_z_m": 0.07034412771463394,
+      "window": {
+        "active": false,
+        "started_frame": 130,
+        "reason": "finished",
+        "extra_depth_m": 0.005
+      }
+    },
+    "175": {
+      "original_goal_z_m": 0.04209156334400177,
+      "candidate_goal_z_m": 0.03709156334400177,
+      "measured_z_m": 0.07150689512491226,
+      "window": {
+        "active": false,
+        "started_frame": 130,
+        "reason": "finished",
+        "extra_depth_m": 0.005
+      }
+    }
+  },
+  "jaw_scores_unchanged": true,
+  "native_decode_rejections": 0,
+  "original_commands_reconstructed": true,
+  "physics_launched": false,
+  "grasp_result": null,
+  "scope": "Frozen observed inputs only; no future-motion or grasp claim; no object truth used",
+  "source_hashes": {
+    "report.json": "6b579e7671fdc2e8bdcbf4aa08ca0e478a2add5e4565ed45d123cd215f1145d7",
+    "run_config.json": "8db865c10f30e2d02114904360afc15919c0d957be9ec831ecabeb1b4acd12ff",
+    "live_observations.hdf5": "a033e55b24662cc78fbdfd0ee354c72b5d7628f223878bfac3fbfe7fcb903e28",
+    "approach_guard_events.json": "91c712332f7a4fa87454a785ab48281af11e27464f59454f497b2bb5767d5d14"
+  },
+  "implementation_hashes": {
+    "src/capstone_vla/ball_capture_window.py": "8ce6267c05fe2832be14db903e1c8f62ebfcdad39a0d3531883246fbfe5d2579",
+    "src/capstone_vla/ball_near_capture.py": "b7ad0aa65801aa72072f0984ed212edf652efef4b003f9e39c9c7e80a9f053f4",
+    "scripts/check_hgwind_capture_window.py": "9c10ee09067704b05f75afb9f25d7de4336323f9c218d72126bc443f533cdaa0"
+  },
+  "date": "2026-10-31",
+  "live_result": {
+    "status": "BALL_LIVE_INCOMPLETE",
+    "recorded_frames": 186,
+    "completed_intervals": 185,
+    "first_contact_frame": 144,
+    "left_contact_frames": [
+      144
+    ],
+    "right_contact_frames": [
+      151,
+      185
+    ],
+    "bilateral_frames": 0,
+    "joint6_terminal_velocity_rad_s": 2.8281,
+    "native_upper_velocity_rad_s": 2.61,
+    "extra_depth_mm": 0
+  },
+  "audit_correction": {
+    "maximum_action_roundoff": 1.7604945279359185e-12,
+    "maximum_event_roundoff": 5.6705820594693535e-12,
+    "near_capture_numeric_atol": 1e-10,
+    "discrete_decisions_exact": true,
+    "old_report_sha256": "534bda98530307720a431adb147adbc2a85af29501d459a3a2aa3a66c8caaa94"
+  },
+  "physical_result_pending": true
+}

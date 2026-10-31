@@ -1,5 +1,9 @@
 # Research roadmap
 
+## 31 October 2026 — Test explicit depth with bounded capture dwell
+
+Next user-run check enables5mm depth and a finite geometry-triggered capture window, preserving jaw decoding and native limits. This is VLA plus explicit visual/control assistance, not pure-policy generalization. Inspect actual descending depth, contact, lift and joint dynamics. Expiry is not grasp confirmation; if safety still aborts, investigate low-level contact dynamics without further threshold relaxation. [Details](BALL_VISUAL_APPROACH.md).
+
 ## 31 October 2026 — Complete the contact phase before further training
 
 Run the opt-in clipped-sphere/recovery repair with depth0 first; evaluate joint oscillation and sustained bilateral lift. A separate aligned-only5mm depth option is prepared for the user’s shallow-grasp concern. Do not raise native limits or treat visually captured ball as a completed grasp. Existing contact-stage oscillation predates reacquisition jumps, so the repair is not claimed to cure the low-level dynamics. No recollection or additional training is proposed. [Protocol](BALL_VISUAL_APPROACH.md).

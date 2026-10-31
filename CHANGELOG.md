@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-31 — Diagnose premature lift; prepare explicit deeper capture
+
+- Record zero bilateral contact and a joint6 abort in the depth0 near-capture run. Preserve the failed original numerical-audit report and complete its corrected analysis.
+- Add a finite geometry-triggered capture dwell with explicit5mm target depth, separated XY/Z recovery budgets and unchanged model jaw/native limits.
+- Validate saved inputs and CPU regressions; physical result pending, with no claim of contact confirmation.
+
 ## 2026-10-31 — Repair near-capture perception and goal recovery
 
 - Record brief bilateral contact followed by native motion-limit abort; no successful grasp claim.

@@ -27,7 +27,8 @@ TEACHER=ROOT/'data/derived/hgwind_effort_probes/20261029_220130_402255_joint_onl
 SURROGATE=ROOT/'data/derived/hgwind_action_contract_v1/20261029_220618_809794_traj_00018'
 
 
-def prepare(run,frames,prefix,camera_protocol="legacy",diagnostic_vertical=False,approach_guard=False,approach_follow=False,near_capture=False,capture_depth_mm=0):
+def prepare(run,frames,prefix,camera_protocol="legacy",diagnostic_vertical=False,approach_guard=False,approach_follow=False,near_capture=False,capture_depth_mm=0,capture_window=False):
+    require(not capture_window or (near_capture and capture_depth_mm==5),'Capture window requires --near-capture --capture-depth-mm 5')
     require(not near_capture or approach_follow,'Near capture requires --approach-follow')
     require(capture_depth_mm in (0,5) and (not capture_depth_mm or near_capture),'Depth requires near capture')
     require(not approach_follow or approach_guard,'Visual follow requires --approach-guard')
@@ -99,7 +100,7 @@ def prepare(run,frames,prefix,camera_protocol="legacy",diagnostic_vertical=False
            'src/capstone_vla/closed_loop.py','src/capstone_vla/live_policy_protocol.py',
            'src/capstone_vla/cartesian_target_replay.py','src/capstone_vla/cartesian_target_trace.py',
            'src/capstone_vla/task2_bridge.py','src/capstone_vla/franka.py']
-    names+=['src/capstone_vla/ball_near_capture.py','src/capstone_vla/ball_approach_guard.py','src/capstone_vla/ball_visual_geometry.py','src/capstone_vla/ball_approach_follow.py']
+    names+=['src/capstone_vla/ball_capture_window.py','src/capstone_vla/ball_near_capture.py','src/capstone_vla/ball_approach_guard.py','src/capstone_vla/ball_visual_geometry.py','src/capstone_vla/ball_approach_follow.py']
     paths=[ROOT/n for n in names]+native+[manifest,Path(prior['task']),Path(prior['original_depth_helper']),
         Path(prior['source']),Path(prior['source']).with_name('meta.json'),SURROGATE/'report.json',dataset/'dataset.json']
     if diagnostic_vertical:paths.append(dataset/'arrays.npz')
@@ -123,6 +124,9 @@ def prepare(run,frames,prefix,camera_protocol="legacy",diagnostic_vertical=False
         if near_capture:
             from capstone_vla.ball_near_capture import SETTINGS
             cfg['approach_guard']['near_capture']=dict(settings=dict(SETTINGS),extra_depth_m=capture_depth_mm/1000)
+        if capture_window:
+            from capstone_vla.ball_capture_window import SETTINGS as CAPTURE_SETTINGS
+            cfg['approach_guard']['capture_window']=dict(CAPTURE_SETTINGS)
         cfg['policy_postprocessing']=True
     return cfg,lab,repo
 
@@ -150,7 +154,8 @@ def main():
     p.add_argument('--approach-follow',action='store_true',help='Optional near-ball XY visual tracking; requires approach guard, preserves its height and original jaw rules')
     p.add_argument('--near-capture',action='store_true',help='Opt-in clipped-ball localization and continuous follow recovery')
     p.add_argument('--capture-depth-mm',type=int,choices=[0,5],default=0,help='Separate aligned-only depth ablation; requires near capture')
-    a=p.parse_args();cfg,lab,repo=prepare(a.run_dir.resolve(),a.frames,a.prefix,a.camera_protocol,a.diagnostic_vertical,a.approach_guard,a.approach_follow,a.near_capture,a.capture_depth_mm)
+    p.add_argument('--capture-window',action='store_true',help='Finite geometric capture dwell; explicit hybrid controller, requires 5 mm depth')
+    a=p.parse_args();cfg,lab,repo=prepare(a.run_dir.resolve(),a.frames,a.prefix,a.camera_protocol,a.diagnostic_vertical,a.approach_guard,a.approach_follow,a.near_capture,a.capture_depth_mm,a.capture_window)
     env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1',HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1')
     model_check=[str(ROOT/'.venv_dynamicvla/bin/python'),str(ROOT/'scripts/hgwind_policy_server.py'),'--preflight',str(a.run_dir.resolve())]
     if a.check_load:model_check.append('--check-load')
@@ -161,6 +166,7 @@ def main():
     if a.approach_guard:print('VISUAL_APPROACH_GUARD RGB_only=true static_radius_m='+str(cfg['approach_guard']['ball_radius_m'])+' missing=pose_hold jaw_threshold=0.5 certified_collision_avoidance=false',flush=True)
     if a.approach_follow:print('VISUAL_FOLLOW near_region_m=0.08 causal_RGB_velocity=true base_height_rule=retained jaw_rule_unchanged=true pure_VLA=false',flush=True)
     if a.near_capture:print('NEAR_CAPTURE clipped_RGB=true recovery_hold=true extra_depth_mm='+str(a.capture_depth_mm)+' native_limits=unchanged jaw=unchanged',flush=True)
+    if a.capture_window:print('CAPTURE_WINDOW geometry_triggered=true maximum_frames=42 extra_depth_mm=5 jaw=unchanged grasp_confirmation=false',flush=True)
     print('CAMERA_PROTOCOL '+a.camera_protocol+' physics_and_model_unchanged=true',flush=True)
     print('SIMULATION_MODE synchronous_pause_during_inference; engineering_check_only; real_time=false',flush=True)
     print('COMMAND '+shlex.join(cmd),flush=True)

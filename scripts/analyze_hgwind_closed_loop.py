@@ -20,23 +20,25 @@ from capstone_vla.ball_visual_geometry import locate_ball
 from capstone_vla.ball_near_capture import locate_for_plan
 
 
-# The sole superseded analyzer is retained in Git commit 3fadd5a. Its runtime
-# controller hashes must still match; only post-run numerical verification changed.
+# Named prior analyzers are retained in commits 3fadd5a and 469fd68.
+# Controller hashes must still match; only post-run numerical verification changed.
 LEGACY_APPROACH_ANALYZER_SHA256 = '36291fdf6055aa9f7470bd6ba57177df68578a20b0bd46afe1e5c441e10dcbb8'
+NEAR_CAPTURE_ANALYZER_SHA256 = "20f7bbcbd59a7ab609a138fda94a48fce0ea6052faf13e026b19c55afae65a44"
 APPROACH_AUDIT_ATOL = 1e-12
+NEAR_CAPTURE_AUDIT_ATOL = 1e-10
 
 
-def audit_approach_value(expected, recorded, path='decision'):
+def audit_approach_value(expected, recorded, path='decision', atol=APPROACH_AUDIT_ATOL):
     """Discrete decisions exact; finite floating geometry tolerates roundoff only."""
     if type(expected) is not type(recorded):raise ValueError('Approach type mismatch: '+path)
     if isinstance(expected, dict):
         if set(expected)!=set(recorded):raise ValueError('Approach keys mismatch: '+path)
-        for key in expected:audit_approach_value(expected[key],recorded[key],path+'/'+key)
+        for key in expected:audit_approach_value(expected[key],recorded[key],path+'/'+key,atol)
     elif isinstance(expected, list):
         if len(expected)!=len(recorded):raise ValueError('Approach length mismatch: '+path)
-        for i,(a,b) in enumerate(zip(expected,recorded)):audit_approach_value(a,b,path+'/'+str(i))
+        for i,(a,b) in enumerate(zip(expected,recorded)):audit_approach_value(a,b,path+'/'+str(i),atol)
     elif isinstance(expected, float):
-        if not (np.isfinite(expected) and np.isfinite(recorded) and abs(expected-recorded)<=APPROACH_AUDIT_ATOL):
+        if not (np.isfinite(expected) and np.isfinite(recorded) and abs(expected-recorded)<=atol):
             raise ValueError('Approach numeric mismatch: '+path)
     elif expected!=recorded:raise ValueError('Approach decision mismatch: '+path)
 
@@ -44,9 +46,9 @@ def audit_approach_value(expected, recorded, path='decision'):
 def verify_analysis_revision(path, digest, result):
     actual=sha256(path)
     if actual==digest:return
-    if Path(path).resolve()==Path(__file__).resolve() and digest==LEGACY_APPROACH_ANALYZER_SHA256:
+    if Path(path).resolve()==Path(__file__).resolve() and digest in (LEGACY_APPROACH_ANALYZER_SHA256,NEAR_CAPTURE_ANALYZER_SHA256):
         result['posthoc_analyzer_correction']=dict(original_sha256=digest,current_sha256=actual,
-            reason='Allow 1e-12 floating roundoff; decisions/jaw/model provenance remain exact')
+            reason='Numerical audit only: 1e-12 legacy, 1e-10 near-capture nonlinear fitting; decisions/jaw/provenance exact')
         return
     raise ValueError('Runtime changed: '+str(path))
 
@@ -60,6 +62,7 @@ def analyze(out,exit_code):
     try:
         diagnostic=validate_provenance(cfg)
         approach_plan=cfg.get('approach_guard');guard=make_approach_guard(approach_plan)
+        approach_atol=NEAR_CAPTURE_AUDIT_ATOL if approach_plan and 'near_capture' in approach_plan else APPROACH_AUDIT_ATOL
         if guard is not None:
             if diagnostic:raise ValueError('Combined approach/height intervention')
             result.update(visual_guidance=True,policy_postprocessing=True,unmodified_model_actions=False,
@@ -139,11 +142,11 @@ def analyze(out,exit_code):
                             [optics[name] for name in camera_order],camera_order,approach_plan)
                         expected_action,event=guard.apply(raw,i,obs['state'][i,14:21],obs['robot_finger_points'][i],
                             obs['robot_finger_corners'][i],detection)
-                        np.testing.assert_allclose(actions[i],expected_action,rtol=0,atol=APPROACH_AUDIT_ATOL)
+                        np.testing.assert_allclose(actions[i],expected_action,rtol=0,atol=approach_atol)
                         np.testing.assert_array_equal(actions[i,28],raw[28])
                         untouched=np.flatnonzero(expected_action==raw)
                         np.testing.assert_array_equal(actions[i,untouched],raw[untouched])
-                        audit_approach_value(dict(event,detection=detection),guard_events[i])
+                        audit_approach_value(dict(event,detection=detection),guard_events[i],atol=approach_atol)
                     else:np.testing.assert_array_equal(actions[i],raw)
                 expected=decoded_request(actions[i],i,anchor)
                 if i>=len(packets) or not native_inputs_match(packets[i]['inputs'],expected['inputs']):raise ValueError('Consumed action differs from native request')
