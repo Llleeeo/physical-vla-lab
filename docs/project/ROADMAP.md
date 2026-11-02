@@ -1,5 +1,9 @@
 # Research roadmap
 
+## 2 November 2026 — Begin HT reproduction and dynamic latency study
+
+The [new plan](HT_DYNAMIC_STUDY.md) supersedes the single-case wind-grasp tuning steps below. Start with official HT reproduction, then validate one suitable dynamic task and compare Flow/MSE/HT. The [artifact audit](HT_READINESS_AUDIT.md) is complete; GPU access, HT environment and runnable reference assets remain to be verified. Do not treat the existing 40 wind episodes as a ready 29D training cohort. Retain all historical failures and assistance labels.
+
 ## 31 October 2026 — Test explicit depth with bounded capture dwell
 
 Next user-run check enables5mm depth and a finite geometry-triggered capture window, preserving jaw decoding and native limits. This is VLA plus explicit visual/control assistance, not pure-policy generalization. Inspect actual descending depth, contact, lift and joint dynamics. Expiry is not grasp confirmation; if safety still aborts, investigate low-level contact dynamics without further threshold relaxation. [Details](BALL_VISUAL_APPROACH.md).

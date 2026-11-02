@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-02 — Plan HT study and audit reusable resources
+
+- Adopt a scoped HT reproduction followed by DynamicVLA Flow/MSE/HT comparisons with physical-time inference delay.
+- Document existing environments, data availability and the unresolved multi-episode action-label contract.
+- Reconcile the completed historical five-repeat batch: 3 grasp failures, 1 runtime abort, 1 incomplete/invalid result, no recorded pass.
+- Preserve old findings as historical context. No controller, training or simulator code changes; no new algorithmic result.
+
 ## 2026-10-31 — Freeze hybrid capture configuration for five repeats
 
 - Verify complete269-frame capture-window trial:37 bilateral frames, longest0.433s, no safety abort, final grasp fails.

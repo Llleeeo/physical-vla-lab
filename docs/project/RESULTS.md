@@ -1,5 +1,11 @@
 # Results and limitations
 
+## 2 November 2026 — Reconcile frozen repeats and inventory
+
+The saved five-repeat batch is complete, with zero recorded grasp passes: three completed grasp failures, one runtime safety abort and one incomplete/invalid result. These are exposed-case model-noise repeats with explicit controller assistance, not held-out generalization trials. The incomplete result is not a completed grasp failure. Earlier “results pending” entries below are historical preparation notes.
+
+The new resource audit verifies the presence of 40 raw/rendered wind episodes and records the unresolved 9D-to-29D label gap. No new physical rollout or HT experiment was performed. [Counts, per-seed categories and source hashes](../../results/summaries/2026-11-02-ht-readiness-audit.json); [audit scope](HT_READINESS_AUDIT.md).
+
 ## 31 October 2026 — Capture window completes but loses grasp
 
 Run184624 completes269/269 intervals and807 physics callbacks with no safety abort. First contact160, first bilateral163,37 bilateral frames in total and longest continuous span163–188 (0.433s). Final bilateral hold, sustained lift and relative retention fail. The model requests closure continuously from148 through268. This is an exposed VLA plus RGB controller result; integration passes, grasp does not. No independent-policy or held-out success is claimed.

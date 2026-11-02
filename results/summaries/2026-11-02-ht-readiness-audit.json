@@ -1,0 +1,92 @@
+{
+  "schema": "physical-vla-lab.ht-readiness-audit.v1",
+  "date": "2026-11-02",
+  "source_commit": "00da754fbda53b20ee26a9058554e66bc1888c73",
+  "scope": "Read-only inspection of existing artifacts and package metadata; no new learning or physical evaluation.",
+  "wind_data": {
+    "episodes": 40,
+    "frames": 12154,
+    "raw_files_present": 40,
+    "render_files_present": 40,
+    "raw_action_dim": 9,
+    "development_action_dim": 29,
+    "multi_episode_training_ready": false,
+    "current_training_case": "local/traj_00018",
+    "audit_scope": "Read-only schema/timestamp/all-action finiteness and three RGB frames per camera; not full video decode or29D label certification"
+  },
+  "earlier_task_export": {
+    "train_episodes": 40,
+    "train_frames": 11128,
+    "validation_episodes": 8,
+    "validation_frames": 1848,
+    "source_assistance": "attached; not proof of unassisted execution"
+  },
+  "repeat_batch": {
+    "complete": true,
+    "counts": {
+      "grasp_pass": 0,
+      "grasp_fail": 3,
+      "runtime_abort": 1,
+      "incomplete_or_invalid": 1
+    },
+    "heldout": false,
+    "pure_vla": false,
+    "rows": [
+      {
+        "seed": 90000,
+        "outcome": "grasp_fail",
+        "completed_frames": 269
+      },
+      {
+        "seed": 190000,
+        "outcome": "runtime_abort",
+        "completed_frames": 216
+      },
+      {
+        "seed": 290000,
+        "outcome": "grasp_fail",
+        "completed_frames": 269
+      },
+      {
+        "seed": 390000,
+        "outcome": "incomplete_or_invalid",
+        "completed_frames": null
+      },
+      {
+        "seed": 490000,
+        "outcome": "grasp_fail",
+        "completed_frames": 269
+      }
+    ]
+  },
+  "versions": {
+    "dynamicvla_revision": "434dc7105cf6d559018d15af5fecbcdad44f036e",
+    "python_model": "3.12.7",
+    "torch": "2.7.1+cu126",
+    "transformers": "5.2.0",
+    "lerobot": "0.3.3",
+    "isaaclab": "2.2.1",
+    "isaacsim": "4.5.0-rc.36+release.19112.f59b3005.gl"
+  },
+  "ht_status": "Literature/source screening exists; no HT checkout in inspected project third_party; no RoboMimic or MuJoCo distributions in the two inspected environments; no local reproduction established.",
+  "timing_status": "Existing ball launcher explicitly pauses simulation during inference; delay-aware evaluation remains to be implemented.",
+  "gpu_probe": "nvidia-smi could not communicate with the driver in the audit session; host GPU availability and cause remain unverified.",
+  "source_hashes": {
+    "data/derived/hgwind_multiepisode_readiness_20261031/inventory.json": "bfe7a1374710f240386643e61440f842e825d8ad45bf913f5f54bd8b80542d97",
+    "data/derived/hgwind_40_camera_v2_20261028/visual_audit.json": "e390a6b4111d4e8f94ba3e70cf5df61977f6a92d28a2e8c739b36503d7f6395d",
+    "data/derived/task2_multiepisode_20261026/export_report.json": "68f712637cc03d9537e0ea4c8ee021693a46a8286e21afa773e843b3c2aac5bd",
+    "data/derived/simple_dynamic_task_screen_20261031/selection_summary.json": "954d46b37a21b94b6f281432831a8bcbcd42b1bd5efeae0e55a05693c733b940",
+    "src/capstone_vla/ball_action_contract.py": "26c0c97e3a31f27935bdb7542f47fb8d92de9ba6d9778eb6d0212f3ad389ee1b",
+    "src/capstone_vla/hgwind_development_data.py": "78b008548670cc232f15e6036c2eefbed104225e02d4d687c632ac254f5e367d",
+    "scripts/run_hgwind_closed_loop.py": "b34d1b09e19daf6736473813468365b884baa3c898bd591801f9f0053c987fde",
+    "data/derived/hgwind_traj18_development_20261031/training_runs/20261031_133555_985430/repeat_batches/20261031_190930_805834/summary.json": "bb192623bbfab9c07f73b685900f058f401236b4f154be26a1cd535f1d2762b6"
+  },
+  "validation": {
+    "cpu_contract_tests_passed": 503,
+    "clean_tracked_export": true,
+    "test_file_list": "current .github/workflows/cpu-checks.yml",
+    "pinned_cpu_package_versions": "all six requirements-cpu.txt entries matched installed distribution metadata",
+    "gpu_tested": false,
+    "note": "Existing CPU environment used without installation; pip check unavailable because that interpreter has no pip module."
+  }
+}

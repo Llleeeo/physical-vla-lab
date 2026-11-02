@@ -1,5 +1,22 @@
 # Physical VLA Lab
 
+Research on learned robot actions in dynamic physical scenes, using RoboPhys and DynamicVLA.
+
+## Current direction — 2 November 2026
+
+The next study asks whether HT-Policy's efficient action regression can improve dynamic manipulation once inference delay is included in the physical rollout. We will first reproduce a small official HT experiment, then compare Flow, MSE and HT under a common execution interface. A training-objective extension will be considered only if failure analysis supports it.
+
+Read the [research plan](docs/project/HT_DYNAMIC_STUDY.md) and [resource audit](docs/project/HT_READINESS_AUDIT.md). **HT reproduction has not started; no HT improvement or robust learned dynamic-grasp result is claimed.**
+
+The audit confirms 40 existing wind-ball replay/render pairs, but their raw 9D actions are not a complete multi-episode dataset for the later 29D controller contract. Existing live rollouts pause physics during inference, so a timing-aware evaluator is still needed. The final historical five-repeat batch has zero recorded grasp passes: three completed grasp failures, one safety abort and one incomplete/invalid result. [Evidence](results/summaries/2026-11-02-ht-readiness-audit.json).
+
+This is an independent research integration. RoboPhys supplies upstream simulation/data capabilities, DynamicVLA supplies the pretrained baseline, and HT-Policy supplies the proposed regression method. See [attribution](THIRD_PARTY.md).
+
+<details>
+<summary>Historical development status through 31 October 2026</summary>
+
+The entries below preserve earlier engineering findings. Their proposed next steps are superseded by the current research plan; the five-repeat result is now recorded above.
+
 Latest training: [precision-oriented refinement](docs/project/BALL_PRECISION_TRAINING.md) completed with modest prediction improvement; no candidate passed the predeclared gates, so the parent checkpoint is retained. Sampling variability and systematic prediction error remain unresolved; the [matched fixed-input diagnostic](docs/project/BALL_SAMPLING_DIAGNOSTIC.md#observed-result--31-october) finds30-step sampling slower and less accurate than10 on the selected inputs. Retain10 steps; prediction bias and noise sensitivity both remain. The [full-episode shared-noise comparison](docs/project/BALL_NOISE_REPLANNING.md#observed-result--31-october) also shows no reliable improvement across eight seeds; it is not adopted. The [matched prefix-weighting ablation](docs/project/BALL_PREFIX_ABLATION.md#observed-result--31-october) modestly improves position versus uniform continuation but remains worse than the parent near contact. Neither continuation is promoted. The [upper-target provenance audit](results/summaries/2026-10-31-ball-upper-target-audit.json) reconstructs all269 labels exactly: the startup height jump is already present in native expert requests, with evidence for ingress hold/release. Startup nominal translation mismatch remains; neither labels nor runtime controls are changed. The [completed translation-objective comparison](docs/project/BALL_SERVO_ABLATION.md#observed-result--31-october) reduces near-contact nominal command error by 5.13% versus parent, while near-contact position error worsens by 3.41% and jaw errors remain unchanged. The default is retained; one exploratory candidate rollout is proposed.
 
 Latest development: the height intervention still failed, with early contact preceding the intervention. The [fixed-command smoothing comparison](docs/project/BALL_SMOOTHING_DIAGNOSTIC.md) also fails: premature finger contact advances from frame120 to97. This filter is not adopted; no successful learned ball grasp is established.
@@ -42,6 +59,9 @@ The first [integrated ball action-contract check](docs/project/BALL_ACTION_CONTR
 The [bounded paired diagnostic](docs/project/CONTRACT_VIDEO_BATCH.md) now completes after the recording fix: `traj_00018` reproduces its native teacher exactly and passes the frozen 29D surrogate with 1.767 s bilateral contact and 57.277 mm retained lift. The other two native teachers abort on motion feasibility before surrogate testing; their early divergence from source remains unresolved. All four new saved runs have five verified review videos each. This is one additional development-case success, not learned-policy performance, broad contract validation or training readiness. See [verified results](results/summaries/2026-10-29-bounded-contract-batch-result.json).
 
 The startup-force diagnostic now records a complete measurement under GDB: 169 recorded frames, the same motion-safety abort as the prior fresh-worker teacher, and five verified review videos. All 15 compared action/observation/native arrays match that failure exactly. Ten fan force calls were observed, including four before control-frame recording at the same simulation clock; none had a zero configured physics dt. Original force-call history remains unavailable, so these calls do not establish causality. The later guarded [worker-history comparison](docs/project/WORKER_HISTORY_DIAGNOSTIC.md) reproduces all three original episodes exactly in15 full action/observation arrays per episode, including successful attempt60. It also changes startup scheduling, so a matched-startup fresh60 comparison is prepared before attributing causality. No native crash recurs in that launch, which does not establish a general startup fix. Rendering remains optional (`--render`); raw trajectories and analysis are retained by default. 263 CPU checks and actual scene/native-entry preflight pass; the matched fresh control is pending. See the [measurement](results/summaries/2026-10-29-startup-force-measurement.json).
+
+
+</details>
 
 ## Workflow
 
@@ -88,7 +108,7 @@ Simulation entry points currently retain experiment-specific paths and require s
 
 ## Research direction
 
-The planned contribution is an evidence-backed account of physical generalization: separate observation, action execution and contact failures; control changes in physical conditions; and evaluate recovery under explicit disturbances after establishing a reliable baseline. These are research goals, not established novelty claims. [Roadmap](docs/project/ROADMAP.md).
+The current focus is the interaction between action-prediction quality and inference delay. The [HT study plan](docs/project/HT_DYNAMIC_STUDY.md) defines the comparison and its limits. Historical physics/generalization and hardware goals remain background motivation; they are not current completed outcomes. See the [roadmap](docs/project/ROADMAP.md).
 
 ## Attribution and updates
 

@@ -17,3 +17,7 @@ The license at that checkout is **S-Lab License 1.0**, including non-commercial 
 Isaac Sim/Isaac Lab, LeRobot, PyTorch, Hugging Face libraries, NumPy, SciPy, h5py and related tools retain their respective licenses. Environment/setup files reference dependencies; they do not grant rights to redistribute their software, weights or datasets.
 
 No blanket open-source license is applied by this initial research-source publication. Public visibility alone does not grant additional reuse rights. A project license can be selected by the owner after reviewing authorship and dependency boundaries.
+
+## Planned HT-Policy reproduction
+
+Reference implementation: https://github.com/the-labone/regression-policy. HT-Policy is an upstream method, not a method introduced by this project. The runtime source revision, license and dataset/checkpoint terms must be recorded before installation or redistribution. This documentation update includes no HT source code, dataset or model weights.
